@@ -1,5 +1,5 @@
 {
-  "name": "sdevore/Scid",
+  "name": "sdevore/cakephp-scid-plugin",
   "description": "Scid plugin for CakePHP",
   "type": "cakephp-plugin",
   "require": {
