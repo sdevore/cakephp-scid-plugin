@@ -1,0 +1,25 @@
+{
+  "name": "sdevore/Scid",
+  "description": "Scid plugin for CakePHP",
+  "type": "cakephp-plugin",
+  "require": {
+    "php": ">=7.0.0",
+    "cakephp/cakephp": ">=3.3.2 <4.0.0",
+    "picqer/php-barcode-generator": "^0.2.2",
+    "friendsofcake/bootstrap-ui": "^1.2",
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Scid\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Scid\\Test\\": "tests",
+      "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
+    }
+  }
+}
