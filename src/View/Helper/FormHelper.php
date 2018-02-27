@@ -83,6 +83,28 @@
             return $this->_domId($value);
         }
 
+        /**
+         * Creates a `<button>` tag.
+         *
+         * The type attribute defaults to `type="submit"`
+         * You can change it to a different value by using `$options['type']`.
+         *
+         * ### Options:
+         *
+         * - `escape` - HTML entity encode the $title of the button. Defaults to false.
+         * - `confirm` - Confirm message to show. Form execution will only continue if confirmed then.
+         *
+         * @param string $title The button's caption. Not automatically HTML encoded
+         * @param array $options Array of options and HTML attributes.
+         * @return string A HTML button tag.
+         * @link https://book.cakephp.org/3.0/en/views/helpers/form.html#creating-button-elements
+         */
+        public function button($title, array $options = [])
+        {
+            $title = $this->Html->titleFromOptions($title, $options);
+
+            return parent::button($title, $options);
+        }
         public function postButton($title, $url, array $options = []) {
             if (!empty($options['icon'])) {
 
@@ -185,7 +207,7 @@
          */
         private function __bootstrapMarkdown($options) {
             $id = $options['id'];
-            $this->Html->script(array(
+            $this->Html->useScript(array(
                                     'Scid.bootstrap-markdown', 'Scid.markdown',
                                     'Scid.to-markdown',
                                 ), array('block' => TRUE,));
@@ -252,8 +274,8 @@ SCRIPT;
          */
         private function __bootstrapSwitch($fieldName, $options) {
             $idForInput = $this->domId($fieldName);
-            $this->Html->script(array('Scid.bootstrap-switch.min',), array('block' => TRUE,));
-            $this->Html->css('Scid.bootstrap-switch.min', 'stylesheet', array('block' => TRUE,));
+            $this->Html->useScript(array('Scid.bootstrap-switch.min',), array('block' => TRUE,));
+            $this->Html->useCssFile('Scid.bootstrap-switch.min');
             if (!empty($options['value']) && $options['value']) {
                 $options['checked'] = 'checked';
             }
@@ -456,8 +478,8 @@ CHECK_ALL_SCRIPT;
          */
         private function __bootstrapDateRangePicker($options) {
             $id = $options['id'];
-            $this->Html->script(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => TRUE,));
-            $this->Html->addLess('less/daterangepicker.less');
+            $this->Html->useScript(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => TRUE,));
+            $this->Html->useCssFile('Scid.daterangepicker');
             $options['prepend'] = $this->Html->icon('calendar');
             $options['type'] = 'text';
             $defaultRangeOptions = array('autoApply' => TRUE);
@@ -476,8 +498,8 @@ CHECK_ALL_SCRIPT;
          */
         private function __bootstrapDateTimePicker($options) {
             $id = $options['id'];
-            $this->Html->script(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => TRUE,));
-            $this->Html->addLess('less/daterangepicker.less');
+            $this->Html->useScript(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => TRUE,));
+            $this->Html->useCssFile('Scid.daterangepicker');
             $options['prepend'] = $this->Html->icon('calendar');
             $options['type'] = 'text';
             $defaultRangeOptions = array(
@@ -500,8 +522,8 @@ CHECK_ALL_SCRIPT;
          */
         private function __bootstrapTimePicker($options) {
             $id = $options['id'];
-            $this->Html->script(array('Scid.bootstrap-timepicker.min',), array('block' => TRUE,));
-            $this->Html->addLess('less/bootstrap-timepicker.less');
+            $this->Html->useScript(array('Scid.bootstrap-timepicker.min',), array('block' => TRUE,));
+            $this->Html->useCssFile('Scid.bootstrap-timepicker');
             $options['prepend'] = $this->Html->icon('clock-o');
             if (!empty($this->_inputDefaults['between'])) {
                 $options['between'] = $this->_inputDefaults['between'];
@@ -527,7 +549,7 @@ CHECK_ALL_SCRIPT;
         private function __durationPicker($options) {
             $id = $options['id'];
             $options['type'] = 'text';
-            $this->Html->script(array('Scid.bootstrap-duration-picker',), array('block' => TRUE,));
+            $this->Html->useScript(array('Scid.bootstrap-duration-picker',), array('block' => TRUE,));
             $showSeconds = 'false';
             if (!empty($options['duration']['showSeconds'])) {
                 if ($options['duration']['showSeconds']) {
@@ -564,8 +586,8 @@ CHECK_ALL_SCRIPT;
 
         private function __bootstrapDatePicker($options) {
             $id = $options['id'];
-            $this->Html->script(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => TRUE,));
-            $this->Html->addLess('less/daterangepicker.less');
+            $this->Html->useScript(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => TRUE,));
+            $this->Html->useCssFile('Scid.daterangepicker');
             $options['prepend'] = $this->Html->icon('calendar');
             $options['type'] = 'text';
             $defaultRangeOptions = array(
@@ -587,7 +609,7 @@ CHECK_ALL_SCRIPT;
          * @return mixed
          */
         private function __bootstrapDateTimePickerOld($options, $idForInput) {
-            $this->Html->script(array(
+            $this->Html->useScript(array(
                                     'Scid.moment.min',
                                     'Scid.bootstrap-datetimepicker.min',
                                 ), array('block' => TRUE,));
@@ -612,7 +634,7 @@ CHECK_ALL_SCRIPT;
          * @return mixed
          */
         private function __bootstrapMonthPicker($options, $idForInput) {
-            $this->Html->script(array(
+            $this->Html->useScript(array(
                                     'Scid.moment.min',
                                     'Scid.bootstrap-datetimepicker.min',
                                 ), array('block' => TRUE,));
@@ -638,7 +660,7 @@ CHECK_ALL_SCRIPT;
          * @return mixed
          */
         private function __bootstrapTimePickerOld($options, $idForInput) {
-            $this->Html->script(array(
+            $this->Html->useScript(array(
                                     'Scid.moment.min',
                                     'Scid.bootstrap-datetimepicker.min',
                                 ), array('block' => TRUE,));

@@ -3,6 +3,7 @@
     namespace Scid\View\Helper;
 
     use Cake\ORM\Entity;
+    use Cake\Core\Configure;
     use BootstrapUI\View\Helper\HtmlHelper as Helper;
 
     use Picqer\Barcode\BarcodeGeneratorHTML;
@@ -73,6 +74,8 @@
             'types'       => 'book',
 
         ];
+        const SCID_CSS_PATHS = 'Scid.css.paths';
+        const SCID_SCRIPT_URLS = 'Scid.script.urls';
 
         /**
          * A list of allowed styles for buttons.
@@ -317,6 +320,8 @@
          * @return string HTML icon markup.
          */
         public function icon($name, array $options = []) {
+            // TODO: one could be more judicious in only loading the styles requested
+            $this->useScript('Scid.fontawesome-all');
             $options += [
                 'tag'     => 'i',
                 'iconSet' => 'fa',
@@ -521,6 +526,135 @@ ENABLEPOPOVER;
             else {
                 return $phone;
             }
+        }
+
+        /**
+         * adds path for for CSS stylesheets to include in the layout based on needs of the plugin and other uses.
+         *
+         * ### Usage
+         *
+         * Include one CSS file:
+         *
+         * ```
+         * echo $this->Html->css('styles.css');
+         * ```
+         *
+         * Include multiple CSS files:
+         *
+         * ```
+         * echo $this->Html->css(['one.css', 'two.css']);
+         * ```
+         *
+         * Add the stylesheet to view block "css":
+         *
+         * ```
+         * $this->Html->css('styles.css', ['block' => true]);
+         * ```
+         *
+         * Add the stylesheet to a custom block:
+         *
+         * ```
+         * $this->Html->css('styles.css', ['block' => 'layoutCss']);
+         * ```
+         *
+         * ### Options
+         *
+         * - `block` Set to true to append output to view block "css" or provide
+         *   custom block name.
+         * - `once` Whether or not the css file should be checked for uniqueness. If true css
+         *   files  will only be included once, use false to allow the same
+         *   css to be included more than once per request.
+         * - `plugin` False value will prevent parsing path as a plugin
+         * - `rel` Defaults to 'stylesheet'. If equal to 'import' the stylesheet will be imported.
+         * - `fullBase` If true the URL will get a full address for the css file.
+         *
+         * @param string|array $paths The name of a CSS style sheet or an array containing names of
+         *   CSS stylesheets. If `$paths` is prefixed with '/', the path will be relative to the webroot
+         *   of your application. Otherwise, the path will be relative to your CSS path, usually webroot/css.
+         * @param array $options Array of options and HTML arguments.
+         * @return string|null CSS `<link />` or `<style />` tag, depending on the type of link.
+         * @link https://book.cakephp.org/3.0/en/views/helpers/html.html#linking-to-css-files
+         */
+        public function useCssFile($paths, array $options=[]) {
+            $existingPaths = Configure::read(self::SCID_CSS_PATHS);
+            if (empty($existingPaths)) {
+                $existingPaths = [];
+            }
+            if (is_string($paths)) {
+                $paths = [$paths];
+            }
+            $options['block'] = TRUE;
+            foreach ($paths as $path) {
+                if (empty($existingPaths[$path])) {
+                    $existingPaths[$path] = $options;
+                    $this->css($path, $options);
+                }
+
+            }
+            Configure::write(self::SCID_CSS_PATHS, $existingPaths);
+
+        }
+
+
+        /**
+         * adds one or many scripts to be returned as links with scriptFiles() depending on the number of scripts given.
+         *
+         * If the filename is prefixed with "/", the path will be relative to the base path of your
+         * application. Otherwise, the path will be relative to your JavaScript path, usually webroot/js.
+         *
+         * ### Usage
+         *
+         * Include one script file:
+         *
+         * ```
+         * echo $this->Html->script('styles.js');
+         * ```
+         *
+         * Include multiple script files:
+         *
+         * ```
+         * echo $this->Html->script(['one.js', 'two.js']);
+         * ```
+         *
+         * Add the script file to a custom block:
+         *
+         * ```
+         * $this->Html->script('styles.js', ['block' => 'bodyScript']);
+         * ```
+         *
+         * ### Options
+         *
+         * - `block` Set to true to append output to view block "script" or provide
+         *   custom block name.
+         * - `once` Whether or not the script should be checked for uniqueness. If true scripts will only be
+         *   included once, use false to allow the same script to be included more than once per request.
+         * - `plugin` False value will prevent parsing path as a plugin
+         * - `fullBase` If true the url will get a full address for the script file.
+         *
+         * @param string|array $url String or array of javascript files to include
+         * @param array $options Array of options, and html attributes see above.
+         * @return string|null String of `<script />` tags or null if block is specified in options
+         *   or if $once is true and the file has been included before.
+         * @link https://book.cakephp.org/3.0/en/views/helpers/html.html#linking-to-javascript-files
+         */
+
+        public function useScript($urls, array $options = []) {
+            $existingUrls = Configure::read(self::SCID_SCRIPT_URLS);if (empty($existingUrls)) {
+                $existingUrls = [];
+            }
+            if (is_string($urls)) {
+                $urls = [$urls];
+            }
+            $options['block'] = TRUE;
+            foreach ($urls as $url) {
+                if (empty($existingUrls[$url])) {
+
+                $existingUrls[$url] = $options;
+                $this->script($url, $options);
+                }
+            }
+            Configure::write(self::SCID_SCRIPT_URLS, $existingUrls);
+
         }
     }
 
