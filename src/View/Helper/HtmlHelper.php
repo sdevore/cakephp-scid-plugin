@@ -19,6 +19,7 @@
     class HtmlHelper extends Helper
     {
 
+        protected $_mapConfig;
         protected $_didEnablePopovers = FALSE;
         protected $_icons = [
             'add'                => 'plus',
@@ -328,39 +329,45 @@
                     'crossorigin' => "",
                 ]);
             $center = [
-                'lat'=>0,
-                'lng'=>0];
+                'lat' => 0,
+                'lng' => 0,
+            ];
             if (!empty($options['center'])) {
                 $center = $options['center'];
             }
             $mapID = uniqid('map');
-$access_token = 'pk.eyJ1Ijoic2Rldm9yZSIsImEiOiJjamVmNmtqZTQxZm15MzNwYjRwNHR2eGE5In0.PscrlK0nx6mD9uE3IxtEcA';
+            if (empty($this->_mapConfig)) {
+                $this->_mapConfig = Configure::read('Scid.map');
+            }
+            $access_token = $this->_mapConfig['accessToken'];
+            $tileType = $this->_mapConfig['tileType'];
             $script = <<<MAP
 var $mapID = L.map('$mapID').setView([{$center['lat']}, {$center['lng']}], 3);
             L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"http://mapbox.com\">Mapbox</a>',
     maxZoom: 18,
-    id: 'mapbox.streets',
+    id: '$tileType',
     accessToken: '${access_token}'
 }).addTo($mapID);
 
 
 MAP;
             $script2 = '';
-            foreach ($options['data'] as $data) {
-                $title = $data['title'];
-                $lat = $data['lat'];
-                $lng = $data['lng'];
-                $script2 = $script2 . "\n" . "L.marker([$lat, $lng]).addTo($mapID).bindPopup('$title');";
+            if (!empty($options['data'])) {
+                foreach ($options['data'] as $data) {
+                    $title = $data['title'];
+                    $lat = $data['lat'];
+                    $lng = $data['lng'];
+                    $script2 =
+                        $script2 . "\n" . "L.marker([$lat, $lng]).addTo($mapID).bindPopup('$title');";
+                }
             }
             $this->scriptBlock($script . $script2, ['block' => self::SCRIPT_BOTTOM]);
 
-            return $this->div('map','', ['id'=>$mapID]);
+            return $this->div('map', '', ['id' => $mapID]);
+        }
 
-    }
-
-        function GetCenterFromDegrees($data)
-        {
+        function GetCenterFromDegrees($data) {
             if (!is_array($data)) return FALSE;
 
             $num_coords = count($data);
@@ -369,8 +376,7 @@ MAP;
             $Y = 0.0;
             $Z = 0.0;
 
-            foreach ($data as $coord)
-            {
+            foreach ($data as $coord) {
                 $lat = $coord[0] * pi() / 180;
                 $lon = $coord[1] * pi() / 180;
 
@@ -391,8 +397,9 @@ MAP;
             $hyp = sqrt($X * $X + $Y * $Y);
             $lat = atan2($Z, $hyp);
 
-            return array($lat * 180 / pi(), $lon * 180 / pi());
+            return [$lat * 180 / pi(), $lon * 180 / pi()];
         }
+
         /**
          * Returns Bootstrap icon markup. By default, uses `<I>` and `fa`.
          *
@@ -671,7 +678,7 @@ ENABLEMASONRY;
             ${varName}.imagesLoaded().progress( function() {
                  ${varName}.isotope('layout');
             });
-          
+
 ENABLEISOTOPE;
             $this->scriptBlock($enableIsotope, ['block' => self::SCRIPT_BOTTOM]);
             if (!empty($sizeClass) && !empty($widthClass)) {
