@@ -313,16 +313,98 @@
             return parent::image($path, $options);
         }
 
+        public function map($options) {
+
+            $this->useCssFile(
+                "https://unpkg.com/leaflet@1.3.1/dist/leaflet.css",
+                [
+                    'integrity'   => "sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==",
+                    'crossorigin' => "",
+                ]);
+            $this->useScript(
+                "https://unpkg.com/leaflet@1.3.1/dist/leaflet.js",
+                [
+                    'integrity'   => "sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==",
+                    'crossorigin' => "",
+                ]);
+            $center = [
+                'lat'=>0,
+                'lng'=>0];
+            if (!empty($options['center'])) {
+                $center = $options['center'];
+            }
+            $mapID = uniqid('map');
+$access_token = 'pk.eyJ1Ijoic2Rldm9yZSIsImEiOiJjamVmNmtqZTQxZm15MzNwYjRwNHR2eGE5In0.PscrlK0nx6mD9uE3IxtEcA';
+            $script = <<<MAP
+var $mapID = L.map('$mapID').setView([{$center['lat']}, {$center['lng']}], 3);
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"http://mapbox.com\">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox.streets',
+    accessToken: '${access_token}'
+}).addTo($mapID);
+
+
+MAP;
+            $script2 = '';
+            foreach ($options['data'] as $data) {
+                $title = $data['title'];
+                $lat = $data['lat'];
+                $lng = $data['lng'];
+                $script2 = $script2 . "\n" . "L.marker([$lat, $lng]).addTo($mapID).bindPopup('$title');";
+            }
+            $this->scriptBlock($script . $script2, ['block' => self::SCRIPT_BOTTOM]);
+
+            return $this->div('map','', ['id'=>$mapID]);
+
+    }
+
+        function GetCenterFromDegrees($data)
+        {
+            if (!is_array($data)) return FALSE;
+
+            $num_coords = count($data);
+
+            $X = 0.0;
+            $Y = 0.0;
+            $Z = 0.0;
+
+            foreach ($data as $coord)
+            {
+                $lat = $coord[0] * pi() / 180;
+                $lon = $coord[1] * pi() / 180;
+
+                $a = cos($lat) * cos($lon);
+                $b = cos($lat) * sin($lon);
+                $c = sin($lat);
+
+                $X += $a;
+                $Y += $b;
+                $Z += $c;
+            }
+
+            $X /= $num_coords;
+            $Y /= $num_coords;
+            $Z /= $num_coords;
+
+            $lon = atan2($Y, $X);
+            $hyp = sqrt($X * $X + $Y * $Y);
+            $lat = atan2($Z, $hyp);
+
+            return array($lat * 180 / pi(), $lon * 180 / pi());
+        }
         /**
          * Returns Bootstrap icon markup. By default, uses `<I>` and `fa`.
          *
          * @param string $name    Name of icon (i.e. search, leaf, etc.).
          * @param array  $options Additional HTML attributes.
+         *
          * @return string HTML icon markup.
          */
-        public function icon($name, array $options = []) {
+        public
+        function icon($name, array $options = []) {
             // TODO: one could be more judicious in only loading the styles requested
-            $this->useScript('Scid.fontawesome-all');
+            $this->useScript('Scid.fontawesome-all', ['block' => self::SCRIPT_BOTTOM]);
             $options += [
                 'tag'     => 'i',
                 'iconSet' => 'fa',
@@ -400,7 +482,8 @@
          *
          * @return string
          */
-        public function link($title, $url = NULL, array $options = []) {
+        public
+        function link($title, $url = NULL, array $options = []) {
             $title = $this->titleFromOptions($title, $options);
 
             return parent::link($title, $url, $options);
@@ -409,9 +492,11 @@
         /**
          * @param   string $title
          * @param array    $options
+         *
          * @return string
          */
-        public function titleFromOptions($title, array &$options) {
+        public
+        function titleFromOptions($title, array &$options) {
             if (!empty($options['icon'])) {
                 if (is_string($options['icon'])) {
                     $icon = ['icon' => $options['icon']];
@@ -442,9 +527,11 @@
          *                       target: null,
          *                       remove: false
          *                       }
+         *
          * @return void
          */
-        public function matchHeight($class, $options = []) {
+        public
+        function matchHeight($class, $options = []) {
             $this->useScript('Scid.jquery.matchHeight-min', ['block' => self::SCRIPT_BOTTOM]);
             $optionsJson = '';
             if (!empty($options)) {
@@ -455,7 +542,8 @@
             });", ['block' => self::SCRIPT_BOTTOM,]);
         }
 
-        public function tooltip() {
+        public
+        function tooltip() {
 
             $enableToolTip = <<<ENABLETOOLTIP
  $(function () {
@@ -475,7 +563,8 @@ ENABLETOOLTIP;
          *
          * @return string
          */
-        public function popover($linkTitle, $title, $content = NULL, $options = [], $popoverOptions = []) {
+        public
+        function popover($linkTitle, $title, $content = NULL, $options = [], $popoverOptions = []) {
             $options['data-toggle'] = "popover";
             if (empty($options['tag'])) {
                 $options['tag'] = 'span';
@@ -497,7 +586,8 @@ ENABLETOOLTIP;
             return $this->tag($tag, $linkTitle, $options);
         }
 
-        protected function enablePopovers() {
+        protected
+        function enablePopovers() {
             if (!$this->_didEnablePopovers) {
                 $enablePopover = <<<ENABLEPOPOVER
 $(function () {
@@ -509,8 +599,11 @@ ENABLEPOPOVER;
             }
         }
 
-        public function enableMasonry($selector = '.grid', $options = []) {
-            $this->useScript(['Scid.masonry.pkgd.min', 'Scid.imagesloaded.pkgd.min'], ['block' => self::SCRIPT_BOTTOM]);
+        public
+        function enableMasonry($selector = '.grid', $options = []) {
+            $this->useScript([
+                                 'Scid.masonry.pkgd.min', 'Scid.imagesloaded.pkgd.min',
+                             ], ['block' => self::SCRIPT_BOTTOM]);
             $_options = [
                 'itemSelector'    => '.grid-item',
                 'columnWidth'     => '.grid-sizer',
@@ -538,14 +631,18 @@ ENABLEMASONRY;
             $this->scriptBlock($enableMasonry, ['block' => self::SCRIPT_BOTTOM]);
         }
 
-        private function buildJSArray($array = []) {
+        private
+        function buildJSArray($array = []) {
             $json = json_encode($array, JSON_PRETTY_PRINT, 2);
 
             return $json;
         }
 
-        public function enableIsotope($selector = '.grid', $options = []) {
-            $this->useScript(['Scid.isotope.pkgd.min', 'Scid.imagesloaded.pkgd.min'], ['block' => self::SCRIPT_BOTTOM]);
+        public
+        function enableIsotope($selector = '.grid', $options = []) {
+            $this->useScript([
+                                 'Scid.isotope.pkgd.min', 'Scid.imagesloaded.pkgd.min',
+                             ], ['block' => self::SCRIPT_BOTTOM]);
             $_options = [
                 'itemSelector'    => '.grid-item',
                 'percentPosition' => TRUE,
@@ -558,13 +655,12 @@ ENABLEMASONRY;
             }
             if (!empty($options['masonry']['columnWidth'])) {
                 $widthClass = $options['masonry']['columnWidth'];
-                if (strpos($widthClass, '.') !== false  && strpos($widthClass, '.') == 0 ) {
-                    $widthClass = ltrim($widthClass,'.');
+                if (strpos($widthClass, '.') !== FALSE && strpos($widthClass, '.') == 0) {
+                    $widthClass = ltrim($widthClass, '.');
                 }
                 else {
                     $options['masonry']['columnWidth'] = '.' . $widthClass;
                 }
-
             }
             $optionString = json_encode($options, JSON_PRETTY_PRINT, 4);
 
@@ -592,7 +688,8 @@ ENABLEISOTOPE;
          *
          * @return mixed
          */
-        public function phone($phone) {
+        public
+        function phone($phone) {
             $phone = preg_replace("/[^0-9]/", "", $phone);
 
             if (strlen($phone) == 7) {
@@ -651,10 +748,12 @@ ENABLEISOTOPE;
          *                              the webroot of your application. Otherwise, the path will be relative to your
          *                              CSS path, usually webroot/css.
          * @param array        $options Array of options and HTML arguments.
+         *
          * @return string|null CSS `<link />` or `<style />` tag, depending on the type of link.
          * @link https://book.cakephp.org/3.0/en/views/helpers/html.html#linking-to-css-files
          */
-        public function useCssFile($paths, array $options = []) {
+        public
+        function useCssFile($paths, array $options = []) {
             $existingPaths = Configure::read(self::SCID_CSS_PATHS);
             if (empty($existingPaths)) {
                 $existingPaths = [];
@@ -709,12 +808,15 @@ ENABLEISOTOPE;
          *
          * @param string|array $url     String or array of javascript files to include
          * @param array        $options Array of options, and html attributes see above.
+         *
          * @return string|null String of `<script />` tags or null if block is specified in options
          *                              or if $once is true and the file has been included before.
          * @link https://book.cakephp.org/3.0/en/views/helpers/html.html#linking-to-javascript-files
          */
 
-        public function useScript($urls, array $options = []) {
+        public
+        function useScript($urls, array $options = []) {
+
             $existingUrls = Configure::read(self::SCID_SCRIPT_URLS);
             if (empty($existingUrls)) {
                 $existingUrls = [];
