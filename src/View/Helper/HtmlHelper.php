@@ -6,6 +6,7 @@
     use Cake\Core\Configure;
     use BootstrapUI\View\Helper\HtmlHelper as Helper;
 
+    use Cake\View\View;
     use Picqer\Barcode\BarcodeGeneratorHTML;
     use Picqer\Barcode\BarcodeGeneratorSVG;
     use Picqer\Barcode\BarcodeGeneratorPNG;
@@ -22,57 +23,21 @@
         protected $_mapConfig;
         protected $_didEnablePopovers = FALSE;
         protected $_icons = [
-            'add'                => 'plus',
-            'add-photographer'   => 'user-plus',
-            'add-assignment'     => [
-                'icon'   => 'calendar-plus',
-                'weight' => 'regular',
-            ],
-            'accept-assignment'  => [
-                'icon'   => 'calendar-plus',
-                'weight' => 'light',
-            ],
-            'delete'             => 'times',
-            'delete-contractor'  => 'user-times',
-            'delete-assignment'  => [
-                'icon'   => 'calendar-times',
-                'weight' => 'regular',
-            ],
-            'decline-assignment' => [
-                'icon'   => 'calendar-minus',
-                'weight' => 'light',
-            ],
-            'calendar'           => 'calendar',
-            'assignment'         => 'server',
-            'assignments'        => 'th-list',
-            'view'               => 'eye',
-            'invite'             => 'envelope',
-            'invites'            => [
-                'icon'   => 'envelope',
-                'weight' => 'regular',
-            ],
-            'invitations'        => 'list-alt',
-            'opened'             => [
-                'icon'   => 'envelope-open',
-                'weight' => 'regular',
-            ],
-            'help'               => 'question-circle',
-            'news'               => [
+            'add'         => 'plus',
+            'add-user'    => 'user-plus',
+            'delete'      => 'times',
+            'delete-user' => 'user-times',
+            'calendar'    => 'calendar',
+            'view'        => 'eye',
+            'help'        => 'question-circle',
+            'news'        => [
                 'icon'   => 'newspaper',
                 'weight' => 'regular',
             ],
-            'email'              => 'envelope-square',
-            'cell'               => 'mobile',
-            'remind'             => 'retweet',
-            'contractor'         => 'user',
-            'contractors'        => 'users',
-            'companies'          => 'building',
-            'users'              => 'users',
-            'roles'              => 'wrench',
-            'skills'             => 'industry',
-            'states'             => 'cogs',
-            'regions'            => 'globe',
-            'types'              => 'book',
+            'email'       => 'envelope-square',
+            'cell'        => 'mobile',
+            'remind'      => 'retweet',
+            'users'       => 'users',
 
         ];
         const SCID_CSS_PATHS = 'Scid.css.paths';
@@ -143,6 +108,19 @@
             'lg'    => 'btn-lg',
             'block' => 'btn-block',
         ];
+
+        /**
+         * HtmlHelper constructor.
+         *
+         * @param \Cake\View\View $View
+         * @param array           $config
+         */
+        public function __construct(\Cake\View\View $View, array $config = []) {
+            $icons = (array)Configure::read('Scid.HtmlHelper.icons') + $this->_icons;
+            $this->_icons = $icons;
+
+            parent::__construct($View, $config);
+        }
 
         /**
          * add files to a list of less files to be expanded later
