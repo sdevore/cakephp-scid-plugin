@@ -22,7 +22,9 @@
         protected $_didEnablePopovers = FALSE;
         protected $_icons = [
             'add'                => 'plus',
+            'add-user'   => 'user-plus',
             'add-photographer'   => 'user-plus',
+            'add-contractor'   => 'user-plus',
             'add-assignment'     => [
                 'icon'   => 'calendar-plus',
                 'weight' => 'regular',
@@ -33,6 +35,7 @@
             ],
             'delete'             => 'times',
             'delete-contractor'  => 'user-times',
+            'delete-user'  => 'user-times',
             'delete-assignment'  => [
                 'icon'   => 'calendar-times',
                 'weight' => 'regular',
