@@ -185,6 +185,9 @@
                             $options = $this->__selectExtraOptions( $options);
                         }
                         break;
+                    case 'select2':
+                        $options = $this->__select2( $options);
+                        break;
                     case 'sortable-serialize':
                         $options = $this->__sortableSerialize( $options);
                         break;
@@ -822,6 +825,12 @@ CHECK_ALL_SCRIPT;
              */
             $this->Html->useCssFile(['Scid.select2.min','Scid.select2-bootstrap.min']);
             $this->Html->useScript('Scid.select2.min', ['block'=>HtmlHelper::SCRIPT_BOTTOM]);
+            $options['type'] = 'select';
+            $script = "$(document).ready(function() {
+    $('#{$id}').select2();
+});";
+            $this->Html->scriptBlock($script, array('block' => HtmlHelper::SCRIPT_BOTTOM));
+            return $options;
         }
         /**
          * @param null|array $options
