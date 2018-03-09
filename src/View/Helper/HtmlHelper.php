@@ -6,6 +6,7 @@
     use Cake\Core\Configure;
     use BootstrapUI\View\Helper\HtmlHelper as Helper;
 
+    use Cake\View\View;
     use Picqer\Barcode\BarcodeGeneratorHTML;
     use Picqer\Barcode\BarcodeGeneratorSVG;
     use Picqer\Barcode\BarcodeGeneratorPNG;
@@ -21,60 +22,21 @@
 
         protected $_didEnablePopovers = FALSE;
         protected $_icons = [
-            'add'                => 'plus',
-            'add-user'   => 'user-plus',
-            'add-photographer'   => 'user-plus',
-            'add-contractor'   => 'user-plus',
-            'add-assignment'     => [
-                'icon'   => 'calendar-plus',
-                'weight' => 'regular',
-            ],
-            'accept-assignment'  => [
-                'icon'   => 'calendar-plus',
-                'weight' => 'light',
-            ],
-            'delete'             => 'times',
-            'delete-contractor'  => 'user-times',
-            'delete-user'  => 'user-times',
-            'delete-assignment'  => [
-                'icon'   => 'calendar-times',
-                'weight' => 'regular',
-            ],
-            'decline-assignment' => [
-                'icon'   => 'calendar-minus',
-                'weight' => 'light',
-            ],
-            'calendar'           => 'calendar',
-            'assignment'         => 'server',
-            'assignments'        => 'th-list',
-            'view'               => 'eye',
-            'invite'             => 'envelope',
-            'invites'            => [
-                'icon'   => 'envelope',
-                'weight' => 'regular',
-            ],
-            'invitations'        => 'list-alt',
-            'opened'             => [
-                'icon'   => 'envelope-open',
-                'weight' => 'regular',
-            ],
-            'help'               => 'question-circle',
-            'news'               => [
+            'add'         => 'plus',
+            'add-user'    => 'user-plus',
+            'delete'      => 'times',
+            'delete-user' => 'user-times',
+            'calendar'    => 'calendar',
+            'view'        => 'eye',
+            'help'        => 'question-circle',
+            'news'        => [
                 'icon'   => 'newspaper',
                 'weight' => 'regular',
             ],
-            'email'              => 'envelope-square',
-            'cell'               => 'mobile',
-            'remind'             => 'retweet',
-            'contractor'         => 'user',
-            'contractors'        => 'users',
-            'companies'          => 'building',
-            'users'              => 'users',
-            'roles'              => 'wrench',
-            'skills'             => 'industry',
-            'states'             => 'cogs',
-            'regions'            => 'globe',
-            'types'              => 'book',
+            'email'       => 'envelope-square',
+            'cell'        => 'mobile',
+            'remind'      => 'retweet',
+            'users'       => 'users',
 
         ];
         const SCID_CSS_PATHS = 'Scid.css.paths';
@@ -145,6 +107,19 @@
             'lg'    => 'btn-lg',
             'block' => 'btn-block',
         ];
+
+        /**
+         * HtmlHelper constructor.
+         *
+         * @param \Cake\View\View $View
+         * @param array           $config
+         */
+        public function __construct(\Cake\View\View $View, array $config = []) {
+            $icons = (array)Configure::read('Scid.HtmlHelper.icons') + $this->_icons;
+            $this->_icons = $icons;
+
+            parent::__construct($View, $config);
+        }
 
         /**
          * add files to a list of less files to be expanded later
@@ -321,6 +296,7 @@
          *
          * @param string $name    Name of icon (i.e. search, leaf, etc.).
          * @param array  $options Additional HTML attributes.
+         *
          * @return string HTML icon markup.
          */
         public function icon($name, array $options = []) {
@@ -412,6 +388,7 @@
         /**
          * @param   string $title
          * @param array    $options
+         *
          * @return string
          */
         public function titleFromOptions($title, array &$options) {
@@ -445,6 +422,7 @@
          *                       target: null,
          *                       remove: false
          *                       }
+         *
          * @return void
          */
         public function matchHeight($class, $options = []) {
@@ -513,7 +491,9 @@ ENABLEPOPOVER;
         }
 
         public function enableMasonry($selector = '.grid', $options = []) {
-            $this->useScript(['Scid.masonry.pkgd.min', 'Scid.imagesloaded.pkgd.min'], ['block' => self::SCRIPT_BOTTOM]);
+            $this->useScript([
+                                 'Scid.masonry.pkgd.min', 'Scid.imagesloaded.pkgd.min',
+                             ], ['block' => self::SCRIPT_BOTTOM]);
             $_options = [
                 'itemSelector'    => '.grid-item',
                 'columnWidth'     => '.grid-sizer',
@@ -548,7 +528,9 @@ ENABLEMASONRY;
         }
 
         public function enableIsotope($selector = '.grid', $options = []) {
-            $this->useScript(['Scid.isotope.pkgd.min', 'Scid.imagesloaded.pkgd.min'], ['block' => self::SCRIPT_BOTTOM]);
+            $this->useScript([
+                                 'Scid.isotope.pkgd.min', 'Scid.imagesloaded.pkgd.min',
+                             ], ['block' => self::SCRIPT_BOTTOM]);
             $_options = [
                 'itemSelector'    => '.grid-item',
                 'percentPosition' => TRUE,
@@ -561,13 +543,12 @@ ENABLEMASONRY;
             }
             if (!empty($options['masonry']['columnWidth'])) {
                 $widthClass = $options['masonry']['columnWidth'];
-                if (strpos($widthClass, '.') !== false  && strpos($widthClass, '.') == 0 ) {
-                    $widthClass = ltrim($widthClass,'.');
+                if (strpos($widthClass, '.') !== FALSE && strpos($widthClass, '.') == 0) {
+                    $widthClass = ltrim($widthClass, '.');
                 }
                 else {
                     $options['masonry']['columnWidth'] = '.' . $widthClass;
                 }
-
             }
             $optionString = json_encode($options, JSON_PRETTY_PRINT, 4);
 
@@ -654,6 +635,7 @@ ENABLEISOTOPE;
          *                              the webroot of your application. Otherwise, the path will be relative to your
          *                              CSS path, usually webroot/css.
          * @param array        $options Array of options and HTML arguments.
+         *
          * @return string|null CSS `<link />` or `<style />` tag, depending on the type of link.
          * @link https://book.cakephp.org/3.0/en/views/helpers/html.html#linking-to-css-files
          */
@@ -712,6 +694,7 @@ ENABLEISOTOPE;
          *
          * @param string|array $url     String or array of javascript files to include
          * @param array        $options Array of options, and html attributes see above.
+         *
          * @return string|null String of `<script />` tags or null if block is specified in options
          *                              or if $once is true and the file has been included before.
          * @link https://book.cakephp.org/3.0/en/views/helpers/html.html#linking-to-javascript-files
