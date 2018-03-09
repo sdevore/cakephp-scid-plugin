@@ -7,7 +7,6 @@
     use Cake\Utility\Hash;
     use Cake\Utility\Inflector;
     use BootstrapUI\View\Helper\FormHelper as Helper;
-
     use InvalidArgumentException;
 
     /**
@@ -210,7 +209,7 @@
             $this->Html->useScript(array(
                                     'Scid.bootstrap-markdown', 'Scid.markdown',
                                     'Scid.to-markdown',
-                                ), array('block' => TRUE,));
+                                ), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
             if (!isset($options['rows'])) {
                 $options['row'] = 15;
             }
@@ -260,7 +259,7 @@ $("#{$id}").markdown({
   ]
 })
 SCRIPT;
-                $this->Html->scriptBlock($script, array('block' => TRUE,));
+                $this->Html->scriptBlock($script, array('block' => HtmlHelper::SCRIPT_BOTTOM,));
                 unset($options['markdown']);
             }
             return $options;
@@ -274,7 +273,7 @@ SCRIPT;
          */
         private function __bootstrapSwitch($fieldName, $options) {
             $idForInput = $this->domId($fieldName);
-            $this->Html->useScript(array('Scid.bootstrap-switch.min',), array('block' => TRUE,));
+            $this->Html->useScript(array('Scid.bootstrap-switch.min',), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
             $this->Html->useCssFile('Scid.bootstrap-switch.min');
             if (!empty($options['value']) && $options['value']) {
                 $options['checked'] = 'checked';
@@ -316,7 +315,7 @@ SCRIPT;
 SWITCH;
             }
 
-            $this->Html->scriptBlock($script . $onSwitch, array('block' => TRUE,));
+            $this->Html->scriptBlock($script . $onSwitch, array('block' => HtmlHelper::SCRIPT_BOTTOM,));
             return $this->checkbox($fieldName, $options);
         }
 
@@ -778,7 +777,7 @@ CHECK_ALL_SCRIPT;
          * @return null|array
          */
         private function __sortableSerialize($options) {
-            $this->Html->useScript('Scid.jquery-sortable-min', ['block' => self::SCRIPT_BOTTOM]);
+            $this->Html->useScript('Scid.jquery-sortable-min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $id = $options['id'];
             $group = 'serialization';
             if (!empty($options['sortable-serialize']['group'])) {
@@ -813,13 +812,24 @@ CHECK_ALL_SCRIPT;
             return $options;
         }
 
+        private function __select2($options) {
+            /**
+             * https://github.com/select2/select2
+             * and
+             * https://github.com/select2/select2-bootstrap-theme
+             * <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+             */
+            $this->Html->useCssFile(['Scid.select2.min','Scid.select2-bootstrap.min']);
+            $this->Html->useScript('Scid.select2.min', ['block'=>HtmlHelper::SCRIPT_BOTTOM]);
+        }
         /**
          * @param null|array $options
          *
          * @return null|array
          */
         private function __sortablePost($options) {
-            $this->Html->useScript('Scid.jquery-sortable-min', ['block' => self::SCRIPT_BOTTOM]);
+            $this->Html->useScript('Scid.jquery-sortable-min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $id = $options['id'];
             $url = $options['url'];
             if (is_array($url)) {
