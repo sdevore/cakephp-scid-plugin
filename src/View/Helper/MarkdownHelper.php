@@ -10,6 +10,7 @@
     use cebe\markdown\Markdown;
     use cebe\markdown\MarkdownExtra;
     use cebe\markdown\GithubMarkdown;
+    use DebugKit\DebugTimer;
 
     /**
      * Markdown helper
@@ -25,7 +26,7 @@
         protected $_defaultConfig = [];
 
         /**
-         * Default configuration.
+         * Default markdown parser is null.
          *
          * @var \cebe\markdown\Parser
          */
@@ -90,25 +91,33 @@
          * Fetch the content for a block and render it with the markdown parser. If a block is
          * empty or undefined '' will be returned.
          *
-         * @param string $name Name of the block
+         * @param string $name    Name of the block
          * @param string $default Default text
+         *
          * @return string The block content or $default if the block does not exist.
          * @see \Cake\View\View::fetch()
          */
-        public function fetch($blockName = 'markdown' ,$default ='') {
+        public function fetch($blockName = 'markdown', $default = '') {
             $block = $this->_View->fetch($blockName, $default);
             if ($block) {
-                return $this->parse($block);
+                $md5 = md5($block);
+                $parsed = Cache::read($md5);
+                if (!$parsed) {
+                    $parsed = $this->parse($block);
+                    Cache::write($md5, $parsed);
+                }
+
+                return $parsed;
             }
             else {
                 return '';
             }
         }
 
-        public function element ($path, $options) {
+        public function element($path, $options) {
             if (isset($options['cache'])) {
                 if (is_bool($options['cache'])) {
-                    $options['cache'] = ['config'=>null,'key'=>null];
+                    $options['cache'] = ['config' => NULL, 'key' => NULL];
                 }
                 if (empty($options['cache']['config'])) {
                     $options['cache']['config'] = 'default';
@@ -134,14 +143,15 @@
             }
             if (!empty($pathInfo['basename'])) {
                 $filePath =
-                    APP .  'Template' . DS . 'Element' . DS. $pathInfo['dirname'] . DS . $pathInfo['basename'] . '.' . $pathInfo['extension'];
+                    APP . 'Template' . DS . 'Element' . DS . $pathInfo['dirname'] . DS . $pathInfo['basename'] . '.' . $pathInfo['extension'];
                 $file = new File($filePath);
                 $text = $file->read();
                 if ($text) {
                     $parsed = $this->_parser->parse($text);
                     if (!empty($options['cache']['key'])) {
-                        Cache::write($options['cache']['key'], $parsed , $options['cache']['config']);
+                        Cache::write($options['cache']['key'], $parsed, $options['cache']['config']);
                     }
+
                     return $parsed;
                 }
             }

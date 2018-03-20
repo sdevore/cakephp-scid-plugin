@@ -3,13 +3,13 @@
   "description": "Scid plugin for CakePHP",
   "type": "cakephp-plugin",
   "suggest": {
-        "markstory/asset_compress": "An asset compression plugin which provides file concatenation and a flexible filter system for preprocessing and minification.",
-        "phpunit/phpunit": "Allows automated tests to be run without system-wide install.",
-        "cakephp/cakephp-codesniffer": "Allows to check the code against the coding standards used in CakePHP.",
+    "markstory/asset_compress": "An asset compression plugin which provides file concatenation and a flexible filter system for preprocessing and minification.",
+    "phpunit/phpunit": "Allows automated tests to be run without system-wide install.",
+    "cakephp/cakephp-codesniffer": "Allows to check the code against the coding standards used in CakePHP.",
     "dereuromark/cakephp-ide-helper": "annotate classes and views to work better with autocomplete in IDE",
     "lavary/crunz": "usefu for scheduling",
     "tanuck/cakephp-markdown": "dev-master"
-    },
+  },
   "require": {
     "php": ">=7.0.0",
     "cakephp/cakephp": ">=3.3.2 <4.0.0",
@@ -17,7 +17,8 @@
     "friendsofcake/bootstrap-ui": "^1.2",
     "orainteractive/cakephp3-email-template": "^1.1",
     "cebe/markdown": "*",
-    "fzaninotto/faker":"^1.7"
+    "fzaninotto/faker": "^1.7",
+    "gourmet/email": "~3.0"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
