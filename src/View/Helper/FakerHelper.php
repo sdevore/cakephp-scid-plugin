@@ -173,7 +173,7 @@
          */
         private
         function __getSession(): \Cake\Network\Session {
-            return $this->_View->request->session();
+            return $this->_View->request->getSession();
         }
 
         /**
