@@ -27,6 +27,14 @@ class EmailHelper extends GourmetEmailHelper
      */
     protected $_defaultConfigExt = [
         'tags' => [
+            'ol'=>[
+                'options'=>['tag'=>'ol','class'=>'ol text'],
+                'itemOptions'=>['class'=>'li text']
+            ],
+            'ul'=>[
+                'options'=>['tag'=>'ul','class'=>'ul text'],
+                'itemOptions'=>['class'=>'li text']
+            ],
             'hr' => ['html'=>'<div class="hr" style="width: 100%; margin: 0 auto;"> <!--[if mso | IE]>
                                   <table class="hr__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%; margin-right: auto; margin-left: auto;" width="100%" align="center">
                                     <tr>
@@ -41,6 +49,8 @@ class EmailHelper extends GourmetEmailHelper
             
         ]
     ];
+
+    const LIST_INDENT = '    ';
 
     public function __construct(\Cake\View\View $View, array $config = []) {
         $this->_defaultConfig += $this->_defaultConfigExt;
@@ -75,15 +85,20 @@ class EmailHelper extends GourmetEmailHelper
             $items = $this->_plainNestedList($list, $options, $itemOptions);
             $text = '';
             foreach ($items as $item) {
-                $text .= '  ' . $this->_eol();
+                $text .= self::LIST_INDENT . $item . $this->_eol();
             }
             return $this->_eol() .  $text . $this->_eol() ;
         }
-        if (empty($options) && !empty($this->_defaultConfig['options']['nestedList']['options'])) {
-            $options = $this->_defaultConfig['options']['nestedList']['options'];
+        $tag = 'ul';
+        if (!empty($options['tag'])) {
+            $tag = $options['tag'];
         }
-        if (empty($options) && !empty($this->_defaultConfig['options']['nestedList']['itemOptions'])) {
-            $itemOptions = $this->_defaultConfig['options']['nestedList']['itemOptions'];
+        if (empty($options) && !empty($this->_config['tags'][$tag]['options'])) {
+            $options = $this->_config['tags'][$tag]['options'];
+        }
+
+        if (empty($itemOptions) && !empty($this->_config['tags'][$tag]['itemOptions'])) {
+            $itemOptions = $this->_config['tags'][$tag]['itemOptions'];
         }
         return $this->Html->nestedList($list, $options, $itemOptions);
     }
@@ -172,8 +187,10 @@ class EmailHelper extends GourmetEmailHelper
         }
         $index = 1;
         foreach ($items as $key => $item) {
+            $subItems = null;
             if (is_array($item)) {
-                $item = $key . $this->nestedList($item, $options, $itemOptions);
+                $subItems = $this->_plainNestedList($item, $options, $itemOptions);
+                $item = $key;
             }
             if ($tag == 'ol') {
                 $item = $index . '. ' .  $item;
@@ -182,9 +199,14 @@ class EmailHelper extends GourmetEmailHelper
                 $item = '* ' . $item;
             }
             $out[] = $item;
+            if (!empty($subItems)) {
+                $out = array_merge($out , $subItems);
+            }
             $index++;
         }
-
+        foreach ($out as $key=>$value) {
+            $out[$key] = self::LIST_INDENT . $value;
+        }
         return $out;
     }
 
