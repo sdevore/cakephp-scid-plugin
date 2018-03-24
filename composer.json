@@ -17,10 +17,14 @@
     "friendsofcake/bootstrap-ui": "^1.2",
     "cebe/markdown": "*",
     "fzaninotto/faker": "^1.7",
-    "gourmet/email": "~3.0"
+    "gourmet/email": "~3.0",
+    "tijsverkoyen/css-to-inline-styles": "^2.2"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
+  },
+  "config": {
+    "sort-packages": true
   },
   "autoload": {
     "psr-4": {
