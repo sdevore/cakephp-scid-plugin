@@ -1,27 +1,28 @@
 {
   "name": "sdevore/cakephp-scid-plugin",
-  "description": "Scid plugin for CakePHP",
   "type": "cakephp-plugin",
-  "suggest": {
-    "markstory/asset_compress": "An asset compression plugin which provides file concatenation and a flexible filter system for preprocessing and minification.",
-    "phpunit/phpunit": "Allows automated tests to be run without system-wide install.",
-    "cakephp/cakephp-codesniffer": "Allows to check the code against the coding standards used in CakePHP.",
-    "dereuromark/cakephp-ide-helper": "annotate classes and views to work better with autocomplete in IDE",
-    "lavary/crunz": "usefu for scheduling",
-    "tanuck/cakephp-markdown": "dev-master"
-  },
+  "description": "Scid plugin for CakePHP",
+  "license": "MIT",
   "require": {
     "php": ">=7.0.0",
     "cakephp/cakephp": ">=3.3.2 <4.0.0",
-    "picqer/php-barcode-generator": "^0.2.2",
-    "friendsofcake/bootstrap-ui": "^1.2",
     "cebe/markdown": "*",
+    "friendsofcake/bootstrap-ui": "^1.2",
     "fzaninotto/faker": "^1.7",
     "gourmet/email": "~3.0",
+    "picqer/php-barcode-generator": "^0.2.2",
     "tijsverkoyen/css-to-inline-styles": "^2.2"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
+  },
+  "suggest": {
+    "cakephp/cakephp-codesniffer": "Allows to check the code against the coding standards used in CakePHP.",
+    "dereuromark/cakephp-ide-helper": "annotate classes and views to work better with autocomplete in IDE",
+    "lavary/crunz": "usefu for scheduling",
+    "markstory/asset_compress": "An asset compression plugin which provides file concatenation and a flexible filter system for preprocessing and minification.",
+    "phpunit/phpunit": "Allows automated tests to be run without system-wide install.",
+    "tanuck/cakephp-markdown": "dev-master"
   },
   "config": {
     "sort-packages": true
