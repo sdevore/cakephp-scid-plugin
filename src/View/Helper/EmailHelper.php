@@ -14,6 +14,7 @@ use TijsVerkoyen\CssToInlineStyles\Exception;
  * Email helper
  *
  * @property \Cake\View\Helper\HtmlHelper $Html
+ * @property \Cake\View\Helper\UrlHelper $Url
  */
 class EmailHelper extends GourmetEmailHelper
 {
