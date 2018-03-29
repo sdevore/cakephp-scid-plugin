@@ -304,6 +304,79 @@ business:
     - thumbtack
     - trademark
   label: Business
+charity:
+  icons:
+    - book-heart
+    - box-heart
+    - box-usd
+    - dollar-sign
+    - donate
+    - dove
+    - gift
+    - globe
+    - hand-heart
+    - hand-holding-heart
+    - hand-holding-seedling
+    - hand-holding-usd
+    - hand-holding-water
+    - hands-heart
+    - hands-helping
+    - hands-usd
+    - handshake
+    - handshake-alt
+    - heart
+    - heart-circle
+    - heart-square
+    - home-heart
+    - leaf
+    - leaf-heart
+    - parachute-box
+    - piggy-bank
+    - ribbon
+    - seedling
+    - usd-circle
+    - usd-square
+  label: Charity
+chat:
+  icons:
+    - comment
+    - comment-alt
+    - comment-alt-check
+    - comment-alt-dots
+    - comment-alt-edit
+    - comment-alt-exclamation
+    - comment-alt-lines
+    - comment-alt-minus
+    - comment-alt-plus
+    - comment-alt-slash
+    - comment-alt-smile
+    - comment-alt-times
+    - comment-check
+    - comment-dots
+    - comment-edit
+    - comment-exclamation
+    - comment-lines
+    - comment-minus
+    - comment-plus
+    - comment-slash
+    - comment-smile
+    - comment-times
+    - comments
+    - comments-alt
+    - phone
+    - phone-plus
+    - phone-slash
+    - poo
+    - quote-left
+    - quote-right
+    - smile
+    - smile-plus
+    - video
+    - video-plus
+    - video-slash
+    - meh
+    - frown
+  label: Chat
 chess:
   icons:
     - chess
@@ -401,6 +474,7 @@ communication:
   label: Communication
 computers:
   icons:
+    - database
     - desktop
     - desktop-alt
     - download
@@ -618,6 +692,11 @@ hands:
     - handshake
     - thumbs-down
     - thumbs-up
+    - hand-holding
+    - hands
+    - hand-receiving
+    - hand-holding-box
+    - allergies
   label: Hands
 health:
   icons:
@@ -947,6 +1026,7 @@ maps:
     - recycle
     - road
     - rocket
+    - route
     - search
     - search-minus
     - search-plus
@@ -981,6 +1061,7 @@ maps:
     - utensil-spoon
     - utensils
     - utensils-alt
+    - wine-glass
     - wheelchair
     - wifi
     - wrench
@@ -1021,6 +1102,39 @@ medical:
     - weight
     - x-ray
   label: Medical
+moving:
+  icons:
+    - truck-moving
+    - truck-container
+    - truck-ramp
+    - truck-loading
+    - truck-couch
+    - ramp-loading
+    - tape
+    - blanket
+    - box-open
+    - box-full
+    - boxes-alt
+    - box-alt
+    - sign
+    - box-up
+    - box-fragile
+    - lamp
+    - couch
+    - loveseat
+    - people-carry
+    - person-carry
+    - person-dolly
+    - person-dolly-empty
+    - dolly
+    - dolly-empty
+    - container-storage
+    - wine-glass
+    - fragile
+    - suitcase
+    - archive
+    - route
+  label: Moving
 objects:
   icons:
     - alarm-clock
@@ -1193,6 +1307,7 @@ objects:
     - utensils-alt
     - watch
     - wheelchair
+    - wine-glass
     - wrench
   label: Objects
 payments-shopping:
