@@ -161,14 +161,8 @@ class EmailHelper extends GourmetEmailHelper
                 $css = $file->read();
                 if (!empty($block)) {
                     $cssToInlineStyles = new CssToInlineStyles();
-                    if (!empty($css)) {
-                        $cssToInlineStyles->setCSS($css);
-                    }
-                    $cssToInlineStyles->setUseInlineStylesBlock();
-                    $cssToInlineStyles->setHTML($block);
                     try {
-                        return $cssToInlineStyles->convert(
-
+                        return $cssToInlineStyles->convert($block, $css
                         );
                     } catch (Exception $e) {
                         return $block;
