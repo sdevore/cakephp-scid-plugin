@@ -114,7 +114,7 @@
             }
         }
 
-        public function element($path, $options) {
+        public function element($path, $options =[]) {
             if (isset($options['cache'])) {
                 if (is_bool($options['cache'])) {
                     $options['cache'] = ['config' => NULL, 'key' => NULL];
