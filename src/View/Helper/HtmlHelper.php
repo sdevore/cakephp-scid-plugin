@@ -122,6 +122,25 @@
             parent::__construct($View, $config);
         }
 
+        public function driverTourButton($title, $options, $tour = [] )  {
+            if (empty($tour)) {
+                return '';
+            }
+            $this->useCssFile('Scid.driver.min');
+            $this->useScript('Scid.driver.min');
+            $jsonTour = json_encode($tour);
+            $driverName = uniqid('driver');
+            $scriptBlock = <<<DRIVER_TOUR_BLOCK
+const ${driverName} = new Driver();
+// Define the steps for introduction
+${driverName}.defineSteps(${jsonTour});
+DRIVER_TOUR_BLOCK;
+
+            $this->scriptBlock($scriptBlock, ['block' => self::SCRIPT_BOTTOM]);
+            $options['onclick'] = $driverName . '.start()';
+            return $this->button($title, '#', $options);
+    }
+
         /**
          * add files to a list of less files to be expanded later
          *
@@ -272,6 +291,7 @@
             if (!empty($options['retina'])) {
                 $retinaPath = $options['retina'];
                 unset($options['retina']);
+                $this->useScript('Scid.retina.min', ['block' => self::SCRIPT_BOTTOM]);
             }
             if (!empty($retinaPath)) {
                 $options['data-rjs'] = $retinaPath;
