@@ -7,10 +7,10 @@
 [submodule "sub-modules/filepond/plugins/file-encode"]
 	path = sub-modules/filepond/plugins/file-encode
 	url = git@github.com:pqina/filepond-plugin-file-encode.git
-[submodule "sub-modules/filepond/plugins/file-validate-size"]
+[submodule "sub-modules/filepond/plugins/file-validate-type"]
 	path = sub-modules/filepond/plugins/file-validate-size
 	url = git@github.com:pqina/filepond-plugin-file-validate-type.git
-[submodule "sub-modules/filepond/plugins/file-validate-size-2"]
+[submodule "sub-modules/filepond/plugins/file-validate-size"]
 	path = sub-modules/filepond/plugins/file-validate-size-2
 	url = git@github.com:pqina/filepond-plugin-file-validate-size.git
 [submodule "sub-modules/filepond/plugins/image-resize"]
