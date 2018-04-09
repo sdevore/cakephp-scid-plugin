@@ -19,9 +19,6 @@
 [submodule "filepond/plugins/file-validate-size"]
 	path = filepond/plugins/file-validate-size
 	url = git@github.com:pqina/filepond-plugin-file-validate-size.git
-[submodule "image-crop"]
-	path = image-crop
-	url = git@github.com:pqina/filepond-plugin-image-crop.git
 [submodule "filepond/plugins/image-exif-orientation"]
 	path = filepond/plugins/image-exif-orientation
 	url = git@github.com:pqina/filepond-plugin-image-exif-orientation.git
