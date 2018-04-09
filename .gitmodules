@@ -1,6 +1,6 @@
 [submodule "sub-modules/driver"]
 	path = sub-modules/driver
 	url = git@github.com:kamranahmedse/driver.js.git
-[submodule "filepond"]
-	path = filepond
+[submodule "sub-modules/filepond"]
+	path = sub-modules/filepond
 	url = git@github.com:pqina/filepond.git
