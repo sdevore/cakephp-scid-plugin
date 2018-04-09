@@ -13,8 +13,8 @@
 [submodule "sub-modules/filepond/plugins/image-transform"]
 	path = sub-modules/filepond/plugins/image-transform
 	url = git@github.com:pqina/filepond-plugin-image-transform.git
-[submodule "sub-modules/filepond/plugins/iamge-preview"]
-	path = sub-modules/filepond/plugins/iamge-preview
+[submodule "sub-modules/filepond/plugins/image-preview"]
+	path = sub-modules/filepond/plugins/image-preview
 	url = git@github.com:pqina/filepond-plugin-image-preview.git
 [submodule "sub-modules/filepond/plugins/image-exif-orientation"]
 	path = sub-modules/filepond/plugins/image-exif-orientation
