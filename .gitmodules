@@ -2,7 +2,7 @@
 	path = sub-modules/driver
 	url = git@github.com:kamranahmedse/driver.js.git
 [submodule "sub-modules/filepond-repositories"]
-	path = sub-modules/filepond-repositories
+	path = sub-modules/filepond/filepond
 	url = git@github.com:pqina/filepond.git
 [submodule "filepond/plugins/file-encode"]
 	path = filepond/plugins/file-encode
