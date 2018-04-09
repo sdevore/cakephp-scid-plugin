@@ -1,9 +1,6 @@
 [submodule "sub-modules/driver"]
 	path = sub-modules/driver
 	url = git@github.com:kamranahmedse/driver.js.git
-[submodule "sub-modules/filepond/plugins/file-encode"]
-	path = sub-modules/filepond/plugins/file-encode
-	url = git@github.com:pqina/filepond-plugin-file-encode.git
 [submodule "sub-modules/filepond/plugins/file-validate-type"]
 	path = sub-modules/filepond/plugins/file-validate-type
 	url = git@github.com:pqina/filepond-plugin-file-validate-type.git
