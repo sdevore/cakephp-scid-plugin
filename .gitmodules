@@ -1,24 +1,3 @@
 [submodule "sub-modules/driver"]
 	path = sub-modules/driver
 	url = git@github.com:kamranahmedse/driver.js.git
-[submodule "sub-modules/filepond/plugins/file-encode"]
-	path = sub-modules/filepond/plugins/file-encode
-	url = git@github.com:pqina/filepond-plugin-file-encode.git
-[submodule "sub-modules/filepond/plugins/file-validate-type"]
-	path = sub-modules/filepond/plugins/file-validate-type
-	url = git@github.com:pqina/filepond-plugin-file-validate-type.git
-[submodule "sub-modules/filepond/plugins/image-resize"]
-	path = sub-modules/filepond/plugins/image-resize
-	url = git@github.com:pqina/filepond-plugin-image-resize.git
-[submodule "sub-modules/filepond/plugins/image-transform"]
-	path = sub-modules/filepond/plugins/image-transform
-	url = git@github.com:pqina/filepond-plugin-image-transform.git
-[submodule "sub-modules/filepond/plugins/file-validate-size"]
-	path = sub-modules/filepond/plugins/file-validate-size
-	url = git@github.com:pqina/filepond-plugin-file-validate-size.git
-[submodule "sub-modules/filepond/plugins/image-exif-orientation"]
-	path = sub-modules/filepond/plugins/image-exif-orientation
-	url = git@github.com:pqina/filepond-plugin-image-exif-orientation.git
-[submodule "filepond/plugins/image-preview"]
-	path = sub-modules/filepond/plugins/image-preview
-	url = git@github.com:pqina/filepond-plugin-image-preview.git
