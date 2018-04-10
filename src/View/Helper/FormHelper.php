@@ -11,12 +11,13 @@
 
     /**
      * Form helper
- *
- * @property \Cake\View\Helper\UrlHelper $Url
- * @property \Scid\View\Helper\HtmlHelper $Html
+     *
+     * @property \Cake\View\Helper\UrlHelper  $Url
+     * @property \Scid\View\Helper\HtmlHelper $Html
      */
     class FormHelper extends Helper
     {
+
         public $helpers = ['Url', 'Scid.Html'];
 
         /**
@@ -31,18 +32,18 @@
             'danger', 'btn-danger',
             'info', 'btn-info',
             'primary', 'btn-primary',
-            'hotlist','btn-hotlist',
-            'company','btn-company',
-            'busy','btn-busy',
-            'available','btn-available',
-            'company-accepted','btn-company-accepted',
-            'pending','btn-pending',
-            'opened','btn-opened',
-            'expired','btn-expired',
-            'accepted','btn-accepted',
-            'accepted-pending','btn-accepted-pending',
-            'accepted-no-block','btn-accepted-no-block',
-            'declined','btn-declined',
+            'hotlist', 'btn-hotlist',
+            'company', 'btn-company',
+            'busy', 'btn-busy',
+            'available', 'btn-available',
+            'company-accepted', 'btn-company-accepted',
+            'pending', 'btn-pending',
+            'opened', 'btn-opened',
+            'expired', 'btn-expired',
+            'accepted', 'btn-accepted',
+            'accepted-pending', 'btn-accepted-pending',
+            'accepted-no-block', 'btn-accepted-no-block',
+            'declined', 'btn-declined',
 
         ];
 
@@ -52,30 +53,82 @@
          * @var array
          */
         public $buttonClassAliases = [
-            'default' => 'btn-default',
-            'success' => 'btn-success',
-            'warning' => 'btn-warning',
-            'danger' => 'btn-danger',
-            'info' => 'btn-info',
-            'primary' => 'btn-primary',
-            'hotlist'=>'btn-hotlist',
-            'company'=>'btn-company',
-            'busy'=>'btn-busy',
-            'available'=>'btn-available',
-            'company-accepted'=>'btn-company-accepted',
-            'pending'=>'btn-pending',
-            'opened'=>'btn-opened',
-            'expired'=>'btn-expired',
-            'accepted'=>'btn-accepted',
-            'accepted-pending'=>'btn-accepted-pending',
-            'accepted-no-block'=>'btn-accepted-no-block',
-            'declined'=>'btn-declined',
+            'default'           => 'btn-default',
+            'success'           => 'btn-success',
+            'warning'           => 'btn-warning',
+            'danger'            => 'btn-danger',
+            'info'              => 'btn-info',
+            'primary'           => 'btn-primary',
+            'hotlist'           => 'btn-hotlist',
+            'company'           => 'btn-company',
+            'busy'              => 'btn-busy',
+            'available'         => 'btn-available',
+            'company-accepted'  => 'btn-company-accepted',
+            'pending'           => 'btn-pending',
+            'opened'            => 'btn-opened',
+            'expired'           => 'btn-expired',
+            'accepted'          => 'btn-accepted',
+            'accepted-pending'  => 'btn-accepted-pending',
+            'accepted-no-block' => 'btn-accepted-no-block',
+            'declined'          => 'btn-declined',
         ];
+        protected $_filepondPlugins = [
+            'FilePondPluginFileEncode'           => ['script' => 'file-encode'],
+            'FilePondPluginFileValidateType'     => ['script' => 'file-validate-type'],
+            'FilePondPluginFileValidateSize'     => ['script' => 'file-validate-size'],
+            'FilePondPluginImageExifOrientation' => ['script' => 'image-exif-orientation'],
+            'FilePondPluginImagePreview'         => [
+                'script' => 'image-preview',
+                'css'    => 'image-preview',
+            ],
+            'FilePondPluginImageCrop'            => ['script' => 'image-crop'],
+            'FilePondPluginImageResize'          => ['script' => 'image-resize'],
+            'FilePondPluginImageTransform'       => ['script' => 'image-transform'],
+
+        ];
+        protected $_filepondRequiredPlugins = [
+            'FilePondPluginFileEncode',
+            'FilePondPluginFileValidateType',
+            'FilePondPluginFileValidateSize',
+            'FilePondPluginImageExifOrientation',
+        ];
+
+        protected $_filepondPluginCollections = [
+            'imageCropAspectRatio'         => [
+                'FilePondPluginImageTransform', 'FilePondPluginImageCrop',
+                'FilePondPluginImageResize',
+            ],
+            'imagePreviewHeight'           => [
+                'FilePondPluginImagePreview', 'FilePondPluginImageTransform',
+            ],
+            'imagePreviewMinHeight'        => [
+                'FilePondPluginImageTransform', 'FilePondPluginImageResize',
+            ],
+            'imagePreviewMaxHeight'        => [
+                'FilePondPluginImageTransform', 'FilePondPluginImageResize',
+            ],
+            'imagePreviewMaxFileSize'      => [
+                'FilePondPluginImageTransform', 'FilePondPluginImageResize',
+            ],
+            'imageResizeTargetWidth'       => [
+                'FilePondPluginImageTransform', 'FilePondPluginImageResize',
+            ],
+            'imageTransformOutputQuality'  => ['FilePondPluginImageTransform'],
+            'imageResizeMode'              => [
+                'FilePondPluginImageTransform', 'FilePondPluginImageResize',
+            ],
+            'imageTransformOutputMimeType' => [
+                'FilePondPluginImageTransform',
+            ],
+
+        ];
+        protected $_filePondPluginsRegistered = [];
 
         /**
          * Generate an ID suitable for use in an ID attribute.
          *
          * @param string $value The value to convert into an ID.
+         *
          * @return string The generated id.
          */
         public function domId($value) {
@@ -93,23 +146,23 @@
          * - `escape` - HTML entity encode the $title of the button. Defaults to false.
          * - `confirm` - Confirm message to show. Form execution will only continue if confirmed then.
          *
-         * @param string $title The button's caption. Not automatically HTML encoded
-         * @param array $options Array of options and HTML attributes.
+         * @param string $title   The button's caption. Not automatically HTML encoded
+         * @param array  $options Array of options and HTML attributes.
+         *
          * @return string A HTML button tag.
          * @link https://book.cakephp.org/3.0/en/views/helpers/form.html#creating-button-elements
          */
-        public function button($title, array $options = [])
-        {
+        public function button($title, array $options = []) {
             $title = $this->Html->titleFromOptions($title, $options);
 
             return parent::button($title, $options);
         }
+
         public function postButton($title, $url, array $options = []) {
             if (!empty($options['icon'])) {
 
                 $options['escape'] = FALSE;
                 $title = $this->Html->titleFromOptions($title, $options);
-
             }
             $options = $this->applyButtonClasses($options);
             $options = $this->renameClasses($this->Html->buttonAttrAliases, $options);
@@ -125,6 +178,7 @@
                 $options = $this->applyButtonClasses($options);
             }
             $title = $this->Html->titleFromOptions($title, $options);
+
             return parent::postLink($title, $url, $options); // TODO: Change the autogenerated stub
         }
 
@@ -136,7 +190,8 @@
          * Adds markdown options for textarea
          *
          * @param string $fieldName This should be "Modelname.fieldname".
-         * @param array $options Each type of input takes different options.
+         * @param array  $options   Each type of input takes different options.
+         *
          * @return string Completed form widget.
          * @deprecated Use control() instead.
          */
@@ -152,7 +207,8 @@
          * Adds markdown options for textarea
          *
          * @param string $fieldName This should be "Modelname.fieldname".
-         * @param array $options Each type of input takes different options.
+         * @param array  $options   Each type of input takes different options.
+         *
          * @return string Completed form widget.
          */
         public function control($fieldName, array $options = []) {
@@ -182,23 +238,26 @@
                         break;
                     case 'select':
                         if (isset($options['select-visible-div'])) {
-                            $options = $this->__selectExtraOptions( $options);
+                            $options = $this->__selectExtraOptions($options);
                         }
                         break;
                     case 'select2':
-                        $options = $this->__select2( $options);
+                        $options = $this->__select2($options);
                         break;
                     case 'sortable-serialize':
-                        $options = $this->__sortableSerialize( $options);
+                        $options = $this->__sortableSerialize($options);
                         break;
                     case 'sortable-post':
-                        $options = $this->__sortablePost( $options);
+                        $options = $this->__sortablePost($options);
                         break;
                     case 'duration':
                         $options = $this->__durationPicker($options);
                         break;
+                    case 'filepond':
+                        $options = $this->__filepond($options);
                 }
             }
+
             return parent::control($fieldName, $options); // TODO: Change the autogenerated stub
         }
 
@@ -209,10 +268,10 @@
          */
         private function __bootstrapMarkdown($options) {
             $id = $options['id'];
-            $this->Html->useScript(array(
-                                    'Scid.bootstrap-markdown', 'Scid.markdown',
-                                    'Scid.to-markdown',
-                                ), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+            $this->Html->useScript([
+                                       'Scid.bootstrap-markdown', 'Scid.markdown',
+                                       'Scid.to-markdown',
+                                   ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
             if (!isset($options['rows'])) {
                 $options['row'] = 15;
             }
@@ -224,10 +283,10 @@
             $options['type'] = 'textarea';
 
             if (!empty($options['markdown']['snippets'])) {
-                $btns = array();
+                $btns = [];
                 foreach ($options['markdown']['snippets'] as $name => $value) {
                     $btnName = Inflector::camelize($name);
-                    $btns[]  = <<<BTN
+                    $btns[] = <<<BTN
 {
             name: "cmd{$btnName}",
             toggle: false, // this param only take effect if you load bootstrap.js
@@ -262,9 +321,10 @@ $("#{$id}").markdown({
   ]
 })
 SCRIPT;
-                $this->Html->scriptBlock($script, array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+                $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
                 unset($options['markdown']);
             }
+
             return $options;
         }
 
@@ -272,11 +332,12 @@ SCRIPT;
          * http://www.bootstrap-switch.org/
          * @param $fieldName
          * @param $options
+         *
          * @return string
          */
         private function __bootstrapSwitch($fieldName, $options) {
             $idForInput = $this->domId($fieldName);
-            $this->Html->useScript(array('Scid.bootstrap-switch.min',), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+            $this->Html->useScript(['Scid.bootstrap-switch.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
             $this->Html->useCssFile('Scid.bootstrap-switch.min');
             if (!empty($options['value']) && $options['value']) {
                 $options['checked'] = 'checked';
@@ -318,13 +379,15 @@ SCRIPT;
 SWITCH;
             }
 
-            $this->Html->scriptBlock($script . $onSwitch, array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+            $this->Html->scriptBlock($script . $onSwitch, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
             return $this->checkbox($fieldName, $options);
         }
 
         /**
          * @param $fieldName
          * @param $options
+         *
          * @return string
          */
         private function __bootstrapCheckbox($fieldName, $options) {
@@ -364,7 +427,7 @@ SWITCH;
                 $checkAllClass = $options['checkall-class'];
                 unset($options['checkall-class']);
             }
-            $class = array($checkAllClass);
+            $class = [$checkAllClass];
             if (!empty($options['class'])) {
                 $class = array_merge($class, explode(' ', $options['class']));
             }
@@ -384,12 +447,14 @@ SWITCH;
             if (empty($options['div'])) {
                 $html = $this->Html->div('form-group' . $errorClass, $html);
             }
+
             return $html;
         }
 
         /**
          * @param $fieldName
          * @param $options
+         *
          * @return string
          */
         private function __bootstrapCheckAll($fieldName, $options) {
@@ -449,7 +514,8 @@ $("#{$idForInput}").click(function () {
     $(".{$checkAllClass}").prop('checked', $(this).prop('checked'));
 });
 CHECK_ALL_SCRIPT;
-            $this->Html->scriptBlock($script, array('inline' => FALSE,));
+            $this->Html->scriptBlock($script, ['inline' => FALSE,]);
+
             return $html;
         }
 
@@ -477,70 +543,80 @@ CHECK_ALL_SCRIPT;
          *                                      autoApply: (boolean) Hide the apply and cancel buttons, and automatically apply a new date range as soon as two dates or a predefined range is selected
          *                                      parentEl: (string) jQuery selector of the parent element that the date range picker will be added to, if not provided this will be 'body'
          * @param $idForInput
+         *
          * @return mixed
          */
         private function __bootstrapDateRangePicker($options) {
             $id = $options['id'];
-            $this->Html->useScript(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+            $this->Html->useScript([
+                                       'Scid.moment.min', 'Scid.daterangepicker',
+                                   ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
             $this->Html->useCssFile('Scid.daterangepicker');
             $options['prepend'] = $this->Html->icon('calendar');
             $options['type'] = 'text';
-            $defaultRangeOptions = array('autoApply' => TRUE);
+            $defaultRangeOptions = ['autoApply' => TRUE];
             $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
             $this->Html->scriptBlock("$(document).ready(function() {
         $('#{$id}').daterangepicker({$rangeOptionString});
-    });", array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
             return $options;
         }
 
         /**
          * @param $options
          * @param $idForInput
+         *
          * @return mixed
          */
         private function __bootstrapDateTimePicker($options) {
             $id = $options['id'];
-            $this->Html->useScript(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => HtmlHelper::SCRIPT_BOTTOM));
+            $this->Html->useScript([
+                                       'Scid.moment.min', 'Scid.daterangepicker',
+                                   ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $this->Html->useCssFile('Scid.daterangepicker');
             $options['prepend'] = $this->Html->icon('calendar');
             $options['type'] = 'text';
-            $defaultRangeOptions = array(
+            $defaultRangeOptions = [
                 'singleDatePicker' => TRUE,
                 'timePicker'       => TRUE,
-                'locale'           => array('format' => 'MM/DD/YYYY h:mm A'),
-            );
+                'locale'           => ['format' => 'MM/DD/YYYY h:mm A'],
+            ];
             $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
             $this->Html->scriptBlock("$(document).ready(function() {
         $('#{$id}').daterangepicker({$rangeOptionString});
-    });", array('block' => HtmlHelper::SCRIPT_BOTTOM));
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+
             return $options;
         }
 
         /**
          * @param $options
          * @param $idForInput
+         *
          * @return mixed
          */
         private function __bootstrapTimePicker($options) {
             $id = $options['id'];
-            $this->Html->useScript(array('Scid.bootstrap-timepicker.min',), array('block' => HtmlHelper::SCRIPT_BOTTOM));
+            $this->Html->useScript(['Scid.bootstrap-timepicker.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $this->Html->useCssFile('Scid.bootstrap-timepicker');
             $options['prepend'] = $this->Html->icon('clock-o');
             if (!empty($this->_inputDefaults['between'])) {
                 $options['between'] = $this->_inputDefaults['between'];
-                $options['between'] = str_replace('input-group', 'input-group bootstrap-timepicker timepicker', $options['between']);
+                $options['between'] =
+                    str_replace('input-group', 'input-group bootstrap-timepicker timepicker', $options['between']);
             }
             else {
                 $options['between'] = "<div class=\"input-group bootstrap-timepicker timepicker\">";
             }
             $options['type'] = 'text';
 
-
             $this->Html->scriptBlock("$(document).ready(function() {
         $('#{$id}').timepicker();
-    });", array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
             return $options;
         }
 
@@ -552,7 +628,7 @@ CHECK_ALL_SCRIPT;
         private function __durationPicker($options) {
             $id = $options['id'];
             $options['type'] = 'text';
-            $this->Html->useScript(array('Scid.bootstrap-duration-picker',), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+            $this->Html->useScript(['Scid.bootstrap-duration-picker',], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
             $showSeconds = 'false';
             if (!empty($options['duration']['showSeconds'])) {
                 if ($options['duration']['showSeconds']) {
@@ -583,40 +659,45 @@ CHECK_ALL_SCRIPT;
             ${onChanged}
 });";
             unset($options['duration']);
-            $this->Html->scriptBlock($script, array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
             return $options;
         }
 
         private function __bootstrapDatePicker($options) {
             $id = $options['id'];
-            $this->Html->useScript(array('Scid.moment.min', 'Scid.daterangepicker',), array('block' => HtmlHelper::SCRIPT_BOTTOM));
+            $this->Html->useScript([
+                                       'Scid.moment.min', 'Scid.daterangepicker',
+                                   ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $this->Html->useCssFile('Scid.daterangepicker');
             $options['prepend'] = $this->Html->icon('calendar');
             $options['type'] = 'text';
-            $defaultRangeOptions = array(
+            $defaultRangeOptions = [
                 'singleDatePicker' => TRUE,
                 'timePicker'       => FALSE,
-                'locale'           => array('format' => 'MM/DD/YYYY h:mm A'),
-            );
+                'locale'           => ['format' => 'MM/DD/YYYY h:mm A'],
+            ];
             $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
             $this->Html->scriptBlock("$(document).ready(function() {
         $('#{$id}').daterangepicker({$rangeOptionString});
-    });", array('block' => HtmlHelper::SCRIPT_BOTTOM));
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+
             return $options;
         }
 
         /**
          * @param $options
          * @param $idForInput
+         *
          * @return mixed
          */
         private function __bootstrapDateTimePickerOld($options, $idForInput) {
-            $this->Html->useScript(array(
-                                    'Scid.moment.min',
-                                    'Scid.bootstrap-datetimepicker.min',
-                                ), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
-            $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', array('block' => TRUE,));
+            $this->Html->useScript([
+                                       'Scid.moment.min',
+                                       'Scid.bootstrap-datetimepicker.min',
+                                   ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+            $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
             if (!empty($this->_inputDefaults['after'])) {
                 $options['after'] = $this->_inputDefaults['after'];
             }
@@ -627,21 +708,23 @@ CHECK_ALL_SCRIPT;
         $('#{$idForInput}').datetimepicker({
         pickTime: true
         });
-    });", array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
             return $options;
         }
 
         /**
          * @param $options
          * @param $idForInput
+         *
          * @return mixed
          */
         private function __bootstrapMonthPicker($options, $idForInput) {
-            $this->Html->useScript(array(
-                                    'Scid.moment.min',
-                                    'Scid.bootstrap-datetimepicker.min',
-                                ), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
-            $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', array('block' => TRUE,));
+            $this->Html->useScript([
+                                       'Scid.moment.min',
+                                       'Scid.bootstrap-datetimepicker.min',
+                                   ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+            $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
             if (!empty($this->_inputDefaults['after'])) {
                 $options['after'] = $this->_inputDefaults['after'];
             }
@@ -653,21 +736,23 @@ CHECK_ALL_SCRIPT;
         pickTime: false,
         format: 'MM/YYYY'
         });
-    });", array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
             return $options;
         }
 
         /**
          * @param $options
          * @param $idForInput
+         *
          * @return mixed
          */
         private function __bootstrapTimePickerOld($options, $idForInput) {
-            $this->Html->useScript(array(
-                                    'Scid.moment.min',
-                                    'Scid.bootstrap-datetimepicker.min',
-                                ), array('block' => HtmlHelper::SCRIPT_BOTTOM,));
-            $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', array('block' => TRUE,));
+            $this->Html->useScript([
+                                       'Scid.moment.min',
+                                       'Scid.bootstrap-datetimepicker.min',
+                                   ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+            $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
             if (!empty($this->_inputDefaults['after'])) {
                 $options['after'] = $this->_inputDefaults['after'];
             }
@@ -680,7 +765,8 @@ CHECK_ALL_SCRIPT;
                     minuteStepping:15,
                     useSeconds: false
                 });
-    });", array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
             return $options;
         }
 
@@ -693,14 +779,14 @@ CHECK_ALL_SCRIPT;
                 $rangeOptions = $options['rangeOptions'];
             }
             else {
-                $rangeOptions = array();
+                $rangeOptions = [];
             }
             foreach ($defaultOptions as $key => $option) {
                 if (!isset($rangeOptions[$key])) {
                     $rangeOptions[$key] = $option;
                 }
             }
-            $rangeOptionDateKeys = array('startDate', 'endDate', 'minDate', 'maxDate');
+            $rangeOptionDateKeys = ['startDate', 'endDate', 'minDate', 'maxDate'];
             if (!empty($options['startDate']) && !empty($options['endDate'])) {
                 $options['value'] =
                     CakeTime::format($options['startDate'], '%m/%d/%Y') . ' - ' . CakeTime::format($options['endDate'], '%m/%d/%Y');
@@ -717,6 +803,7 @@ CHECK_ALL_SCRIPT;
             else {
                 $rangeOptionString = $this->__rangeOptionsString($rangeOptions);
             }
+
             return $rangeOptionString;
         }
 
@@ -741,6 +828,7 @@ CHECK_ALL_SCRIPT;
                 }
             }
             $rangeOptionString .= '}';
+
             return $rangeOptionString;
         }
 
@@ -749,7 +837,7 @@ CHECK_ALL_SCRIPT;
          *
          * @return null|array
          */
-        private function __selectExtraOptions( $options = null) {
+        private function __selectExtraOptions($options = NULL) {
             if (!empty($options['select-visible-div'])) {
                 $groupClass = $options['select-visible-div'];
                 unset($options['select-visible-div']);
@@ -770,10 +858,51 @@ CHECK_ALL_SCRIPT;
                             });
                         }).change();
                     });";
-                $this->Html->scriptBlock($script, array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+                $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
             }
+
             return $options;
         }
+
+        private function __filepond($options) {
+
+
+            $filepondOptions = [
+                'lableIdle' =>
+                    'Drag & Drop your picture or <span class="filepond--label-action">Browse</span>',
+            ];
+
+            if (!empty($options['filepond'])) {
+                $filepondOptions = $options['filepond'];
+                unset($options['filepond']);
+            }
+            $this->Html->useScript('Scid.filepond.min');
+            $this->Html->useCssFile('Scid.filepond.min');
+            $options = $this->Html->injectClasses('filepond', $options);
+
+            foreach ($this->_filepondRequiredPlugins as $name) {
+                $this->_registerFilepondPlugin($name);
+            }
+            foreach ($filepondOptions as $option => $value) {
+                if (!empty($this->_filepondPluginCollections[$option])) {
+                    $pluginCollection = $this->_filepondPluginCollections[$option];
+                    foreach ($pluginCollection as $name) {
+                        $this->_registerFilepondPlugin($name);
+                    }
+                }
+            }
+            $filepondOptions = json_encode($filepondOptions);
+            $options['type'] = 'file';
+            $id = $options['id'];
+            $script = "FilePond.create(
+  document.querySelector('#${id}'),
+  ${filepondOptions}
+);";
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
+            return $options;
+        }
+
         /**
          * @param null|array $options
          *
@@ -802,16 +931,16 @@ CHECK_ALL_SCRIPT;
     _super(\$item, container);
   }
 });";
-            $this->Html->scriptBlock($script, array('block' => HtmlHelper::SCRIPT_BOTTOM,));
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
             if ($options['sortable-serialize']['test'] && $options['sortable-serialize']['test']) {
-                $options['type']='textarea';
+                $options['type'] = 'textarea';
                 $options['label'] = 'Serialized ' . $group;
             }
             else {
-                $options['type']='hidden';
+                $options['type'] = 'hidden';
                 $this->unlockField($options['name']);
-
             }
+
             return $options;
         }
 
@@ -821,17 +950,19 @@ CHECK_ALL_SCRIPT;
              * and
              * https://github.com/select2/select2-bootstrap-theme
              * <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+             * <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
              */
-            $this->Html->useCssFile(['Scid.select2.min','Scid.select2-bootstrap.min']);
-            $this->Html->useScript('Scid.select2.min', ['block'=>HtmlHelper::SCRIPT_BOTTOM]);
+            $this->Html->useCssFile(['Scid.select2.min', 'Scid.select2-bootstrap.min']);
+            $this->Html->useScript('Scid.select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $options['type'] = 'select';
             $script = "$(document).ready(function() {
     $('#{$id}').select2();
 });";
-            $this->Html->scriptBlock($script, array('block' => HtmlHelper::SCRIPT_BOTTOM));
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+
             return $options;
         }
+
         /**
          * @param null|array $options
          *
@@ -868,15 +999,34 @@ CHECK_ALL_SCRIPT;
     _super(\$item, container);
   }
 });";
-            $this->Html->scriptBlock($script, array('block' => HtmlHelper::SCRIPT_BOTTOM));
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             if ($options['sortable-serialize']['test'] && $options['sortable-serialize']['test']) {
-                $options['type']='textarea';
+                $options['type'] = 'textarea';
                 $options['label'] = 'Serialized ' . $group;
             }
             else {
-                $options['type']='hidden';
+                $options['type'] = 'hidden';
             }
+
             return $options;
+        }
+
+        /**
+         * @param $name
+         *
+         * @return void
+         */
+        private function _registerFilepondPlugin($name) {
+            if (empty($this->_filePondPluginsRegistered[$name])) {
+                $value = $this->_filepondPlugins[$name];
+                $this->Html->useScript('Scid.filepond-plugin-' . $value['script'] . '.min');
+                if (!empty($value['css'])) {
+                    $this->Html->useCssFile('Scid.filepond-plugin-' . $value['css'] . '.min');
+                }
+                $this->Html->scriptBlock("FilePond.registerPlugin($name);",
+                                         ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+                $this->_filePondPluginsRegistered[$name] = TRUE;
+            }
         }
 
     }
