@@ -122,7 +122,7 @@
             parent::__construct($View, $config);
         }
 
-        public function driverTourButton($title, $options, $tour = [] )  {
+        public function driverTourButton($title, $options, $tour = []) {
             if (empty($tour)) {
                 return '';
             }
@@ -138,8 +138,9 @@ DRIVER_TOUR_BLOCK;
 
             $this->scriptBlock($scriptBlock, ['block' => self::SCRIPT_BOTTOM]);
             $options['onclick'] = $driverName . '.start()';
+
             return $this->button($title, '#', $options);
-    }
+        }
 
         /**
          * add files to a list of less files to be expanded later
@@ -510,8 +511,8 @@ MAP;
                     $icon = $options['icon'];
                 }
                 $icon += [
-                    'icon-class'  => 'd-md-none d-lg-block',
-                    'title-class' => 'd-block d-sm-none',
+                    'icon-class'  => 'd-inline d-md-none d-lg-inline',
+                    'title-class' => 'd-none d-md-inline',
                 ];
 
                 // add icon to left of title
@@ -588,6 +589,7 @@ ENABLETOOLTIP;
             }
             $this->enablePopovers();
             $linkTitle = $this->titleFromOptions($linkTitle, $options);
+
             return $this->tag($tag, $linkTitle, $options);
         }
 
