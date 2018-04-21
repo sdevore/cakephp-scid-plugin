@@ -510,8 +510,8 @@ MAP;
                     $icon = $options['icon'];
                 }
                 $icon += [
-                    'icon-class'  => 'hidden-md',
-                    'title-class' => 'hidden-xs hidden-sm',
+                    'icon-class'  => 'd-md-none d-lg-block',
+                    'title-class' => 'd-block d-sm-none',
                 ];
 
                 // add icon to left of title
@@ -587,7 +587,7 @@ ENABLETOOLTIP;
                 $options['data-' . $key] = $popoverOption;
             }
             $this->enablePopovers();
-
+            $linkTitle = $this->titleFromOptions($linkTitle, $options);
             return $this->tag($tag, $linkTitle, $options);
         }
 
