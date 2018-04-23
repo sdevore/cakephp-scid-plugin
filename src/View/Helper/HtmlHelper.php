@@ -314,7 +314,12 @@ DRIVER_TOUR_BLOCK;
         }
 
         public function map($options) {
-
+            if (empty($this->_mapConfig)) {
+                $this->_mapConfig = Configure::read('Scid.map');
+            }
+            if (empty($this->_mapConfig) || empty($this->_mapConfig['showMaps']) || $this->_mapConfig['showMaps'] === false) {
+                return '<!-- maps are disabled -->';
+            }
             $this->useCssFile(
                 "https://unpkg.com/leaflet@1.3.1/dist/leaflet.css",
                 [
