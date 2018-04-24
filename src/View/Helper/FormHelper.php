@@ -254,7 +254,7 @@
                         $options = $this->__durationPicker($options);
                         break;
                     case 'filepond':
-                        $options = $this->__filepond($options);
+                        $options = $this->__filepond($fieldName, $options);
                     case 'countries':
                         $options = $this->__countries($options);
                 }
@@ -276,6 +276,7 @@
             $options['type'] = 'select';
             $script = "populateCountries(\"${countriesId}\", \"${statesId}\");";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+
             return $options;
         }
 
@@ -882,7 +883,7 @@ CHECK_ALL_SCRIPT;
             return $options;
         }
 
-        private function __filepond($options) {
+        private function __filepond($fieldName, $options) {
 
 
             $filepondOptions = [
@@ -917,6 +918,12 @@ CHECK_ALL_SCRIPT;
   ${filepondOptions}
 );";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+            $this->unlockField($fieldName . '.name');
+            $this->unlockField($fieldName . '.type');
+            $this->unlockField($fieldName . 'tmp_name');
+            $this->unlockField($fieldName . 'error');
+            $this->unlockField($fieldName . 'size');
+            $this->unlockField($fieldName);
 
             return $options;
         }
@@ -973,6 +980,7 @@ CHECK_ALL_SCRIPT;
             $this->Html->useCssFile(['Scid.select2.min', 'Scid.select2-bootstrap.min']);
             $this->Html->useScript('Scid.select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $options['type'] = 'select';
+            $id = $options['id'];
             $script = "$(document).ready(function() {
     $('#{$id}').select2();
 });";
