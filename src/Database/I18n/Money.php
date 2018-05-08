@@ -7,23 +7,45 @@
      */
 
     namespace Scid\I18n;
-    use SebastianBergmann\Money\IntlFormatter;
-    class Money extends \SebastianBergmann\Money\Money
+
+    use Money\Currencies\ISOCurrencies;
+    use Money\Currency;
+    use Money\Formatter\IntlMoneyFormatter;
+use Money\Money as MoneyPHP;
+
+    class Money
     {
         public static $defaultCurrency = 'USD';
-        public static $defaultLocale;
-        public function __construct($amount, $currency, $locale = null)
+        public static $defaultLocale = 'en_US';
+
+        /**
+         * @var MoneyPHP
+         */
+        protected  $_money;
+
+        public function __construct($amount, $currency = 'USD', $locale = null)
         {
             if (!empty($locale)) {
                 static::$defaultLocale = $locale;
             }
-            parent::__construct($amount, $currency);
+            $this->_money = new Money($amount, new Currency($currency));
         }
+
+        /**
+         * @param null $locale
+         *
+         * @return string
+         */
         public function format($locale = null)
         {
             $locale = $locale ?: static::$defaultLocale;
-            return (new IntlFormatter($locale))->format($this);
+            $currencies = new ISOCurrencies();
+
+            $numberFormatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+            $moneyFormatter = new IntlMoneyFormatter($numberFormatter, $currencies);
+           return $moneyFormatter->format($this->_money);
         }
+
         public function __toString()
         {
             return $this->format();

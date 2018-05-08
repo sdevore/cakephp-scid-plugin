@@ -3,6 +3,7 @@ namespace Scid\View\Helper;
 
 use Cake\View\Helper;
 use Cake\View\View;
+use Money\Money;
 use Scid\Utility\ScidUtils;
 
 /**
@@ -48,6 +49,16 @@ class ScidHelper extends Helper
         }
 
         return $boolean?$true:$false;
+
+    }
+
+    /**
+     * @param \Money\Money|NULL $money
+     *
+     * @return string
+     */
+    public static function money(Money $money = NULL) {
+        return ScidUtils::formatMoney($money);
 
     }
 }
