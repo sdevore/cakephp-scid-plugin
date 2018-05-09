@@ -7,6 +7,7 @@
      */
     $config = [
         'Scid' => [
+            'viewDebug'      => FALSE,
             'MarkdownHelper' => ['parser' => 'markdown-extra'],
             'HtmlHelper'     => [
                 'icons' => [
@@ -24,4 +25,5 @@
             ],
         ],
     ];
+
     return $config;

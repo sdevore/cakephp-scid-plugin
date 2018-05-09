@@ -516,7 +516,7 @@ MAP;
                     $icon = $options['icon'];
                 }
                 $icon += [
-                    'icon-class'  => 'd-inline d-md-none d-lg-inline',
+                    'icon-class'  => '.d-md-none .d-lg-inline',
                     'title-class' => 'd-none d-md-inline',
                 ];
 
@@ -713,6 +713,24 @@ ENABLEISOTOPE;
             else {
                 return $phone;
             }
+        }
+        public function bootstrapColTest() {
+            if (!Configure::read('Scid.viewDebug')) {
+                return '';
+            }
+            $return = '';
+            $sizes = [
+                'xs'=>['badge','badge-light','d-inline','d-sm-none'],
+                'sm' => ['badge','badge-success','d-none','d-sm-inline','d-md-none'],
+                'md'=> ['badge','badge-warning','d-none','d-md-inline','d-lg-none'],
+                'lg' =>['badge','badge-info','d-none','d-lg-inline','d-xl-none'],
+                'xl'=>['badge','badge-danger','d-none','d-xl-inline']
+            ];
+            foreach ($sizes as $label=>$class) {
+                $return .= $this->tag('span',$label,['class'=>$class]);
+            }
+            return $return;
+
         }
 
         /**
