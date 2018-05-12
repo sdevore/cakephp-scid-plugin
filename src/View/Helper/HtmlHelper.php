@@ -516,7 +516,7 @@ MAP;
                     $icon = $options['icon'];
                 }
                 $icon += [
-                    'icon-class'  => '.d-md-none .d-lg-inline',
+                    'icon-class'  => 'd-md-none d-lg-inline',
                     'title-class' => 'd-none d-md-inline',
                 ];
 
