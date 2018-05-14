@@ -272,7 +272,7 @@
       if (this.$editor === null) {
         // Create the panel
         var editorHeader = $('<div/>', {
-          'class': 'md-header btn-toolbar'
+          'class': 'md-heading btn-toolbar'
         });
 
         // Merge the main & additional button groups together
@@ -1110,7 +1110,7 @@
           hotkey: 'Ctrl+H',
           icon: {
             glyph: 'glyphicon glyphicon-header',
-            fa: 'fa fa-header',
+            fa: 'fa fa-heading',
             'fa-3': 'icon-font',
             octicons: 'octicon octicon-text-size'
           },
@@ -1191,7 +1191,7 @@
           hotkey: 'Ctrl+G',
           icon: {
             glyph: 'glyphicon glyphicon-picture',
-            fa: 'fa fa-picture-o',
+            fa: 'fa fa-image', // scid: modified for fontawesome pro
             'fa-3': 'icon-picture',
             octicons: 'octicon octicon-file-media'
           },

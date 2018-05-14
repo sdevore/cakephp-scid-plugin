@@ -226,14 +226,14 @@
                         $options = $this->__bootstrapDateTimePicker($options);
                         break;
                     case 'timepicker':
-                        $options = $this->__bootstrapTimePicker($options);
+                        $options = $this->__timePicker($options);
                         break;
-                    case 'daterangepicker':
-                        $options = $this->__bootstrapDateRangePicker($options);
+                    case 'daterange':
+                        $options = $this->__dateRange($options);
                         break;
                     case 'textarea':
                         if (isset($options['markdown'])) {
-                            $options = $this->__bootstrapMarkdown($options);
+                            $options = $this->__markdown($options);
                         }
                         break;
                     case 'select':
@@ -255,8 +255,13 @@
                         break;
                     case 'filepond':
                         $options = $this->__filepond($fieldName, $options);
+                        break;
                     case 'countries':
                         $options = $this->__countries($options);
+                        break;
+                    case 'toggle':
+                        $options = $this->__bootstrapToggle($fieldName, $options);
+                        break;
                 }
             }
 
@@ -266,6 +271,7 @@
         /**
          *
          * from https://www.cssscript.com/generic-country-state-dropdown-list-countries-js/#comments
+         *
          * @param $options
          *
          * @return mixed
@@ -292,10 +298,12 @@
          *
          * @return mixed
          */
-        private function __bootstrapMarkdown($options) {
+        private function __markdown($options) {
             $id = $options['id'];
+            // note we use a slightly modified from the upstream bootstrap-markdown
+            // to fix icon for picture
             $this->Html->useScript([
-                                       'Scid.bootstrap-markdown', 'Scid.markdown',
+                                       'Scid.bootstrap-markdown.scid', 'Scid.markdown',
                                        'Scid.to-markdown',
                                    ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
             if (!isset($options['rows'])) {
@@ -307,21 +315,22 @@
             $options['data-provide'] = 'markdown';
             $options['data-iconlibrary'] = "fa";
             $options['type'] = 'textarea';
-
+            $markdownOptions = [
+                'fullscreen' => ['enable' => FALSE],
+            ];
             if (!empty($options['markdown']['snippets'])) {
-                $btns = [];
+                $markdownOptions['addionalButtons'] = [];
                 foreach ($options['markdown']['snippets'] as $name => $value) {
                     $btnName = Inflector::camelize($name);
-                    $btns[] = <<<BTN
-{
-            name: "cmd{$btnName}",
-            toggle: false, // this param only take effect if you load bootstrap.js
-            title: "{$name}",
-            btnText: '{$name}',
-            callback: function(e){
+                    $btn = [
+                        'name'     => "cmd{$btnName}",
+                        'toggle'   => FALSE,
+                        'title'    => $name,
+                        'btnText'  => $name,
+                        'callback' => "function(e){
               // Replace selection with some drinks
 
-              chunk = "{$value} "
+              chunk = \"{$value} \"
 
               // transform selection and set the cursor into chunked text
               e.replaceSelection(chunk)
@@ -329,27 +338,17 @@
 
               // Set the cursor
               e.setSelection(cursor,cursor+chunk.length)
-            }
-          }
-BTN;
+            }",
+                    ];
                 }
-                $btnString = implode(',', $btns);
-
+            }
+            $markdownOptionsJson = json_encode($markdownOptions);
                 $script /** @lang JavaScript */ = <<<SCRIPT
-$("#{$id}").markdown({
-  additionalButtons: [
-    [{
-          name: "groupCustom",
-          data: [
-          {$btnString}
-          ]
-    }]
-  ]
-})
+$("#{$id}").markdown({$markdownOptionsJson})
 SCRIPT;
                 $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
                 unset($options['markdown']);
-            }
+
 
             return $options;
         }
@@ -363,28 +362,37 @@ SCRIPT;
          */
         private function __bootstrapToggle($fieldName, $options) {
             $idForInput = $this->domId($fieldName);
+            $options['type'] = 'checkbox';
+            $options['label'] = FALSE;
             $this->Html->useScript(['Scid.bootstrap-toggle.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-            $this->Html->useCssFile(['Scid.bootstrap-toggle.min','Scid.bootstrap-toggle.bootstrap4fix']);
+            $this->Html->useCssFile([
+                                        'Scid.bootstrap-toggle.min',
+                                        'Scid.bootstrap-toggle-bootstrap4fix',
+                                    ]);
             if (!empty($options['value']) && $options['value']) {
                 $options['checked'] = 'checked';
             }
-            $options['data-toggle'] ='toggle';
+            $options['data-toggle'] = 'toggle';
             $onSwitch = '';
             if (!empty($options['url'])) {
                 $url = $options['url'];
                 if (is_array($url)) {
-                    $url = Router::url($url);
+                    $url = $this->Url->build($url);
                 }
-
+                $token = $this->request->getParam('_csrfToken');
                 $onSwitch = /** @lang jquery */
                     <<<SWITCH
                 $(function() {
-    $('{$idForInput}').change(function() {
+    $('#{$idForInput}').change(function() {
+    var state=$(this).prop('checked');
       $.ajax({
   type: "GET",
-  url: "{$url}/new_state:" + state,
+  url: "{$url}&new_state=" + state,
   data: state,
   cache: false,
+  beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRF-Token', "{$token}");
+        },
   success: function(data, textStatus,jqXHR ){
      console.log(textStatus);
      console.log(data);
@@ -394,8 +402,10 @@ SCRIPT;
      console.log(textStatus);
      console.log(errorThrown);
      console.log(jqXHR);
-     $("#{$idForInput}").bootstrapSwitch('state', !state, true);
-     alert(textStatus + ':' + errorThrown);
+     $("#{$idForInput}").bootstrapToggle({
+     onstyle:'danger',offstyle:'danger'});
+     
+     alert(textStatus + ': problem updating database');
   }
 });
     })
@@ -426,14 +436,17 @@ SCRIPT;
 SWITCH;
             }
 
-            $this->Html->scriptBlock( $onSwitch, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+            $this->Html->scriptBlock($onSwitch, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
 
-            return $this->checkbox($fieldName, $options);
+            return $options;
         }
+
         /**
          * http://www.bootstrap-switch.org/ maynot support bootstrap 4 try bootstrapToggle
+         *
          * @param $fieldName
          * @param $options
+         *
          * @deprecated use boostrapToggle instead
          * @return string
          */
@@ -648,7 +661,7 @@ CHECK_ALL_SCRIPT;
          *
          * @return mixed
          */
-        private function __bootstrapDateRangePicker($options) {
+        private function __dateRange($options) {
             $id = $options['id'];
             $this->Html->useScript([
                                        'Scid.moment.min', 'Scid.daterangepicker',
@@ -700,11 +713,11 @@ CHECK_ALL_SCRIPT;
          *
          * @return mixed
          */
-        private function __bootstrapTimePicker($options) {
+        private function __timePicker($options) {
             $id = $options['id'];
             $this->Html->useScript(['Scid.bootstrap-timepicker.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $this->Html->useCssFile('Scid.bootstrap-timepicker');
-            $options['prepend'] = $this->Html->icon('clock-o');
+            $options['prepend'] = $this->Html->icon('clock');
             if (!empty($this->_inputDefaults['between'])) {
                 $options['between'] = $this->_inputDefaults['between'];
                 $options['between'] =
@@ -873,6 +886,7 @@ CHECK_ALL_SCRIPT;
         }
 
         /**
+         * @url http://www.daterangepicker.com
          * @param $options
          * @param $rangeOptionString
          */
@@ -913,25 +927,7 @@ CHECK_ALL_SCRIPT;
          * @param $rangeOptions
          */
         private function __rangeOptionsString($rangeOptions) {
-            $rangeOptionString = "{\n";
-            foreach ($rangeOptions as $key => $value) {
-                $key = '"' . $key . '"';
-                if (is_bool($value)) {
-                    $rangeOptionString .= $key . ': ' . ($value ? 'true' : 'false') . ",\n";
-                }
-                elseif (is_array($value)) {
-                    $rangeOptionString .= $key . ": " . $this->__rangeOptionsString($value);
-                }
-                elseif (FALSE != strpos($key, 'Date')) {
-                    $rangeOptionString .= $key . ': \'' . CakeTime::format($value, '%m/%d/%Y') . "',\n";
-                }
-                else {
-                    $rangeOptionString .= $key . ': \'' . $value . "',\n";
-                }
-            }
-            $rangeOptionString .= '}';
-
-            return $rangeOptionString;
+            return json_encode($rangeOptions);
         }
 
         /**
