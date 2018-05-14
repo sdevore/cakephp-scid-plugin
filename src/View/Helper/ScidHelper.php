@@ -44,7 +44,7 @@ class ScidHelper extends Helper
                 break;
             case 'yes-no':
                 $true = 'Yes';
-                $true = 'No';
+                $false = 'No';
                 break;
         }
 
