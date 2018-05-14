@@ -11,7 +11,7 @@
     use Cake\Database\Driver;
     use Cake\Database\Type;
     use Money\Currency;
-    use Money\Money;
+    use Scid\Database\I18n\Money;
     use PDO;
 
     class MoneyType extends Type
@@ -36,7 +36,10 @@
                 return $value;
             }
             try {
-                return new Money($value, new Currency('USD'));
+                if (empty($value)) {
+                    $value = 0;
+                }
+                return new Money($value *100, new Currency('USD'));
             } catch (\Exception $e) {
                 return NULL;
             }
