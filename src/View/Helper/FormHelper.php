@@ -343,12 +343,11 @@
                 }
             }
             $markdownOptionsJson = json_encode($markdownOptions);
-                $script /** @lang JavaScript */ = <<<SCRIPT
+            $script /** @lang JavaScript */ = <<<SCRIPT
 $("#{$id}").markdown({$markdownOptionsJson})
 SCRIPT;
-                $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-                unset($options['markdown']);
-
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+            unset($options['markdown']);
 
             return $options;
         }
@@ -728,8 +727,20 @@ CHECK_ALL_SCRIPT;
             }
             $options['type'] = 'text';
 
+            $json =
+                [
+                    'icons' => [
+                        'up'   => 'far fa-chevron-up',
+                        'down' => 'far fa-chevron-down',
+                    ],
+                ];
+            if (!empty($options['timepicker'])) {
+                $json = $json + $options['timepicker'];
+                unset($options['timepicker']);
+            }
+            $json = json_encode($json);
             $this->Html->scriptBlock("$(document).ready(function() {
-        $('#{$id}').timepicker();
+        $('#{$id}').timepicker({$json});
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
 
             return $options;
@@ -1068,8 +1079,16 @@ CHECK_ALL_SCRIPT;
             $this->Html->useScript('Scid.select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $options['type'] = 'select';
             $id = $options['id'];
+            if (empty($options['select2'])) {
+                $selectOptions = ['minimumResultsForSearch' => 10];
+            }
+            else {
+                $selectOptions = $options['select2'];
+                unset($options['select2']);
+            }
+            $selectOptions = json_encode($selectOptions);
             $script = "$(document).ready(function() {
-    $('#{$id}').select2();
+    $('#{$id}').select2({$selectOptions});
 });";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
 
