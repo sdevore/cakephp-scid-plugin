@@ -53,11 +53,11 @@ class ScidHelper extends Helper
     }
 
     /**
-     * @param \Money\Money|NULL $money
+     * @param \Money\Money|NULL|\Scid\Database\I18n\Money $money
      *
      * @return string
      */
-    public static function money(Money $money = NULL) {
+    public static function money( $money = NULL) {
         return ScidUtils::formatMoney($money);
 
     }

@@ -84,24 +84,18 @@
         }
 
         /**
-         * @param \Money\Money|NULL $money
+         * @param \Money\Money|\Scid\Database\I18n\Money|NULL $money
          *
          * @return string
          */
-        public static function formatMoney(Money $money = NULL) {
+        public static function formatMoney( $money = NULL) {
             if (NULL === $money) {
-                $money = new Money(0, new Currency('USD'));
+                $money = new \Scid\Database\I18n\Money(0, new Currency('USD'));
             }
-            if (empty(ScidUtils::$currencies)) {
-                ScidUtils::$currencies = new ISOCurrencies();
+            if ($money instanceof \Money\Money) {
+                $money = new \Scid\Database\I18n\Money($money->getAmount(), $money->getCurrency());
             }
-            if (empty(ScidUtils::$numberFormatter)) {
-             ScidUtils::$numberFormatter = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
-            }
-            if (empty(ScidUtils::$moneyFormatter)) {
-                ScidUtils::$moneyFormatter = new IntlMoneyFormatter(ScidUtils::$numberFormatter, ScidUtils::$currencies);
-            }
-            return ScidUtils::$moneyFormatter->format($money);
+            return $money->format();
 
         }
     }
