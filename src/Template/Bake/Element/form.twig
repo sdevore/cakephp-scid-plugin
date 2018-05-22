@@ -1,0 +1,46 @@
+<div class="{{ pluralVar }} form content">
+    <?= $this->Form->create(${{ singularVar }}) ?>
+    <div class="card">
+        <div class="card-header">
+            <strong><?= __('{{ action|humanize }} {{ singularHumanName }}') ?></strong>
+        </div>
+        <div class="card-body">
+            <fieldset>
+                <legend><?= __('{{ action|humanize }} {{ singularHumanName }}') ?></legend>
+{% for field in fields if field not in primaryKey %}
+    {%- if keyFields[field] %}
+        {%- set fieldData = Bake.columnData(field, schema) %}
+        {%- if fieldData.null %}
+            <?= $this->Form->control('{{ field }}', ['options' => ${{ keyFields[field] }}, 'empty' => true]); ?>
+        {{- "\n" }}
+        {%- else %}
+            <?= $this->Form->control('{{ field }}', ['options' => ${{ keyFields[field] }}]); ?>
+            {{- "\n" }}
+        {%- endif %}
+        {%- elseif field not in ['created', 'modified', 'updated'] %}
+            {%- set fieldData = Bake.columnData(field, schema) %}
+            {%- if fieldData.type in ['date', 'datetime', 'time'] and fieldData.null %}
+           <?= $this->Form->control('{{ field }}', ['empty' => true]); ?>
+                {{- "\n" }}
+            {%- else %}
+            <?= $this->Form->control('{{ field }}'); ?>
+                {{- "\n" }}
+            {%- endif %}
+        {%- endif %}
+        {%- endfor %}
+
+        {%- if associations.BelongsToMany %}
+            {%- for assocName, assocData in associations.BelongsToMany %}
+            <?= $this->Form->control('{{ assocData.property }}._ids', ['options' => ${{ assocData.variable }}]); ?>
+                {{- "\n" }}
+            {%- endfor %}
+        {% endif %}
+            </fieldset>
+        </div>
+   <div class="card-footer">
+    <?= $this->Form->button(__('Submit'),['class'=>'success']) ?>
+   </div>
+    </div>
+    <?= $this->Form->end() ?>
+
+</div>
