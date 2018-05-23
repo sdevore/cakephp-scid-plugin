@@ -305,7 +305,7 @@ DRIVER_TOUR_BLOCK;
                     }
                     $value['options'] = $this->injectClasses(['dropdown-item'], $value['options']);
                     $link[] =
-                        $this->link(__('For {0}', $value['title']), $value['url'], $value['options']);
+                        $this->link($value['title'], $value['url'], $value['options']);
                 }
             }
             $link = join("\r", $link);
