@@ -264,6 +264,58 @@ DRIVER_TOUR_BLOCK;
             return $this->link($title, $url, $options);
         }
 
+        public function dropdown($title, $url = '', array $links = [], array $options = []) {
+            if (isset($options['div'])) {
+                $divOptions = $options['div'];
+                unset($options['div']);
+            }
+            else {
+                $divOptions = [];
+            }
+            $divOptions = $this->injectClasses('btn-group', $divOptions);
+            if (empty($url)) {
+
+                $dropOptions = $this->injectClasses(['dropdown-toggle'], $options);
+                $dropOptions['data-toggle'] = 'dropdown';
+                $dropOptions['aria-haspopup'] = 'true';
+                $dropOptions['aria-expanded'] = 'false';
+                $dropOptions['id'] = uniqid('dropdownMenuButton');
+                $dropdown = $this->button($title, '#', $dropOptions);
+            }
+            else {
+                $dropdown = $this->button($title, $url, $options);
+                $dropOptions =
+                    $this->injectClasses(['dropdown-toggle', 'dropdown-toggle-split'], $options);
+                $dropOptions['data-toggle'] = 'dropdown';
+                $dropOptions['aria-haspopup'] = 'true';
+                $dropOptions['aria-expanded'] = 'false';
+                $dropOptions['escape'] = FALSE;
+                $dropOptions['id'] = uniqid('dropdownMenuButton');
+                $dropdown .=
+                    $this->button('<span class="sr-only">Toggle Dropdown</span>', '#', $dropOptions);
+            }
+            $link = [];
+            foreach ($links as $value) {
+                if (isset($value['separator'])) {
+                    $link[] = '<div class="dropdown-divider"></div>';
+                }
+                else {
+                    if (empty($value['options'])) {
+                        $value['options'] = [];
+                    }
+                    $value['options'] = $this->injectClasses(['dropdown-item'], $value['options']);
+                    $link[] =
+                        $this->link(__('For {0}', $value['title']), $value['url'], $value['options']);
+                }
+            }
+            $link = join("\r", $link);
+            $menu = $this->tag('div', $link, [
+                'class' => 'dropdown-menu', 'aria-labelledby' => $dropOptions['id'],
+            ]);
+
+            return $this->tag('div', $dropdown . $menu, $divOptions);
+        }
+
         /**
          * @param string|\Cake\ORM\Entity $path
          * @param array                   $options
@@ -317,7 +369,7 @@ DRIVER_TOUR_BLOCK;
             if (empty($this->_mapConfig)) {
                 $this->_mapConfig = Configure::read('Scid.map');
             }
-            if (empty($this->_mapConfig) || empty($this->_mapConfig['showMaps']) || $this->_mapConfig['showMaps'] === false) {
+            if (empty($this->_mapConfig) || empty($this->_mapConfig['showMaps']) || $this->_mapConfig['showMaps'] === FALSE) {
                 return '<!-- maps are disabled -->';
             }
             $this->useCssFile(
@@ -714,23 +766,24 @@ ENABLEISOTOPE;
                 return $phone;
             }
         }
+
         public function bootstrapColTest() {
             if (!Configure::read('Scid.viewDebug')) {
                 return '';
             }
             $return = '';
             $sizes = [
-                'xs'=>['badge','badge-light','d-inline','d-sm-none'],
-                'sm' => ['badge','badge-success','d-none','d-sm-inline','d-md-none'],
-                'md'=> ['badge','badge-warning','d-none','d-md-inline','d-lg-none'],
-                'lg' =>['badge','badge-info','d-none','d-lg-inline','d-xl-none'],
-                'xl'=>['badge','badge-danger','d-none','d-xl-inline']
+                'xs' => ['badge', 'badge-light', 'd-inline', 'd-sm-none'],
+                'sm' => ['badge', 'badge-success', 'd-none', 'd-sm-inline', 'd-md-none'],
+                'md' => ['badge', 'badge-warning', 'd-none', 'd-md-inline', 'd-lg-none'],
+                'lg' => ['badge', 'badge-info', 'd-none', 'd-lg-inline', 'd-xl-none'],
+                'xl' => ['badge', 'badge-danger', 'd-none', 'd-xl-inline'],
             ];
-            foreach ($sizes as $label=>$class) {
-                $return .= $this->tag('span',$label,['class'=>$class]);
+            foreach ($sizes as $label => $class) {
+                $return .= $this->tag('span', $label, ['class' => $class]);
             }
-            return $return;
 
+            return $return;
         }
 
         /**
