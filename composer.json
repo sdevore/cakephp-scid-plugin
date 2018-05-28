@@ -14,8 +14,7 @@
     "picqer/php-barcode-generator": "^0.2.2",
     "tijsverkoyen/css-to-inline-styles": "^2.2",
     "twbs/bootstrap": "^4.1.0",
-    "npm-asset/flatpickr": "*",
-
+    "npm-asset/jquery": "^2.2",
     "oomphinc/composer-installers-extender": "^1.1"
   },
   "require-dev": {
