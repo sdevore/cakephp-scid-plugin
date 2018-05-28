@@ -19,7 +19,7 @@
     "npm-asset/filepond": "^1.6",
     "npm-asset/filepond-plugin-file-validate-size": "*",
     "npm-asset/filepond-plugin-image-exif-orientation": "*",
-    "npm-asset/filepond-plugin-image-resize": "*",
+    "npm-asset/filepond-plugin-image-resize": "dev-master",
     "npm-asset/filepond-plugin-file-validate-type": "*",
     "npm-asset/filepond-plugin-image-transform": "*",
     "npm-asset/filepond-plugin-image-preview": "*",
