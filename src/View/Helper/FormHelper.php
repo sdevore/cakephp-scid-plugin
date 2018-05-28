@@ -801,7 +801,7 @@ CHECK_ALL_SCRIPT;
             $defaultRangeOptions = [
                 'singleDatePicker' => TRUE,
                 'timePicker'       => FALSE,
-                'locale'           => ['format' => 'MM/DD/YYYY h:mm A'],
+                'locale'           => ['format' => 'MM/DD/YYYY'],
             ];
             $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
