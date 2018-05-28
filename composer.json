@@ -21,7 +21,7 @@
     "npm-asset/filepond-plugin-image-exif-orientation": "dev-master",
     "npm-asset/filepond-plugin-image-resize": "dev-master",
     "npm-asset/filepond-plugin-file-validate-type": "dev-master",
-    "npm-asset/filepond-plugin-image-transform": "dev-master",
+    "npm-asset/filepond-plugin-image-transform": "^1",
     "npm-asset/filepond-plugin-image-preview": "dev-master",
     "npm-asset/filepond-plugin-file-encode": "dev-master",
     "npm-asset/filepond-plugin-file-crop": "dev-master",
