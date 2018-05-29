@@ -262,6 +262,9 @@
                     case 'toggle':
                         $options = $this->__bootstrapToggle($fieldName, $options);
                         break;
+                    case 'signature':
+                        $options = $this->__signature($fieldName, $options);
+                        break;
                 }
             }
 
@@ -1092,6 +1095,18 @@ CHECK_ALL_SCRIPT;
 });";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
 
+            return $options;
+        }
+
+        private function __signature($fieldName, $options) {
+            $this->addWidget('signature',
+                             ['Scid.Signature', 'text', 'label']);
+            $this->Html->useScript('/assets/npm-asset/jsignature/libs/jSignature.min',['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $this->Html->useScript('/assets/npm-asset/jsignature/libs/flashcanvas',['block' => HtmlHelper::SCRIPT_TOP]);
+            $signatureBlock ="$(document).ready(function() {
+        $('#signature-container').jSignature({color:'#fff'})
+    })";
+            $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             return $options;
         }
 

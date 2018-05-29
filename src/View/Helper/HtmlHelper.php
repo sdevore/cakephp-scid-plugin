@@ -43,6 +43,7 @@
         const SCID_CSS_PATHS = 'Scid.css.paths';
         const SCID_SCRIPT_URLS = 'Scid.script.urls';
         const SCRIPT_BOTTOM = 'scriptBottom';
+        const SCRIPT_TOP = 'scriptTop';
 
         /**
          * A list of allowed styles for buttons.
@@ -175,6 +176,21 @@ DRIVER_TOUR_BLOCK;
             }
 
             return $lessArray;
+        }
+
+        public function animatedScrollTo ($id, $offset = 0) {
+            $scriptBlock =
+                /** @lang JavaScript 1.8 */
+                <<<ANIMATED_SCROLL_TO
+$(document).ready(function () {
+    // Handler for .ready() called.
+    $('html, body').animate({
+        scrollTop: $('#{$id}').offset().top + {$offset}
+    }, 'slow');
+});
+ANIMATED_SCROLL_TO;
+
+            $this->scriptBlock($scriptBlock, ['block' => self::SCRIPT_BOTTOM]);
         }
 
         public function barcode() {
