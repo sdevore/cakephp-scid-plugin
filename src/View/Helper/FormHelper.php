@@ -1099,13 +1099,76 @@ CHECK_ALL_SCRIPT;
         }
 
         private function __signature($fieldName, $options) {
+            $id = $options['id'];
+            $wrapper_id = 'signature-pad-' . $id;
+            $options['templateVars']['id'] = $wrapper_id;
+            if (empty($options['templateVars']['canvasClass'])) {
+                $options['templateVars']['canvasClass'] = 'signature-pad-canvas';
+                $options['templateVars']['canvasId'] = 'signature-pad-canvas-' . $id;
+            }
+            if (!empty($options['signature'])) {
+                if (!empty($options['signature']['mime-type'])) {
+                    $mimeType = $options['signature']['mime-type'];
+                }
+                else {
+                    $mimeType = 'image/svg+xml';
+                }
+                if (!empty($options['signature']['options'])) {
+                    $signatureOptions = $options['signature']['options'];
+                }
+                unset($options['signature']);
+            }
+            if (empty($signatureOptions)) {
+                $signatureOptions = ["backgroundColor"=> 'rgb(255, 255, 255)'];
+            }
+            $signatureOptions = json_encode($signatureOptions);
+            $signatureOptions = substr($signatureOptions, 0,-1);
+            $signatureOptions .= ",\n onEnd: function (event) {
+        var dataURL = signaturePad.toDataURL('{$mimeType}');
+        document.getElementById('{$id}').value = dataURL;
+    }
+            }";
+
             $this->addWidget('signature',
                              ['Scid.Signature', 'text', 'label']);
-            $this->Html->useScript('/assets/npm-asset/jsignature/libs/jSignature.min',['block' => HtmlHelper::SCRIPT_BOTTOM]);
-            $this->Html->useScript('/assets/npm-asset/jsignature/libs/flashcanvas',['block' => HtmlHelper::SCRIPT_TOP]);
-            $signatureBlock ="$(document).ready(function() {
-        $('#signature-container').jSignature({color:'#fff'})
-    })";
+            $this->Html->useScript('/assets/npm-asset/signature_pad/dist/signature_pad.min',['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $signatureBlock = /** @lang JavaScript 1.8 */
+                <<<SIGNATURE_SCRIPT
+var wrapper = document.getElementById("{$wrapper_id}");
+var canvas = wrapper.querySelector("canvas");
+var signaturePad = new SignaturePad(canvas, 
+    // It's Necessary to use an opaque color when saving image as JPEG;
+    // this option can be omitted if only saving as PNG or SVG
+    {$signatureOptions}
+);
+
+// Adjust canvas coordinate space taking into account pixel ratio,
+// to make it look crisp on mobile devices.
+// This also causes canvas to be cleared.
+function resizeCanvas() {
+    // When zoomed out to less than 100%, for some very strange reason,
+    // some browsers report devicePixelRatio as less than 1
+    // and only part of the canvas is cleared then.
+    var ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+    // This part causes the canvas to be cleared
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext("2d").scale(ratio, ratio);
+
+    // This library does not listen for canvas changes, so after the canvas is automatically
+    // cleared by the browser, SignaturePad#isEmpty might still return false, even though the
+    // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
+    // that the state of this library is consistent with visual state of the canvas, you
+    // have to clear it manually.
+    signaturePad.clear();
+}
+
+// On mobile devices it might make more sense to listen to orientation change,
+// rather than window resize events.
+window.onresize = resizeCanvas;
+resizeCanvas();
+SIGNATURE_SCRIPT;
             $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             return $options;
         }

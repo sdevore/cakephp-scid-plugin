@@ -19,9 +19,11 @@
 
         public function __construct(StringTemplate $templates) {
             $templates->add([
-                                'signatureFormGroup' => '{{label}}<div class="signatureFormGroup bg-danger %s">{{input}}{{error}}{{help}}</div>',
-                                'signatureContainer' => '<div id="signature-container" class="bg-danger"></div><div class="signatureContainer {{type}}{{required}}">{{content}}</div>',
-                                'signature'          => '<input type="{{type}}" name="{{name}}"{{attrs}}/>',
+                                'signatureFormGroup' => '{{label}}<div class="signatureFormGroup {{class}}">{{input}}{{error}}{{help}}</div>',
+                                'signatureContainer' => '<div id="{{id}}" class="signatureContainer {{containerClass}} {{type}}{{required}}">
+      <canvas id="{{canvasId}}" class="signature-pad-canvas {{canvasClass}}"></canvas>
+    {{content}}</div>',
+                                'signature'          => '<input type="{{type}}" name="{{name}}"{{attrs}} signature/>',
                             ]);
 
             $this->_templates = $templates;
