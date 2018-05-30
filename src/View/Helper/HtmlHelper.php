@@ -20,31 +20,46 @@
     class HtmlHelper extends Helper
     {
 
-        protected $_mapConfig;
-        protected $_didEnablePopovers = FALSE;
-        protected $_icons = [
-            'add'         => 'plus',
-            'add-user'    => 'user-plus',
-            'delete'      => 'times',
-            'delete-user' => 'user-times',
-            'calendar'    => 'calendar',
-            'view'        => 'eye',
-            'help'        => 'question-circle',
-            'news'        => [
-                'icon'   => 'newspaper',
-                'weight' => 'regular',
-            ],
-            'email'       => 'envelope-square',
-            'cell'        => 'mobile',
-            'remind'      => 'retweet',
-            'users'       => 'users',
-
-        ];
         const SCID_CSS_PATHS = 'Scid.css.paths';
         const SCID_SCRIPT_URLS = 'Scid.script.urls';
         const SCRIPT_BOTTOM = 'scriptBottom';
         const SCRIPT_TOP = 'scriptTop';
-
+        /**
+         * A mapping of aliases for button styles.
+         *
+         * @var array
+         */
+        public $buttonAttrAliases = [
+            'sm'    => 'btn-sm',
+            'xs'    => 'btn-xs',
+            'lg'    => 'btn-lg',
+            'block' => 'btn-block',
+        ];
+        /**
+         * A mapping of aliases for button styles.
+         *
+         * @var array
+         */
+        public $buttonClassAliases = [
+            'default'           => 'btn-default',
+            'success'           => 'btn-success',
+            'warning'           => 'btn-warning',
+            'danger'            => 'btn-danger',
+            'info'              => 'btn-info',
+            'primary'           => 'btn-primary',
+            'hotlist'           => 'btn-hotlist',
+            'company'           => 'btn-company',
+            'busy'              => 'btn-busy',
+            'available'         => 'btn-available',
+            'company-accepted'  => 'btn-company-accepted',
+            'pending'           => 'btn-pending',
+            'opened'            => 'btn-opened',
+            'expired'           => 'btn-expired',
+            'accepted'          => 'btn-accepted',
+            'accepted-pending'  => 'btn-accepted-pending',
+            'accepted-no-block' => 'btn-accepted-no-block',
+            'declined'          => 'btn-declined',
+        ];
         /**
          * A list of allowed styles for buttons.
          *
@@ -71,43 +86,25 @@
             'declined', 'btn-declined',
 
         ];
+        protected $_mapConfig;
+        protected $_didEnablePopovers = FALSE;
+        protected $_icons = [
+            'add'         => 'plus',
+            'add-user'    => 'user-plus',
+            'delete'      => 'times',
+            'delete-user' => 'user-times',
+            'calendar'    => 'calendar',
+            'view'        => 'eye',
+            'help'        => 'question-circle',
+            'news'        => [
+                'icon'   => 'newspaper',
+                'weight' => 'regular',
+            ],
+            'email'       => 'envelope-square',
+            'cell'        => 'mobile',
+            'remind'      => 'retweet',
+            'users'       => 'users',
 
-        /**
-         * A mapping of aliases for button styles.
-         *
-         * @var array
-         */
-        public $buttonClassAliases = [
-            'default'           => 'btn-default',
-            'success'           => 'btn-success',
-            'warning'           => 'btn-warning',
-            'danger'            => 'btn-danger',
-            'info'              => 'btn-info',
-            'primary'           => 'btn-primary',
-            'hotlist'           => 'btn-hotlist',
-            'company'           => 'btn-company',
-            'busy'              => 'btn-busy',
-            'available'         => 'btn-available',
-            'company-accepted'  => 'btn-company-accepted',
-            'pending'           => 'btn-pending',
-            'opened'            => 'btn-opened',
-            'expired'           => 'btn-expired',
-            'accepted'          => 'btn-accepted',
-            'accepted-pending'  => 'btn-accepted-pending',
-            'accepted-no-block' => 'btn-accepted-no-block',
-            'declined'          => 'btn-declined',
-        ];
-
-        /**
-         * A mapping of aliases for button styles.
-         *
-         * @var array
-         */
-        public $buttonAttrAliases = [
-            'sm'    => 'btn-sm',
-            'xs'    => 'btn-xs',
-            'lg'    => 'btn-lg',
-            'block' => 'btn-block',
         ];
 
         /**
@@ -123,24 +120,37 @@
             parent::__construct($View, $config);
         }
 
-        public function driverTourButton($title, $options, $tour = []) {
-            if (empty($tour)) {
-                return '';
+        function GetCenterFromDegrees($data) {
+            if (!is_array($data)) return FALSE;
+
+            $num_coords = count($data);
+
+            $X = 0.0;
+            $Y = 0.0;
+            $Z = 0.0;
+
+            foreach ($data as $coord) {
+                $lat = $coord[0] * pi() / 180;
+                $lon = $coord[1] * pi() / 180;
+
+                $a = cos($lat) * cos($lon);
+                $b = cos($lat) * sin($lon);
+                $c = sin($lat);
+
+                $X += $a;
+                $Y += $b;
+                $Z += $c;
             }
-            $this->useCssFile('Scid.driver.min');
-            $this->useScript('Scid.driver.min');
-            $jsonTour = json_encode($tour);
-            $driverName = uniqid('driver');
-            $scriptBlock = <<<DRIVER_TOUR_BLOCK
-const ${driverName} = new Driver();
-// Define the steps for introduction
-${driverName}.defineSteps(${jsonTour});
-DRIVER_TOUR_BLOCK;
 
-            $this->scriptBlock($scriptBlock, ['block' => self::SCRIPT_BOTTOM]);
-            $options['onclick'] = $driverName . '.start()';
+            $X /= $num_coords;
+            $Y /= $num_coords;
+            $Z /= $num_coords;
 
-            return $this->button($title, '#', $options);
+            $lon = atan2($Y, $X);
+            $hyp = sqrt($X * $X + $Y * $Y);
+            $lat = atan2($Z, $hyp);
+
+            return [$lat * 180 / pi(), $lon * 180 / pi()];
         }
 
         /**
@@ -163,35 +173,7 @@ DRIVER_TOUR_BLOCK;
             $this->_View->set('lessArray', $lessArray);
         }
 
-        /**
-         * get the less files
-         *
-         * @return array|mixed
-         */
-        public function getLess() {
-            $lessArray = $this->_View->get('lessArray');
-
-            if (empty($lessArray)) {
-                $lessArray = [];
-            }
-
-            return $lessArray;
-        }
-
-        public function fontCursor($selector, $icon, $options = [])  {
-            $this->useScript('/assets/npm-asset/jquery-awesome-cursor/jquery-awesome-cursor.min')
-            if (!empty($options)) {
-                $options =  ',' . json_encode($options);
-            }
-            else {
-                $options = '';
-            }
-            $fontCursor = "$('{$selector}').awesomeCursor('{$icon}' {$options});";
-            $this->scriptBlock($fontCurso, ['block' => self::SCRIPT_BOTTOM]);
-        }
-
-
-        public function animatedScrollTo ($id, $offset = 0) {
+        public function animatedScrollTo($id, $offset = 0) {
             $scriptBlock =
                 /** @lang JavaScript 1.8 */
                 <<<ANIMATED_SCROLL_TO
@@ -214,67 +196,23 @@ ANIMATED_SCROLL_TO;
             $generatorHTML = new BarcodeGeneratorHTML();
         }
 
-        /**
-         * @param       $email
-         * @param array $options 'label' becomes the title if you don't want to use the $email, 'subject','body' added
-         *                       to the mailto url
-         *
-         * @return string
-         */
-        public function emailButton($email, $options = []) {
-            $title = $email;
-            if (isset($options['label'])) {
-                $title = $options['label'];
-                unset($options['label']);
+        public function bootstrapColTest() {
+            if (!Configure::read('Scid.viewDebug')) {
+                return '';
+            }
+            $return = '';
+            $sizes = [
+                'xs' => ['badge', 'badge-light', 'd-inline', 'd-sm-none'],
+                'sm' => ['badge', 'badge-success', 'd-none', 'd-sm-inline', 'd-md-none'],
+                'md' => ['badge', 'badge-warning', 'd-none', 'd-md-inline', 'd-lg-none'],
+                'lg' => ['badge', 'badge-info', 'd-none', 'd-lg-inline', 'd-xl-none'],
+                'xl' => ['badge', 'badge-danger', 'd-none', 'd-xl-inline'],
+            ];
+            foreach ($sizes as $label => $class) {
+                $return .= $this->tag('span', $label, ['class' => $class]);
             }
 
-            if (!isset($options['icon'])) {
-                $options['icon'] = 'email';
-            }
-            $url = 'mailto:' . $email;
-            $query = [];
-            if (!empty($options['subject'])) {
-                $query[] = 'subject=' . $$options['subject'];
-                unset($options['subject']);
-            }
-            if (!empty($options['body'])) {
-                $query[] = 'body=' . $$options['subject'];
-                unset($options['body']);
-            }
-            if (!empty($query)) {
-                $url .= '?' . join('&', $query);
-            }
-
-            return $this->button($title, $url, $options);
-        }
-
-        /**
-         * @param       $phone
-         * @param array $options 'label' becomes the title if you don't want to use the $email, 'subject','body' added
-         *                       to the mailto url
-         *
-         * @return string
-         */
-        public function phoneButton($phone, $options = []) {
-            if (isset($options['label'])) {
-                $title = $options['label'];
-                unset($options['label']);
-            }
-            else {
-                $title = $this->phone($phone);
-            }
-            if (!isset($options['icon'])) {
-                if (!empty($phone->type) && $phone->type->name == 'Cell') {
-                    $options['icon'] = 'cell';
-                }
-                else {
-                    $options['icon'] = 'phone';
-                }
-            }
-
-            $url = 'tel:' . $phone;
-
-            return $this->button($title, $url, $options);
+            return $return;
         }
 
         /**
@@ -291,6 +229,26 @@ ANIMATED_SCROLL_TO;
             $options = $this->renameClasses($this->buttonAttrAliases, $options);
 
             return $this->link($title, $url, $options);
+        }
+
+        public function driverTourButton($title, $options, $tour = []) {
+            if (empty($tour)) {
+                return '';
+            }
+            $this->useCssFile('Scid.driver.min');
+            $this->useScript('Scid.driver.min');
+            $jsonTour = json_encode($tour);
+            $driverName = uniqid('driver');
+            $scriptBlock = <<<DRIVER_TOUR_BLOCK
+const ${driverName} = new Driver();
+// Define the steps for introduction
+${driverName}.defineSteps(${jsonTour});
+DRIVER_TOUR_BLOCK;
+
+            $this->scriptBlock($scriptBlock, ['block' => self::SCRIPT_BOTTOM]);
+            $options['onclick'] = $driverName . '.start()';
+
+            return $this->button($title, '#', $options);
         }
 
         public function dropdown($title, $url = '', array $links = [], array $options = []) {
@@ -346,143 +304,142 @@ ANIMATED_SCROLL_TO;
         }
 
         /**
-         * @param string|\Cake\ORM\Entity $path
-         * @param array                   $options
+         * @param       $email
+         * @param array $options 'label' becomes the title if you don't want to use the $email, 'subject','body' added
+         *                       to the mailto url
          *
-         * @return null|string
+         * @return string
          */
-        public function image($path, array $options = []) {
-            $classes = [];
-            if (!is_string($path) && $path instanceof Entity) {
-                $entity = $path;
-                $retinaPrefix = NULL;
-                $field = 'photo';
+        public function emailButton($email, $options = []) {
+            $title = $email;
+            if (isset($options['label'])) {
+                $title = $options['label'];
+                unset($options['label']);
+            }
 
-                if (!empty($options['field'])) {
-                    $field = $options['field'];
-                    unset($options['field']);
-                }
+            if (!isset($options['icon'])) {
+                $options['icon'] = 'email';
+            }
+            $url = 'mailto:' . $email;
+            $query = [];
+            if (!empty($options['subject'])) {
+                $query[] = 'subject=' . $$options['subject'];
+                unset($options['subject']);
+            }
+            if (!empty($options['body'])) {
+                $query[] = 'body=' . $$options['subject'];
+                unset($options['body']);
+            }
+            if (!empty($query)) {
+                $url .= '?' . join('&', $query);
+            }
 
-                if (method_exists($entity, 'getImagePath')) {
-                    $path = $entity->getImagePath($field, $options);
-                }
-                if (method_exists($entity, 'getRetinaImagePath')) {
-                    $retinaPath = $entity->getRetinaImagePath($field, $options);
-                }
-            }
-            if (!empty($options['retina'])) {
-                $retinaPath = $options['retina'];
-                unset($options['retina']);
-                $this->useScript('Scid.retina.min', ['block' => self::SCRIPT_BOTTOM]);
-            }
-            if (!empty($retinaPath)) {
-                $options['data-rjs'] = $retinaPath;
-            }
-            if (isset($options['responsive'])) {
-                $classes[] = 'img-responsive';
-                unset($options['responsive']);
-            }
-            if (!empty($options['shape'])) {
-                $classes[] = 'img-' . $options['shape'];
-                unset($options['shape']);
-            }
-            if (isset($options['full'])) {
-                unset($options['full']);
-            }
-            $options = $this->injectClasses($classes, $options);
-
-            return parent::image($path, $options);
+            return $this->button($title, $url, $options);
         }
 
-        public function map($options) {
-            if (empty($this->_mapConfig)) {
-                $this->_mapConfig = Configure::read('Scid.map');
-            }
-            if (empty($this->_mapConfig) || empty($this->_mapConfig['showMaps']) || $this->_mapConfig['showMaps'] === FALSE) {
-                return '<!-- maps are disabled -->';
-            }
-            $this->useCssFile(
-                "https://unpkg.com/leaflet@1.3.1/dist/leaflet.css",
-                [
-                    'integrity'   => "sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==",
-                    'crossorigin' => "",
-                ]);
-            $this->useScript(
-                "https://unpkg.com/leaflet@1.3.1/dist/leaflet.js",
-                [
-                    'integrity'   => "sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==",
-                    'crossorigin' => "",
-                ]);
-            $center = [
-                'lat' => 0,
-                'lng' => 0,
+        public
+        function enableIsotope($selector = '.grid', $options = []) {
+            $this->useScript([
+                                 'Scid.isotope.pkgd.min', 'Scid.imagesloaded.pkgd.min',
+                             ], ['block' => self::SCRIPT_BOTTOM]);
+            $_options = [
+                'itemSelector'    => '.grid-item',
+                'percentPosition' => TRUE,
             ];
-            if (!empty($options['center'])) {
-                $center = $options['center'];
-            }
-            $mapID = uniqid('map');
-            if (empty($this->_mapConfig)) {
-                $this->_mapConfig = Configure::read('Scid.map');
-            }
-            $access_token = $this->_mapConfig['accessToken'];
-            $tileType = $this->_mapConfig['tileType'];
-            $script = <<<MAP
-var $mapID = L.map('$mapID').setView([{$center['lat']}, {$center['lng']}], 3);
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"http://mapbox.com\">Mapbox</a>',
-    maxZoom: 18,
-    id: '$tileType',
-    accessToken: '${access_token}'
-}).addTo($mapID);
 
-
-MAP;
-            $script2 = '';
-            if (!empty($options['data'])) {
-                foreach ($options['data'] as $data) {
-                    $title = $data['title'];
-                    $lat = $data['lat'];
-                    $lng = $data['lng'];
-                    $script2 =
-                        $script2 . "\n" . "L.marker([$lat, $lng]).addTo($mapID).bindPopup('$title');";
+            $options = array_merge($options, $_options);
+            if (!empty($options['masonry']['sizeClass'])) {
+                $sizeClass = $options['masonry']['sizeClass'];
+                unset($options['masonry']['sizeClass']);
+            }
+            if (!empty($options['masonry']['columnWidth'])) {
+                $widthClass = $options['masonry']['columnWidth'];
+                if (strpos($widthClass, '.') !== FALSE && strpos($widthClass, '.') == 0) {
+                    $widthClass = ltrim($widthClass, '.');
+                }
+                else {
+                    $options['masonry']['columnWidth'] = '.' . $widthClass;
                 }
             }
-            $this->scriptBlock($script . $script2, ['block' => self::SCRIPT_BOTTOM]);
+            $optionString = json_encode($options, JSON_PRETTY_PRINT, 4);
 
-            return $this->div('map', '', ['id' => $mapID]);
+            $varName = uniqid('$isotope');
+            $enableIsotope = <<<ENABLEISOTOPE
+            var ${varName} = $('${selector}').isotope({$optionString});
+            // layout Masonry after each image loads
+            ${varName}.imagesLoaded().progress( function() {
+                 ${varName}.isotope('layout');
+            });
+
+ENABLEISOTOPE;
+            $this->scriptBlock($enableIsotope, ['block' => self::SCRIPT_BOTTOM]);
+            if (!empty($sizeClass) && !empty($widthClass)) {
+
+                return $this->tag('div', '', ['class' => [$widthClass, $sizeClass]]);
+            }
+            else return '';
         }
 
-        function GetCenterFromDegrees($data) {
-            if (!is_array($data)) return FALSE;
+        public
+        function enableMasonry($selector = '.grid', $options = []) {
+            $this->useScript([
+                                 'Scid.masonry.pkgd.min', 'Scid.imagesloaded.pkgd.min',
+                             ], ['block' => self::SCRIPT_BOTTOM]);
+            $_options = [
+                'itemSelector'    => '.grid-item',
+                'columnWidth'     => '.grid-sizer',
+                'percentPosition' => TRUE,
+            ];
+            $options = array_merge($options, $_options);
+            $optionString = [];
+            foreach ($options as $key => $value) {
+                if (is_bool($value)) {
+                    $optionString[] = $key . ':' . ($value ? 'true' : 'false');
+                }
+                else {
+                    $optionString[] = $key . ':' . "'$value'";
+                }
+            }
+            $optionString = '{' . implode(',', $optionString) . '}';
+            $varName = uniqid('$masonry');
+            $enableMasonry = <<<ENABLEMASONRY
+            var ${varName} = $('${selector}').masonry({$optionString});
+            // layout Masonry after each image loads
+            ${varName}.imagesLoaded().progress( function() {
+                 ${varName}.masonry('layout');
+            });
+ENABLEMASONRY;
+            $this->scriptBlock($enableMasonry, ['block' => self::SCRIPT_BOTTOM]);
+        }
 
-            $num_coords = count($data);
+        public function fontCursor($selector, $icon, $options = []) {
 
-            $X = 0.0;
-            $Y = 0.0;
-            $Z = 0.0;
+            $this->useScript('/assets/npm-asset/jquery-awesome-cursor/dist/jquery.awesome-cursor.min',['block'=>self::SCRIPT_BOTTOM]);
+            if (!empty($options)) {
+                $options = ',' . json_encode($options);
+            }
+            else {
+                $options = '';
+            }
+            $fontCursor = /** @lang JavaScript 1.8 */
+                "$('{$selector}').awesomeCursor('{$icon}'{$options});";
 
-            foreach ($data as $coord) {
-                $lat = $coord[0] * pi() / 180;
-                $lon = $coord[1] * pi() / 180;
+            $this->scriptBlock($fontCursor, ['block' => self::SCRIPT_BOTTOM]);
+        }
 
-                $a = cos($lat) * cos($lon);
-                $b = cos($lat) * sin($lon);
-                $c = sin($lat);
+        /**
+         * get the less files
+         *
+         * @return array|mixed
+         */
+        public function getLess() {
+            $lessArray = $this->_View->get('lessArray');
 
-                $X += $a;
-                $Y += $b;
-                $Z += $c;
+            if (empty($lessArray)) {
+                $lessArray = [];
             }
 
-            $X /= $num_coords;
-            $Y /= $num_coords;
-            $Z /= $num_coords;
-
-            $lon = atan2($Y, $X);
-            $hyp = sqrt($X * $X + $Y * $Y);
-            $lat = atan2($Z, $hyp);
-
-            return [$lat * 180 / pi(), $lon * 180 / pi()];
+            return $lessArray;
         }
 
         /**
@@ -566,6 +523,55 @@ MAP;
         }
 
         /**
+         * @param string|\Cake\ORM\Entity $path
+         * @param array                   $options
+         *
+         * @return null|string
+         */
+        public function image($path, array $options = []) {
+            $classes = [];
+            if (!is_string($path) && $path instanceof Entity) {
+                $entity = $path;
+                $retinaPrefix = NULL;
+                $field = 'photo';
+
+                if (!empty($options['field'])) {
+                    $field = $options['field'];
+                    unset($options['field']);
+                }
+
+                if (method_exists($entity, 'getImagePath')) {
+                    $path = $entity->getImagePath($field, $options);
+                }
+                if (method_exists($entity, 'getRetinaImagePath')) {
+                    $retinaPath = $entity->getRetinaImagePath($field, $options);
+                }
+            }
+            if (!empty($options['retina'])) {
+                $retinaPath = $options['retina'];
+                unset($options['retina']);
+                $this->useScript('Scid.retina.min', ['block' => self::SCRIPT_BOTTOM]);
+            }
+            if (!empty($retinaPath)) {
+                $options['data-rjs'] = $retinaPath;
+            }
+            if (isset($options['responsive'])) {
+                $classes[] = 'img-responsive';
+                unset($options['responsive']);
+            }
+            if (!empty($options['shape'])) {
+                $classes[] = 'img-' . $options['shape'];
+                unset($options['shape']);
+            }
+            if (isset($options['full'])) {
+                unset($options['full']);
+            }
+            $options = $this->injectClasses($classes, $options);
+
+            return parent::image($path, $options);
+        }
+
+        /**
          * make a nicely formatted link (support for icons)
          *
          * @param array|string $title
@@ -581,34 +587,62 @@ MAP;
             return parent::link($title, $url, $options);
         }
 
-        /**
-         * @param   string $title
-         * @param array    $options
-         *
-         * @return string
-         */
-        public
-        function titleFromOptions($title, array &$options) {
-            if (!empty($options['icon'])) {
-                if (is_string($options['icon'])) {
-                    $icon = ['icon' => $options['icon']];
-                }
-                else {
-                    $icon = $options['icon'];
-                }
-                $icon += [
-                    'icon-class'  => 'd-md-none d-lg-inline',
-                    'title-class' => 'd-none d-md-inline',
-                ];
-
-                // add icon to left of title
-                $title =
-                    $this->icon($options['icon'], ['class' => $icon['icon-class']]) . '<span class="' . $icon['title-class'] . '"> ' . $title . '</span>';
-                unset($options['icon']);
-                $options['escape'] = FALSE;
+        public function map($options) {
+            if (empty($this->_mapConfig)) {
+                $this->_mapConfig = Configure::read('Scid.map');
             }
+            if (empty($this->_mapConfig) || empty($this->_mapConfig['showMaps']) || $this->_mapConfig['showMaps'] === FALSE) {
+                return '<!-- maps are disabled -->';
+            }
+            $this->useCssFile(
+                "https://unpkg.com/leaflet@1.3.1/dist/leaflet.css",
+                [
+                    'integrity'   => "sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==",
+                    'crossorigin' => "",
+                ]);
+            $this->useScript(
+                "https://unpkg.com/leaflet@1.3.1/dist/leaflet.js",
+                [
+                    'integrity'   => "sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==",
+                    'crossorigin' => "",
+                ]);
+            $center = [
+                'lat' => 0,
+                'lng' => 0,
+            ];
+            if (!empty($options['center'])) {
+                $center = $options['center'];
+            }
+            $mapID = uniqid('map');
+            if (empty($this->_mapConfig)) {
+                $this->_mapConfig = Configure::read('Scid.map');
+            }
+            $access_token = $this->_mapConfig['accessToken'];
+            $tileType = $this->_mapConfig['tileType'];
+            $script = <<<MAP
+var $mapID = L.map('$mapID').setView([{$center['lat']}, {$center['lng']}], 3);
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"http://mapbox.com\">Mapbox</a>',
+    maxZoom: 18,
+    id: '$tileType',
+    accessToken: '${access_token}'
+}).addTo($mapID);
 
-            return $title;
+
+MAP;
+            $script2 = '';
+            if (!empty($options['data'])) {
+                foreach ($options['data'] as $data) {
+                    $title = $data['title'];
+                    $lat = $data['lat'];
+                    $lng = $data['lng'];
+                    $script2 =
+                        $script2 . "\n" . "L.marker([$lat, $lng]).addTo($mapID).bindPopup('$title');";
+                }
+            }
+            $this->scriptBlock($script . $script2, ['block' => self::SCRIPT_BOTTOM]);
+
+            return $this->div('map', '', ['id' => $mapID]);
         }
 
         /**
@@ -634,14 +668,55 @@ MAP;
             });", ['block' => self::SCRIPT_BOTTOM,]);
         }
 
+        /**
+         * format a phone number
+         *
+         * @param       $phone
+         *
+         * @return mixed
+         */
         public
-        function tooltip() {
+        function phone($phone) {
+            $phone = preg_replace("/[^0-9]/", "", $phone);
 
-            $enableToolTip = <<<ENABLETOOLTIP
- $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-})
-ENABLETOOLTIP;
+            if (strlen($phone) == 7) {
+                return preg_replace("/([0-9]{3})([0-9]{4})/", "$1-$2", $phone);
+            }
+            elseif (strlen($phone) == 10) {
+                return preg_replace("/([0-9]{3})([0-9]{3})([0-9]{4})/", "($1) $2-$3", $phone);
+            }
+            else {
+                return $phone;
+            }
+        }
+
+        /**
+         * @param       $phone
+         * @param array $options 'label' becomes the title if you don't want to use the $email, 'subject','body' added
+         *                       to the mailto url
+         *
+         * @return string
+         */
+        public function phoneButton($phone, $options = []) {
+            if (isset($options['label'])) {
+                $title = $options['label'];
+                unset($options['label']);
+            }
+            else {
+                $title = $this->phone($phone);
+            }
+            if (!isset($options['icon'])) {
+                if (!empty($phone->type) && $phone->type->name == 'Cell') {
+                    $options['icon'] = 'cell';
+                }
+                else {
+                    $options['icon'] = 'phone';
+                }
+            }
+
+            $url = 'tel:' . $phone;
+
+            return $this->button($title, $url, $options);
         }
 
         /**
@@ -679,140 +754,44 @@ ENABLETOOLTIP;
             return $this->tag($tag, $linkTitle, $options);
         }
 
-        protected
-        function enablePopovers() {
-            if (!$this->_didEnablePopovers) {
-                $enablePopover = <<<ENABLEPOPOVER
-$(function () {
-        $('[data-toggle="popover"]').popover()
-})
-ENABLEPOPOVER;
-                $this->scriptBlock($enablePopover, ['block' => self::SCRIPT_BOTTOM]);
-                $this->_didEnablePopovers = TRUE;
-            }
-        }
-
-        public
-        function enableMasonry($selector = '.grid', $options = []) {
-            $this->useScript([
-                                 'Scid.masonry.pkgd.min', 'Scid.imagesloaded.pkgd.min',
-                             ], ['block' => self::SCRIPT_BOTTOM]);
-            $_options = [
-                'itemSelector'    => '.grid-item',
-                'columnWidth'     => '.grid-sizer',
-                'percentPosition' => TRUE,
-            ];
-            $options = array_merge($options, $_options);
-            $optionString = [];
-            foreach ($options as $key => $value) {
-                if (is_bool($value)) {
-                    $optionString[] = $key . ':' . ($value ? 'true' : 'false');
-                }
-                else {
-                    $optionString[] = $key . ':' . "'$value'";
-                }
-            }
-            $optionString = '{' . implode(',', $optionString) . '}';
-            $varName = uniqid('$masonry');
-            $enableMasonry = <<<ENABLEMASONRY
-            var ${varName} = $('${selector}').masonry({$optionString});
-            // layout Masonry after each image loads
-            ${varName}.imagesLoaded().progress( function() {
-                 ${varName}.masonry('layout');
-            });
-ENABLEMASONRY;
-            $this->scriptBlock($enableMasonry, ['block' => self::SCRIPT_BOTTOM]);
-        }
-
-        private
-        function buildJSArray($array = []) {
-            $json = json_encode($array, JSON_PRETTY_PRINT, 2);
-
-            return $json;
-        }
-
-        public
-        function enableIsotope($selector = '.grid', $options = []) {
-            $this->useScript([
-                                 'Scid.isotope.pkgd.min', 'Scid.imagesloaded.pkgd.min',
-                             ], ['block' => self::SCRIPT_BOTTOM]);
-            $_options = [
-                'itemSelector'    => '.grid-item',
-                'percentPosition' => TRUE,
-            ];
-
-            $options = array_merge($options, $_options);
-            if (!empty($options['masonry']['sizeClass'])) {
-                $sizeClass = $options['masonry']['sizeClass'];
-                unset($options['masonry']['sizeClass']);
-            }
-            if (!empty($options['masonry']['columnWidth'])) {
-                $widthClass = $options['masonry']['columnWidth'];
-                if (strpos($widthClass, '.') !== FALSE && strpos($widthClass, '.') == 0) {
-                    $widthClass = ltrim($widthClass, '.');
-                }
-                else {
-                    $options['masonry']['columnWidth'] = '.' . $widthClass;
-                }
-            }
-            $optionString = json_encode($options, JSON_PRETTY_PRINT, 4);
-
-            $varName = uniqid('$isotope');
-            $enableIsotope = <<<ENABLEISOTOPE
-            var ${varName} = $('${selector}').isotope({$optionString});
-            // layout Masonry after each image loads
-            ${varName}.imagesLoaded().progress( function() {
-                 ${varName}.isotope('layout');
-            });
-
-ENABLEISOTOPE;
-            $this->scriptBlock($enableIsotope, ['block' => self::SCRIPT_BOTTOM]);
-            if (!empty($sizeClass) && !empty($widthClass)) {
-
-                return $this->tag('div', '', ['class' => [$widthClass, $sizeClass]]);
-            }
-            else return '';
-        }
-
         /**
-         * format a phone number
+         * @param   string $title
+         * @param array    $options
          *
-         * @param       $phone
-         *
-         * @return mixed
+         * @return string
          */
         public
-        function phone($phone) {
-            $phone = preg_replace("/[^0-9]/", "", $phone);
+        function titleFromOptions($title, array &$options) {
+            if (!empty($options['icon'])) {
+                if (is_string($options['icon'])) {
+                    $icon = ['icon' => $options['icon']];
+                }
+                else {
+                    $icon = $options['icon'];
+                }
+                $icon += [
+                    'icon-class'  => 'd-md-none d-lg-inline',
+                    'title-class' => 'd-none d-md-inline',
+                ];
 
-            if (strlen($phone) == 7) {
-                return preg_replace("/([0-9]{3})([0-9]{4})/", "$1-$2", $phone);
+                // add icon to left of title
+                $title =
+                    $this->icon($options['icon'], ['class' => $icon['icon-class']]) . '<span class="' . $icon['title-class'] . '"> ' . $title . '</span>';
+                unset($options['icon']);
+                $options['escape'] = FALSE;
             }
-            elseif (strlen($phone) == 10) {
-                return preg_replace("/([0-9]{3})([0-9]{3})([0-9]{4})/", "($1) $2-$3", $phone);
-            }
-            else {
-                return $phone;
-            }
+
+            return $title;
         }
 
-        public function bootstrapColTest() {
-            if (!Configure::read('Scid.viewDebug')) {
-                return '';
-            }
-            $return = '';
-            $sizes = [
-                'xs' => ['badge', 'badge-light', 'd-inline', 'd-sm-none'],
-                'sm' => ['badge', 'badge-success', 'd-none', 'd-sm-inline', 'd-md-none'],
-                'md' => ['badge', 'badge-warning', 'd-none', 'd-md-inline', 'd-lg-none'],
-                'lg' => ['badge', 'badge-info', 'd-none', 'd-lg-inline', 'd-xl-none'],
-                'xl' => ['badge', 'badge-danger', 'd-none', 'd-xl-inline'],
-            ];
-            foreach ($sizes as $label => $class) {
-                $return .= $this->tag('span', $label, ['class' => $class]);
-            }
+        public
+        function tooltip() {
 
-            return $return;
+            $enableToolTip = <<<ENABLETOOLTIP
+ $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+})
+ENABLETOOLTIP;
         }
 
         /**
@@ -948,6 +927,26 @@ ENABLEISOTOPE;
                 }
             }
             Configure::write(self::SCID_SCRIPT_URLS, $existingUrls);
+        }
+
+        protected
+        function enablePopovers() {
+            if (!$this->_didEnablePopovers) {
+                $enablePopover = <<<ENABLEPOPOVER
+$(function () {
+        $('[data-toggle="popover"]').popover()
+})
+ENABLEPOPOVER;
+                $this->scriptBlock($enablePopover, ['block' => self::SCRIPT_BOTTOM]);
+                $this->_didEnablePopovers = TRUE;
+            }
+        }
+
+        private
+        function buildJSArray($array = []) {
+            $json = json_encode($array, JSON_PRETTY_PRINT, 2);
+
+            return $json;
         }
     }
 
