@@ -178,6 +178,19 @@ DRIVER_TOUR_BLOCK;
             return $lessArray;
         }
 
+        public function fontCursor($selector, $icon, $options = [])  {
+            $this->useScript('/assets/npm-asset/jquery-awesome-cursor/jquery-awesome-cursor.min')
+            if (!empty($options)) {
+                $options =  ',' . json_encode($options);
+            }
+            else {
+                $options = '';
+            }
+            $fontCursor = "$('{$selector}').awesomeCursor('{$icon}' {$options});";
+            $this->scriptBlock($fontCurso, ['block' => self::SCRIPT_BOTTOM]);
+        }
+
+
         public function animatedScrollTo ($id, $offset = 0) {
             $scriptBlock =
                 /** @lang JavaScript 1.8 */

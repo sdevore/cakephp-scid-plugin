@@ -1170,6 +1170,7 @@ window.onresize = resizeCanvas;
 resizeCanvas();
 SIGNATURE_SCRIPT;
             $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $this->Html->fontCursor($wrapper_id, 'pencil');
             return $options;
         }
 
