@@ -218,6 +218,9 @@
                     $options['id'] = TRUE;
                 }
                 $options = $this->_initInputField($fieldName, $options);
+                if (!empty($options['data-mask'])) {
+                    $options = $this->__datamask($options);
+                }
                 switch ($options['type']) {
                     case 'datepicker':
                         $options = $this->__bootstrapDatePicker($options);
@@ -750,6 +753,18 @@ CHECK_ALL_SCRIPT;
         }
 
         /**
+         * @param $options
+         *
+         * @return mixed
+         */
+        private function __datamask($options) {
+            $this->Html->useScript('/assets/npm-asset/jquery-mask-plugin/dist/jquery.mask.min',['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            // could add options and build out the script rather then using attribute later
+            return $options;
+        }
+
+
+        /**
          * @param null|array $options
          *
          * @return null|array
@@ -1170,7 +1185,7 @@ window.onresize = resizeCanvas;
 resizeCanvas();
 SIGNATURE_SCRIPT;
             $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-            $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rgb(0,0,0)','size'=>32]);
+            $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rbg(1,1,1)','size'=>32]);
             return $options;
         }
 
