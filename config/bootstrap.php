@@ -7,6 +7,7 @@
      */
 
     use Cake\Core\Configure;
+    use Cake\Core\Plugin;
     use Cake\Database\Type;
     Type::map('money', 'Scid\Database\Type\MoneyType');
 
@@ -14,3 +15,6 @@
     collection((array)Configure::read('Scid.config'))->each(function ($file) {
         Configure::load($file);
     });
+
+    Plugin::load('Robotusers/Excel');
+    Plugin::load('CsvView');
