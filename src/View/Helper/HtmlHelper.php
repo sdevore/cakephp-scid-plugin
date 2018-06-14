@@ -13,7 +13,7 @@
     use Picqer\Barcode\BarcodeGeneratorJPG;
 
     /**
-     * Html helper
+     * Html helper bootstrap 4 cmpati
      *
      * @property \Cake\View\Helper\UrlHelper $Url
      */
