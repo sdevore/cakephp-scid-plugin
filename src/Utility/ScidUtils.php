@@ -11,6 +11,7 @@
     use Cake\Chronos\Chronos;
     use Cake\Chronos\ChronosInterface;
     use Cake\Chronos\Date;
+    use Cake\Utility\Inflector;
     use Money\Currency;
     use Money\Money;
     use Money\Currencies\ISOCurrencies;
@@ -21,7 +22,8 @@
      */
     class ScidUtils
     {
-        public static $states = array(
+
+        public static $states = [
             'AL' => "Alabama",
             'AK' => "Alaska",
             'AZ' => "Arizona",
@@ -73,7 +75,7 @@
             'WV' => "West Virginia",
             'WI' => "Wisconsin",
             'WY' => "Wyoming",
-        );
+        ];
 
         /**
          * @var ISOCurrencies
@@ -141,14 +143,37 @@
          *
          * @return string
          */
-        public static function formatMoney( $money = NULL) {
+        public static function formatMoney($money = NULL) {
             if (NULL === $money) {
                 $money = new \Scid\Database\I18n\Money(0, new Currency('USD'));
             }
             if ($money instanceof \Money\Money) {
                 $money = new \Scid\Database\I18n\Money($money->getAmount(), $money->getCurrency());
             }
-            return $money->format();
 
+            return $money->format();
+        }
+
+        /**
+         * @param      $string
+         * @param      $count
+         * @param bool $includeCount
+         *
+         * @throws \Aura\Intl\Exception
+         * @return string
+         */
+        public static function plural($string, $count, $includeCount = TRUE) {
+            if ($count != 1) {
+                $pluralize = Inflector::pluralize($string);
+            }
+            else {
+                $pluralize = $string;
+            }
+            if ($includeCount) {
+                return __("{0} {1}", [$count, __n($string, $pluralize, $count)]);
+            }
+            else {
+                return __("{0}", [__n($string, $pluralize, $count)]);
+            }
         }
     }

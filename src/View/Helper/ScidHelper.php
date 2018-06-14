@@ -83,4 +83,17 @@ class ScidHelper extends Helper
             return $phone;
         }
     }
+
+    /**
+     * use the Inflector to properly inflect if possible the string based on the count
+     *
+     * @param      $string
+     * @param      $count
+     * @param bool $includeCount
+     *
+     * @return mixed|null|string
+     */
+    public function plural($string, $count, $includeCount = true) {
+        return ScidUtils::plural($string, $count, $includeCount );
+    }
 }

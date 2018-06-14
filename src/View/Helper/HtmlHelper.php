@@ -107,6 +107,8 @@
 
         ];
 
+        protected $_isCell = FALSE;
+
         /**
          * HtmlHelper constructor.
          *
@@ -116,7 +118,9 @@
         public function __construct(\Cake\View\View $View, array $config = []) {
             $icons = (array)Configure::read('Scid.HtmlHelper.icons') + $this->_icons;
             $this->_icons = $icons;
-
+            if (empty($View->layout)) {
+                $this->_isCell = TRUE;
+            }
             parent::__construct($View, $config);
         }
 
@@ -414,7 +418,7 @@ ENABLEMASONRY;
 
         public function fontCursor($selector, $icon, $options = []) {
 
-            $this->useScript('/assets/npm-asset/jquery-awesome-cursor/dist/jquery.awesome-cursor.min',['block'=>self::SCRIPT_BOTTOM]);
+            $this->useScript('/assets/npm-asset/jquery-awesome-cursor/dist/jquery.awesome-cursor.min', ['block' => self::SCRIPT_BOTTOM]);
             if (!empty($options)) {
                 $options = ',' . json_encode($options);
             }
@@ -719,6 +723,29 @@ MAP;
             return $this->button($title, $url, $options);
         }
 
+        public function breadcrumbOptions($brand) {
+            $breadcrumbClass = ['breadcrumb-item'];
+            if (isset($brand['link-color'])) {
+                $breadcrumbClass[] = $brand['link-color'];
+            }
+            elseif (isset($brand['text-color'])) {
+                $breadcrumbClass[] = $brand['text-color'];
+            }
+            $innerAttributes = [];
+            if (isset($brand['link-color'])) {
+                $innerAttributes['class'][] = $brand['link-color'];
+            }
+            elseif (isset($brand['text-color'])) {
+                $innerAttributes['class'][] = $brand['text-color'];
+            }
+            $options = ['class' => $breadcrumbClass];
+            if (!empty($innerAttributes)) {
+                $options['innerAttrs'] = $innerAttributes;
+            }
+
+            return $options;
+        }
+
         /**
          * add support for bootstrap popovers
          *
@@ -845,7 +872,14 @@ ENABLETOOLTIP;
          */
         public
         function useCssFile($paths, array $options = []) {
-            $existingPaths = Configure::read(self::SCID_CSS_PATHS);
+            if ($this->_isCell) {
+                $SCID_CSS_PATHS = 'Cell.' . self::SCID_CSS_PATHS;
+            }
+            else {
+                $SCID_CSS_PATHS = self::SCID_CSS_PATHS;
+            }
+
+            $existingPaths = Configure::read($SCID_CSS_PATHS);
             if (empty($existingPaths)) {
                 $existingPaths = [];
             }
@@ -859,7 +893,7 @@ ENABLETOOLTIP;
                     $this->css($path, $options);
                 }
             }
-            Configure::write(self::SCID_CSS_PATHS, $existingPaths);
+            Configure::write($SCID_CSS_PATHS, $existingPaths);
         }
 
         /**
@@ -907,8 +941,14 @@ ENABLETOOLTIP;
 
         public
         function useScript($urls, array $options = []) {
+            if ($this->_isCell) {
+                $SCID_SCRIPT_URLS = 'Cell.' . self::SCID_SCRIPT_URLS;
+            }
+            else {
+                $SCID_SCRIPT_URLS = self::SCID_SCRIPT_URLS;
+            }
 
-            $existingUrls = Configure::read(self::SCID_SCRIPT_URLS);
+            $existingUrls = Configure::read($SCID_SCRIPT_URLS);
             if (empty($existingUrls)) {
                 $existingUrls = [];
             }
@@ -926,7 +966,7 @@ ENABLETOOLTIP;
                     $this->script($url, $options);
                 }
             }
-            Configure::write(self::SCID_SCRIPT_URLS, $existingUrls);
+            Configure::write($SCID_SCRIPT_URLS, $existingUrls);
         }
 
         protected
