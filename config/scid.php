@@ -10,6 +10,24 @@
             'viewDebug'      => FALSE,
             'MarkdownHelper' => ['parser' => 'markdown-extra'],
             'HtmlHelper'     => [
+                'mime'  => [
+                    'default'     => 'file',
+                    'image'       => [
+                        'default' => 'file-image',
+                    ],
+                    'application' => [
+                        'default'      => 'file',
+                        'msword'       => 'file-word',
+                        'mspowerpoint' => 'file-powerpoint',
+                        'pdf'          => 'file-pdf',
+                        'excel'        => 'file-excel',
+                        'audio'        => 'file-audio',
+                        'video'        => 'file-video',
+                        'zip'          => 'file-archive',
+                    ],
+                    'audio'       => ['default' => 'file-audio'],
+                    'video'       => ['default' => 'file-video'],
+                ],
                 'icons' => [
                     'email'      => 'envelope',
                     'send-email' => 'paper-plane',

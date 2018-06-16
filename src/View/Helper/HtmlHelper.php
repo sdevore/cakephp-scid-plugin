@@ -106,6 +106,7 @@
             'users'       => 'users',
 
         ];
+        protected $_mimes =[];
 
         protected $_isCell = FALSE;
 
@@ -116,8 +117,8 @@
          * @param array           $config
          */
         public function __construct(\Cake\View\View $View, array $config = []) {
-            $icons = (array)Configure::read('Scid.HtmlHelper.icons') + $this->_icons;
-            $this->_icons = $icons;
+            $this->_icons = (array)Configure::read('Scid.HtmlHelper.icons') + $this->_icons;
+            $this->_mimes = (array)Configure::read('Scid.HtmlHelper.mime') + $this->_mimes;
             if (empty($View->layout)) {
                 $this->_isCell = TRUE;
             }
@@ -447,6 +448,25 @@ ENABLEMASONRY;
         }
 
         /**
+         * returns an icon name for mime types
+         *
+         * @param $mimeType
+         *
+         * @return mixed
+         */
+        public function iconForMimeType($mimeType) {
+            list($mediaType, $subType) = explode('/',$mimeType);
+            $icon = $this->_mimes['default'];
+            if (!empty($mediaType) && !empty($this->_mimes[$mediaType])) {
+                $icon = $this->_mimes[$mediaType]['default'];
+                if (!empty($subType) && !empty($this->_mimes[$mediaType][$subType])) {
+                    $icon = $this->_mimes[$mediaType][$subType];
+                }
+            }
+            return $icon;
+        }
+
+        /**
          * Returns Bootstrap icon markup. By default, uses `<I>` and `fa`.
          *
          * @param string $name    Name of icon (i.e. search, leaf, etc.).
@@ -454,8 +474,7 @@ ENABLEMASONRY;
          *
          * @return string HTML icon markup.
          */
-        public
-        function icon($name, array $options = []) {
+        public function icon($name, array $options = []) {
             // TODO: one could be more judicious in only loading the styles requested
             $this->useScript('Scid.fontawesome-all', ['block' => self::SCRIPT_BOTTOM]);
             $options += [
@@ -543,7 +562,6 @@ ENABLEMASONRY;
                     $field = $options['field'];
                     unset($options['field']);
                 }
-
                 if (method_exists($entity, 'getImagePath')) {
                     $path = $entity->getImagePath($field, $options);
                 }
