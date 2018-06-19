@@ -426,8 +426,9 @@ ENABLEMASONRY;
             else {
                 $options = '';
             }
+            $parameters = "'{$icon}'{$options}";
             $fontCursor = /** @lang JavaScript 1.8 */
-                "$('{$selector}').awesomeCursor('{$icon}'{$options});";
+                "$('{$selector}').awesomeCursor({$parameters});";
 
             $this->scriptBlock($fontCursor, ['block' => self::SCRIPT_BOTTOM]);
         }
@@ -561,7 +562,7 @@ ENABLEMASONRY;
                 }
                 else {
                     $count = $counter;
-                    $counterOptions = ['class'=>'fa-layers-counter',
+                    $counter = ['class'=>'fa-layers-counter',
                         'style'=>'background:green'];
                 }
                 $counter = $this->tag('span', $count, $counter);
