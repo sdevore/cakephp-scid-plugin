@@ -482,7 +482,14 @@ ENABLEMASONRY;
                 'iconSet' => 'fa',
                 'class'   => NULL,
             ];
-
+            if (!empty($name['counter'])) {
+                $counter = $name['counter'];
+                unset($name['counter']);
+                if (!empty($name['size'])) {
+                    $size = $name['size'];
+                    unset($name['size']);
+                }
+            }
             if (is_string($name) && key_exists($name, $this->_icons)) {
                 $name = $this->_icons[$name];
             }
@@ -538,11 +545,42 @@ ENABLEMASONRY;
             }
 
             $option = $this->injectClasses($classes, $options);
+            if (empty($counter)) {
+                return $this->formatTemplate('tag', [
+                    'tag'   => $options['tag'],
+                    'attrs' => $this->templater()->formatAttributes($option, ['tag', 'iconSet']),
+                ]);
+            }
+            else {
+                if (is_array($counter)) {
+                    $count = $counter['count'];
+                    unset($counter['count']);
+                    $counter += ['class'=>'fa-layers-counter',
+                                       'style'=>'background:green'];
 
-            return $this->formatTemplate('tag', [
-                'tag'   => $options['tag'],
-                'attrs' => $this->templater()->formatAttributes($option, ['tag', 'iconSet']),
-            ]);
+                }
+                else {
+                    $count = $counter;
+                    $counterOptions = ['class'=>'fa-layers-counter',
+                        'style'=>'background:green'];
+                }
+                $counter = $this->tag('span', $count, $counter);
+                $icon =$this->formatTemplate('tag', [
+                    'tag'   => $options['tag'],
+                    'attrs' => $this->templater()->formatAttributes($option, ['tag', 'iconSet']),
+                ]);
+                $options = ['class'=>['fa-layers', 'fa-fw'],'escape'=>false];
+                $icon = $this->tag('span',$icon . $counter, $options);
+                if (!empty($size)) {
+                    if (is_numeric($size)) {
+                        $size .= 'x';
+                    }
+                    $icon = $this->tag('span',$icon,['class'=>'fa-'.$size,'escape'=>false]);
+                }
+                return $icon;
+
+            }
+
         }
 
         /**
