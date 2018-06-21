@@ -477,7 +477,7 @@ ENABLEMASONRY;
          */
         public function icon($name, array $options = []) {
             // TODO: one could be more judicious in only loading the styles requested
-            $this->useScript('Scid.fontawesome-all', ['block' => self::SCRIPT_BOTTOM]);
+            $this->useScript('Scid.all', ['block' => self::SCRIPT_BOTTOM]);
             $options += [
                 'tag'     => 'i',
                 'iconSet' => 'fa',
