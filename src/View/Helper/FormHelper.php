@@ -1203,7 +1203,7 @@ window.onresize = resizeCanvas;
 resizeCanvas();
 SIGNATURE_SCRIPT;
             $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-            $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rbg(1,1,1)','size'=>32]);
+           // $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rbg(1,1,1)','size'=>32]);
             return $options;
         }
 
