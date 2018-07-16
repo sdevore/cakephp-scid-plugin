@@ -11,6 +11,9 @@
     use Cake\Chronos\Chronos;
     use Cake\Chronos\ChronosInterface;
     use Cake\Chronos\Date;
+    use Cake\Core\Configure;
+    use Cake\Core\Exception\Exception;
+    use Cake\Filesystem\File;
     use Cake\Utility\Inflector;
     use Money\Currency;
     use Money\Money;
@@ -174,6 +177,47 @@
             }
             else {
                 return __("{0}", [__n($string, $pluralize, $count)]);
+            }
+        }
+
+        /**
+         * @param \Cake\Filesystem\File[]|\Cake\Filesystem\File|string|array $sources
+         * @param   \Cake\Filesystem\File|string                             $destination path to destination file
+         *
+         * @return boolean|string
+         */
+        public static function concatinatePDF($sources, $destination) {
+            $pdftkPath = Configure::read('Scid.PDF.path');
+            if (!is_executable($pdftkPath)) {
+                throw new Exception(sprintf('pdftk binary is not found or not executable: %s', $pdftkPath));
+            }
+            if (!is_array($sources)) {
+                $sources = [$sources];
+            }
+            $paths = [];
+            foreach ($sources as $source) {
+                if ($source instanceof File) {
+                    $paths[] = $source->path;
+                }
+                else {
+                    $paths = $source;
+                }
+            }
+            if ($destination instanceof File) {
+                $destination = $destination->path;
+            }
+            $arguments = implode(' ', $paths);
+
+            $command = sprintf('%s %s cat output %s', $pdftkPath, $arguments, $destination);
+
+            $outputString = NULL;
+            $output = 0;
+            $out = exec($command, $outputString, $output);
+            if ($output == 0) {
+                return TRUE;
+            }
+            else {
+                return FALSE;
             }
         }
     }
