@@ -220,4 +220,51 @@
                 return FALSE;
             }
         }
+
+        /**
+         * @param  \Cake\I18n\Date|\Cake\I18n\Time $datetime
+         * @param array                            $format
+         *
+         * @return string
+         */
+        public static function dateTime($datetime, $format = [
+            \IntlDateFormatter::SHORT,
+            \IntlDateFormatter::SHORT,
+        ]) {
+            if (empty($datetime)) {
+                $datetime = '';
+            }
+            else {
+                $datetime = $datetime->i18nFormat(
+                    $format);
+            }
+
+            return $datetime;
+        }
+
+        /**
+         * @param   \Cake\I18n\Date $date
+         * @param array             $format
+         *
+         * @return string
+         */
+        public static function date($date, $format = [
+            \IntlDateFormatter::SHORT,
+            \IntlDateFormatter::NONE,
+        ]) {
+            return self::dateTime($date, $format);
+        }
+
+        /**
+         * @param   \Cake\I18n\Time $time
+         * @param array             $format
+         *
+         * @return string
+         */
+        public static function time($time, $format = [
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::SHORT,
+        ]) {
+            return self::dateTime($time, $format);
+        }
     }
