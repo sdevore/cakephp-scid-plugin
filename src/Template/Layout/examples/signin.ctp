@@ -1,4 +1,7 @@
 <?php
+/**
+ * @var \App\View\AppView $this
+ */
 /* @var $this \Cake\View\View */
 $this->Html->css('BootstrapUI.signin', ['block' => true]);
 $this->prepend('tb_body_attrs', ' class="' . implode(' ', [$this->request->controller, $this->request->action]) . '" ');

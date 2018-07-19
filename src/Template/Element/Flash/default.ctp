@@ -1,4 +1,7 @@
 <?php
+/**
+ * @var \App\View\AppView $this
+ */
 $class = array_unique((array)$params['class']);
 $message = (isset($params['escape']) && $params['escape'] === false) ? $message : h($message);
 

@@ -796,11 +796,11 @@ CHECK_ALL_SCRIPT;
          * @return mixed
          */
         private function __datamask($options) {
-            $this->Html->useScript('/assets/npm-asset/jquery-mask-plugin/dist/jquery.mask.min',['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $this->Html->useScript('/assets/npm-asset/jquery-mask-plugin/dist/jquery.mask.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             // could add options and build out the script rather then using attribute later
             if (is_array($options['data-mask'])) {
                 $mask = $options['data-mask']['mask'];
-                $maskOptions = ',' . json_encode( $options['data-mask']['options']);
+                $maskOptions = ',' . json_encode($options['data-mask']['options']);
             }
             else {
                 $maskOptions = '';
@@ -809,10 +809,10 @@ CHECK_ALL_SCRIPT;
             unset($options['data-mask']);
             $id = $options['id'];
             $script = "$('#{$id}').mask('{$mask}' {$maskOptions});";
-            $this->Html->scriptBlock($script, ['block'=> HtmlHelper::SCRIPT_BOTTOM]);
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+
             return $options;
         }
-
 
         /**
          * @param null|array $options
@@ -1184,10 +1184,10 @@ CHECK_ALL_SCRIPT;
                 unset($options['signature']);
             }
             if (empty($signatureOptions)) {
-                $signatureOptions = ["backgroundColor"=> 'rgb(255, 255, 255)'];
+                $signatureOptions = ["backgroundColor" => 'rgb(255, 255, 255)'];
             }
             $signatureOptions = json_encode($signatureOptions);
-            $signatureOptions = substr($signatureOptions, 0,-1);
+            $signatureOptions = substr($signatureOptions, 0, -1);
             $signatureOptions .= ",\n onEnd: function (event) {
         var dataURL = signaturePad.toDataURL('{$mimeType}');
         document.getElementById('{$id}').value = dataURL;
@@ -1196,7 +1196,7 @@ CHECK_ALL_SCRIPT;
 
             $this->addWidget('signature',
                              ['Scid.Signature', 'text', 'label']);
-            $this->Html->useScript('/assets/npm-asset/signature_pad/dist/signature_pad.min',['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $this->Html->useScript('/assets/npm-asset/signature_pad/dist/signature_pad.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $signatureBlock = /** @lang JavaScript 1.8 */
                 <<<SIGNATURE_SCRIPT
 var wrapper = document.getElementById("{$wrapper_id}");
@@ -1235,7 +1235,8 @@ window.onresize = resizeCanvas;
 resizeCanvas();
 SIGNATURE_SCRIPT;
             $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-           // $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rbg(1,1,1)','size'=>32]);
+
+            // $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rbg(1,1,1)','size'=>32]);
             return $options;
         }
 

@@ -143,7 +143,6 @@
             if (is_string($time)) {
                 $time = new Time($time);
             }
-
             return $time;
         }
 
@@ -156,7 +155,6 @@
             if (is_string($date)) {
                 $date = new Date($date);
             }
-
             return $date;
         }
 
