@@ -185,6 +185,39 @@
         }
 
         /**
+         * http://rmariuzzo.github.io/checkboxes.js/#limit-max-number-of-checked-checkboxes
+         * @param $context
+         * @param $max
+         *
+         * @return void
+         */
+        public function checkboxesLimit($context, $max) {
+            $this->Html->useScript('/assets/npm-asset/checkboxes.js/dist/checkboxes.mask.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $script = <<<CHECKBOX_LIMIT
+jQuery(function($) {
+    $('{$context}').checkboxes('max', {$max});
+});
+CHECKBOX_LIMIT;
+            $this->Html->scriptBlock($script, ['block'=>HtmlHelper::SCRIPT_BOTTOM]);
+        }
+
+        /**
+         * http://rmariuzzo.github.io/checkboxes.js/#range-selection-of-checkboxes
+         * @param $context string .class or #id
+         *
+         * @return void
+         */
+        public function checkboxesRange($context) {
+            $this->Html->useScript('/assets/npm-asset/checkboxes.js/dist/checkboxes.mask.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $script = <<<CHECKBOX_LIMIT
+jQuery(function($) {
+    $('{$context}').checkboxes('range', true);
+});
+CHECKBOX_LIMIT;
+            $this->Html->scriptBlock($script, ['block'=>HtmlHelper::SCRIPT_BOTTOM]);
+        }
+
+        /**
          * Generates a form input element complete with label and wrapper div.
          *
          * Adds extra tyoes besides the ones supported by parent class method:
