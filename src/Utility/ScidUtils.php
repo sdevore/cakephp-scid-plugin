@@ -10,10 +10,11 @@
 
     use Cake\Chronos\Chronos;
     use Cake\Chronos\ChronosInterface;
-    use Cake\Chronos\Date;
+    use Cake\I18n\Date;
     use Cake\Core\Configure;
     use Cake\Core\Exception\Exception;
     use Cake\Filesystem\File;
+    use Cake\I18n\FrozenDate;
     use Cake\Utility\Inflector;
     use Money\Currency;
     use Money\Money;
@@ -103,16 +104,49 @@
          *
          * @return Date|Chronos[]
          */
-        public static function dateArray($start, $end): array {
-            $current = $start;
+        const DATE_ARRAY_FORMAT = 'Y-m-d';
+
+        /**
+         * @param      \Cake\I18n\Date|Chronos $start
+         * @param      \Cake\I18n\Date|Chronos $end
+         * @param bool $hierarchical
+         *
+         * @return array
+         */
+        public static function dateArray($start, $end, $hierarchical = false): array {
+            $current = $start->copy();
             $result = [];
 
             while ($current->lte($end)) {
-                $result[$current->toDateString()] = ['date' => $current];
-                $current = $current->addDay();
+                if ($hierarchical) {
+                    $result[$current->year][$current->month][$current->day] = ['date' => $current];
+                }
+                else {
+                    $result[$current->format(self::DATE_ARRAY_FORMAT)] = ['date' => $current];
+                }
+
+                $current = $current->copy()->addDay(1);
             }
 
             return $result;
+        }
+
+        /**
+         * @param array $dateArray
+         *
+         * @return array
+         */
+        public static function dateArrayToHeirarchy(array $dateArray) {
+            $array = [];
+            if (empty($dateArray)) {
+                return $dateArray;
+            }
+            foreach ($dateArray as $key => $date) {
+                list($year, $month, $day) = explode('-', $key);
+                $array[$year][$month][$day] = $date;
+                unset($dateArray[$key]);
+            }
+            return $array;
         }
 
         /**
