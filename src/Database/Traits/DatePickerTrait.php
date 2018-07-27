@@ -61,7 +61,7 @@
         private function marshalTime(ArrayObject $data, $modelKey, $key, $value) {
             if ($modelKey == $key) {
                 if (is_string($value)) {
-                    $data[$key] = new Time($value);
+                    $data[$key] = Time::parse($value);
                 }
             }
 
@@ -79,7 +79,7 @@
         private function marshalDate(ArrayObject $data, $modelKey, $key, $value) {
             if ($modelKey == $key) {
                 if (is_string($value)) {
-                    $data[$key] = new Date($value);
+                    $data[$key] = Date::parse($value);
                 }
             }
 

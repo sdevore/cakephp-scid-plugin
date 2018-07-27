@@ -107,8 +107,8 @@
         const DATE_ARRAY_FORMAT = 'Y-m-d';
 
         /**
-         * @param      \Cake\I18n\Date|Chronos $start
-         * @param      \Cake\I18n\Date|Chronos $end
+         * @param      \Cake\I18n\Date|FrozenDate|Chronos $start
+         * @param      \Cake\I18n\Date|FrozenDate|Chronos $end
          * @param bool $hierarchical
          *
          * @return array
