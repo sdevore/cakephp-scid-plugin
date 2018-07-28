@@ -40,8 +40,8 @@
                 $range = $ranges[$key];
                 if (strpos($value, '-') !== FALSE) {
                     list($start, $end) = explode('-', $value);
-                    $start = new Time($start);
-                    $end = new Time($end);
+                    $start = Time::parse($start);
+                    $end = Time::parse($end);
                     $data[$range['start']] = $start;
                     $data[$range['end']] = $end;
                 }
@@ -96,8 +96,8 @@
         protected function setDuration($duration, $startField, $endField) {
             if (strpos($duration, '-') !== FALSE) {
                 list($start, $end) = explode('-', $duration);
-                $start = new Time($start);
-                $end = new Time($end);
+                $start = TIme::parse($start);
+                $end = Time::parse($end);
 
                 $this->set($startField, $start);
                 $this->set($endField, $end);

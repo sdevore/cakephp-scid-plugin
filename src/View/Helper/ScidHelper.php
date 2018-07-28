@@ -109,7 +109,7 @@
         }
 
         /**
-         * @param      \Cake\I18n\Date $date
+         * @param      \Cake\I18n\Date|\Cake\I18n\FrozenDate|\Cake\Chronos\Chronos $date
          * @param array $format
          *
          * @return string
@@ -121,7 +121,7 @@
         }
 
         /**
-         * @param     \Cake\I18n\Time  $time
+         * @param     \Cake\I18n\Time|\Cake\I18n\FrozenTime|\Cake\Chronos\Chronos  $time
          * @param array $format
          *
          * @return string
