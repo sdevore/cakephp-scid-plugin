@@ -1039,7 +1039,9 @@ CHECK_ALL_SCRIPT;
          * @param $rangeOptions
          */
         private function __rangeOptionsString($rangeOptions) {
-            return json_encode($rangeOptions);
+            $result = json_encode($rangeOptions);
+            $result = str_replace('\/', '/', $result);
+            return $result;
         }
 
         /**
