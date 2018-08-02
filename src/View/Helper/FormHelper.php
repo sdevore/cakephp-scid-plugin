@@ -1213,6 +1213,20 @@ CHECK_ALL_SCRIPT;
                 else {
                     $mimeType = 'image/svg+xml';
                 }
+                if (!empty($options['signature']['clear_id'])) {
+                    $clear_id = $options['signature']['clear_id'];
+                    $clear ="document.getElementById('{$clear_id}').addEventListener('click', function () {
+                        signaturePad.clear();
+                    });";
+                    unset($options['signature']['clear']);
+                }
+                if (!empty($options['signature']['undo_id'])) {
+                    $undo_id = $options['signature']['undo_id'];
+                    $undo ="document.getElementById('{$undo_id}').addEventListener('click', function () {
+                        signaturePad.undo();
+                    });";
+                    unset($options['signature']['undo_id']);
+                }
                 if (!empty($options['signature']['options'])) {
                     $signatureOptions = $options['signature']['options'];
                 }
@@ -1270,7 +1284,12 @@ window.onresize = resizeCanvas;
 resizeCanvas();
 SIGNATURE_SCRIPT;
             $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-
+            if (!empty($clear)) {
+                $this->Html->scriptBlock($clear, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            }
+            if (!empty($undo)) {
+                $this->Html->scriptBlock($undo, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            }
             // $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rbg(1,1,1)','size'=>32]);
             return $options;
         }
