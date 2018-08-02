@@ -79,7 +79,8 @@
         private function marshalDate(ArrayObject $data, $modelKey, $key, $value) {
             if ($modelKey == $key) {
                 if (is_string($value)) {
-                    $data[$key] = Date::parse($value);
+                    $date = Date::parse($value);
+                    $data[$key] = Date::createFromFormat($value);
                 }
             }
 
