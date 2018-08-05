@@ -21,6 +21,9 @@
             if ($value === NULL) {
                 $value = new Money(0, new Currency('USD'));
             }
+            if (is_string($value)) {
+                $value = $this->marshal($value);
+            }
             return $value->getAmount();
         }
 
