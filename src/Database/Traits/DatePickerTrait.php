@@ -80,7 +80,7 @@
             if ($modelKey == $key) {
                 if (is_string($value)) {
                     $date = Date::parse($value);
-                    $data[$key] = Date::createFromFormat($value);
+                    $data[$key] = Date::parse($value);
                 }
             }
 
