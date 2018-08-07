@@ -138,7 +138,11 @@
                     }
                     else {
                         $lineItem = new AnetAPI\LineItemType();
+                        $lineItem->setItemId(0);
                         $lineItem->setName(__('Limit of items.'));
+                        $unitPrice = $this->cleanMoney(0);
+                        $lineItem->setQuantity(1);
+                        $lineItem->setUnitPrice($unitPrice);
                         $items[] = $lineItem;
                         break;
                     }
@@ -160,9 +164,9 @@
             $transactionRequestType->setCustomer($customerData);
             $transactionRequestType->setBillTo($customerAddress);
             $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
-            if (!empty($items)) {
-                $transactionRequestType->setLineItems($items);
-            }
+           // if (!empty($items)) {
+           //     $transactionRequestType->setLineItems($items);
+          //  }
 
             // Assemble the complete transaction request
             $request = new AnetAPI\CreateTransactionRequest();
