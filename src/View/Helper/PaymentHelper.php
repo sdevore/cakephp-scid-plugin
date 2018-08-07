@@ -50,7 +50,7 @@
                 $type = $config['type'];
             }
             $this->_options = $scid[$type];
-            if (!empty($scid['sandbox'])) {
+            if (isset($scid['sandbox'])) {
                 $this->_sandbox = $scid['sandbox'];
             }
             if (!empty($config['sandbox'])) {
