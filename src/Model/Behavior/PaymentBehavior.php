@@ -72,6 +72,167 @@
             $refId = 'ref' . time();
 
             // create the credit card
+            $card = new AnetAPI\CreditCardType();
+            $cardNumber  = preg_replace('/\D+/', '', $data['cardNumber']);
+
+
+            $card->setCardNumber($cardNumber);
+            $card->setCardCode($data['cardCode']);
+            $month = $data['expMonth'];
+            $month = str_pad($month,2,'0',STR_PAD_LEFT);
+            $year = $data['expYear'];
+            $card->setExpirationDate($year . '-'. $month);
+//            $opaqueData = new AnetAPI\OpaqueDataType();
+//            $opaqueData->setDataDescriptor($data['dataDescriptor']);
+//            $opaqueData->setDataValue($data['dataValue']);
+
+            $paymentOne = new AnetAPI\PaymentType();
+//            $paymentOne->setOpaqueData($opaqueData);
+            $paymentOne->setCreditCard($card);
+            $order = new AnetAPI\OrderType();
+            if (!empty($data['invoice_number'])) {
+                $order->setInvoiceNumber($data['invoice_number']);
+            }
+            if (!empty($data['payment_description'])) {
+                $order->setDescription($data['payment_description']);
+            }
+            else {
+                $order->setDescription(__('CFSD 16 Community Schools Payment'));
+            }
+            // Set the customer's identifying information
+            $customerData = new AnetAPI\CustomerDataType();
+            $customerData->setType("individual");
+            if ($member instanceof  Entity) {
+                $customerData->setId($member->id);
+                $customerData->setEmail($member->email);
+            }
+            elseif (is_array($member) && !empty($member['id'])) {
+                $customerData->setId($member['id']);
+                $customerData->setEmail($member['email']);
+
+            }
+            $customerAddress = new AnetAPI\CustomerAddressType();
+
+            $customerAddress->setFirstName($data['first']);
+            $customerAddress->setLastName($data['last']);
+
+
+            $customerAddress->setZip($data['zip']);
+
+
+
+            if (!empty($data['items'])) {
+                $items = [];
+                foreach ($data['items'] as $index=> $item) {
+                    if ($index < 25) {
+                        $lineItem = new AnetAPI\LineItemType();
+                        if (!empty($item['description'])) {
+                            $lineItem->setDescription(Text::truncate($item['description'],200));
+                        }
+                        $lineItem->setItemId($item['id']);
+                        $lineItem->setName(Text::truncate($item['name'], 25));
+                        $unitPrice = $this->cleanMoney($item['fee']);
+                        $lineItem->setQuantity(1);
+                        $lineItem->setUnitPrice($unitPrice);
+                        $items[] = $lineItem;
+                    }
+                    else {
+                        $lineItem = new AnetAPI\LineItemType();
+                        $lineItem->setName(__('Limit of items.'));
+                        $items[] = $lineItem;
+                        break;
+                    }
+                }
+
+            }
+            // Add values for transaction settings
+            $duplicateWindowSetting = new AnetAPI\SettingType();
+            $duplicateWindowSetting->setSettingName("duplicateWindow");
+            $duplicateWindowSetting->setSettingValue("60");
+
+            // Create a TransactionRequestType object and add the previous objects to it
+            $transactionRequestType = new AnetAPI\TransactionRequestType();
+            $transactionRequestType->setTransactionType("authCaptureTransaction");
+            $amount = $this->cleanMoney($data['amountPaid']);
+            $transactionRequestType->setAmount($amount);
+            $transactionRequestType->setOrder($order);
+            $transactionRequestType->setPayment($paymentOne);
+            $transactionRequestType->setCustomer($customerData);
+            $transactionRequestType->setBillTo($customerAddress);
+            $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
+            if (!empty($items)) {
+                $transactionRequestType->setLineItems($items);
+            }
+
+            // Assemble the complete transaction request
+            $request = new AnetAPI\CreateTransactionRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setTransactionRequest($transactionRequestType);
+            // Create the controller and get the response
+            $controller = new AnetController\CreateTransactionController($request);
+            if ($this->_sandbox) {
+                $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+            }
+            else {
+                $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+            }
+            $result = [];
+            if ($response != null) {
+                $result['response'] = $response;
+                // Check to see if the API request was successfully received and acted upon
+                if ($response->getMessages()->getResultCode() == "Ok") {
+                    // Since the API request was successful, look for a transaction response
+                    // and parse it to display the results of authorizing the card
+                    $tresponse = $response->getTransactionResponse();
+
+                    if ($tresponse != null && $tresponse->getMessages() != null) {
+                        $result['failed'] = false;
+                        $result['transaction_id'] = $tresponse->getTransId();
+                        $result['response_code'] = $tresponse->getResponseCode();
+                        $result['code'] = $tresponse->getMessages()[0]->getCode();
+                        $result['auth_code'] =  $tresponse->getAuthCode();
+                        $result['description'] = $tresponse->getMessages()[0]->getDescription();
+                    } else {
+                        $result['failed'] = true;
+                        if ($tresponse->getErrors() != null) {
+                            $result['error_code'] = $tresponse->getErrors()[0]->getErrorCode();
+                            $result['error_message'] = $tresponse->getErrors()[0]->getErrorText();
+                        }
+                    }
+                    // Or, print errors if the API request wasn't successful
+                } else {
+                    $result['failed'] = true;
+                    $tresponse = $response->getTransactionResponse();
+
+                    if ($tresponse != null && $tresponse->getErrors() != null) {
+                        $result['error_code'] = $tresponse->getErrors()[0]->getErrorCode() ;
+                        $result['error_message'] =$tresponse->getErrors()[0]->getErrorText() ;
+                    } else {
+                        $result['error_code'] = $response->getMessages()->getMessage()[0]->getCode() ;
+                        $result['error_message'] =$response->getMessages()->getMessage()[0]->getText() ;
+                    }
+                }
+            } else {
+                $result['error_message'] = __('No reponse received');
+            }
+            return $result;
+        }
+
+        /**
+         * @param \App\Model\Entity\Payment $payment
+         * @param array $data
+         * @param \App\Model\Entity\Member|array $member
+         *
+         * @return array
+         */
+        public function charge2($data, $member) {
+            $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+            $merchantAuthentication->setName($this->_options['login_id']);
+            $merchantAuthentication->setTransactionKey($this->_options['transaction_key']);
+            $refId = 'ref' . time();
+
+            // create the credit card
             $opaqueData = new AnetAPI\OpaqueDataType();
             $opaqueData->setDataDescriptor($data['dataDescriptor']);
             $opaqueData->setDataValue($data['dataValue']);
@@ -200,7 +361,5 @@
             }
             return $result;
         }
-
-
 
     }
