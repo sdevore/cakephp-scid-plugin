@@ -281,9 +281,7 @@
                         $items[] = $lineItem;
                     }
                     else {
-                        $lineItem = new AnetAPI\LineItemType();
-                        $lineItem->setName(__('Limit of items.'));
-                        $items[] = $lineItem;
+
                         break;
                     }
                 }
@@ -303,9 +301,9 @@
             $transactionRequestType->setPayment($paymentOne);
             $transactionRequestType->setCustomer($customerData);
             $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
-            if (!empty($items)) {
-                $transactionRequestType->setLineItems($items);
-            }
+//            if (!empty($items)) {
+//                $transactionRequestType->setLineItems($items);
+//            }
 
             // Assemble the complete transaction request
             $request = new AnetAPI\CreateTransactionRequest();
