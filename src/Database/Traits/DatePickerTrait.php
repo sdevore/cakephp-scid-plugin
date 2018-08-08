@@ -164,7 +164,7 @@
          *
          * @return string
          */
-        protected function getDateTimePickerString($date, $format = [
+        public function getDateTimePickerString($date, $format = [
             \IntlDateFormatter::SHORT,
             \IntlDateFormatter::SHORT,
         ]) {
@@ -182,14 +182,14 @@
             return $date;
         }
 
-        protected function getDatePickerString($date) {
+        public function getDatePickerString($date) {
             return $this->getDateTimePickerString($date, [
                 \IntlDateFormatter::SHORT,
                 \IntlDateFormatter::NONE,
             ]);
         }
 
-        protected function getTimePickerString($date) {
+        public function getTimePickerString($date) {
             return $this->getDateTimePickerString($date, [
                 \IntlDateFormatter::NONE,
                 \IntlDateFormatter::SHORT,
