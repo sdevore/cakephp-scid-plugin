@@ -8,6 +8,7 @@
 
     namespace Scid\Database\Type;
 
+    use App\Model\Traits\MoneyEntityTrait;
     use Cake\Database\Driver;
     use Cake\Database\Type;
     use Money\Currency;
@@ -16,6 +17,7 @@
 
     class MoneyType extends Type
     {
+        use MoneyEntityTrait;
 
         public function toDatabase($value, Driver $driver) {
             if ($value === NULL) {
@@ -41,6 +43,9 @@
             try {
                 if (empty($value)) {
                     $value = 0;
+                }
+                if (is_string($value)) {
+                    $value = $this->cleanMoney($value);
                 }
                 return new Money($value *100, new Currency('USD'));
             } catch (\Exception $e) {

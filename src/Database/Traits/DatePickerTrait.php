@@ -171,6 +171,9 @@
             if (empty($date)) {
                 $date = '';
             }
+            else if (is_string($date)) {
+                return $date;
+            }
             else {
                 $date = $date->i18nFormat(
                     $format);
