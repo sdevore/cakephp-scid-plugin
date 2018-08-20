@@ -23,11 +23,6 @@ class FormHelper extends Helper
 {
 
     public $helpers = ['Url', 'Scid.Html'];
-
-    protected $hasExpandedAdded = false;
-    protected $_hasSelect2Added = false;
-    protected $_scidType = null;
-    protected $_dataMaskType = [];
     /**
      * A list of allowed styles for buttons.
      *
@@ -54,7 +49,6 @@ class FormHelper extends Helper
         'declined', 'btn-declined',
 
     ];
-
     /**
      * A mapping of aliases for button styles.
      *
@@ -80,6 +74,10 @@ class FormHelper extends Helper
         'accepted-no-block' => 'btn-accepted-no-block',
         'declined' => 'btn-declined',
     ];
+    protected $hasExpandedAdded = false;
+    protected $_hasSelect2Added = false;
+    protected $_scidType = null;
+    protected $_dataMaskType = [];
     protected $_filepondPlugins = [
         'FilePondPluginFileEncode' => ['script' => 'file-encode'],
         'FilePondPluginFileValidateType' => ['script' => 'file-validate-type'],
@@ -131,18 +129,6 @@ class FormHelper extends Helper
 
     ];
     protected $_filePondPluginsRegistered = [];
-
-    /**
-     * Generate an ID suitable for use in an ID attribute.
-     *
-     * @param string $value The value to convert into an ID.
-     *
-     * @return string The generated id.
-     */
-    public function domId($value)
-    {
-        return $this->_domId($value);
-    }
 
     /**
      * Creates a `<button>` tag.
@@ -334,55 +320,248 @@ CHECKBOX_LIMIT;
     }
 
     /**
-     *
-     * from https://www.cssscript.com/generic-country-state-dropdown-list-countries-js/#comments
-     *
      * @param $options
      *
      * @return mixed
      */
-    private function __countries($options)
+    private function __datamask($options)
     {
-        $this->Html->useScript('Scid.countries');
-        if (empty($options['state_id'])) {
-            $statesId = 'state';
+        $this->Html->useScript('/assets/npm-asset/jquery-mask-plugin/dist/jquery.mask.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        // could add options and build out the script rather then using attribute later
+        if (is_array($options['data-mask'])) {
+            $mask = $options['data-mask']['mask'];
+            $maskOptions = ',' . json_encode($options['data-mask']['options']);
         } else {
-            $statesId = $options['state_id'];
-            unset($options['state_id']);
+            $maskOptions = '';
+            $mask = $options['data-mask'];
         }
-        $countriesId = $options['id'];
-        $options['type'] = 'select';
-        $script = "populateCountries(\"${countriesId}\", \"${statesId}\");";
+        unset($options['data-mask']);
+        switch ($mask) {
+            case 'phone':
+                $options = $this->injectClasses('phone', $options);
+                if (!in_array('phone', $this->_dataMaskType)) {
+                    $script = "$('.phone').mask('(000) 000-0000');";
+                    $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+                    $this->_dataMaskType[] = 'phone';
+
+
+                }
+                return $options;
+        }
+
+        $id = $options['id'];
+        $script = "$('#{$id}').mask('{$mask}' {$maskOptions});";
         $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
 
         return $options;
     }
 
-    private function __expand($options)
+    private function __bootstrapDatePicker($options)
     {
-
-        $options = $this->injectClasses(['autoExpand'], $options);
-        if (!$this->hasExpandedAdded) {
-            $script = <<<EXPAND
-$(document)
-    .one('focus.autoExpand', 'textarea.autoExpand', function(){
-        var savedValue = this.value;
-        this.value = '';
-        this.baseScrollHeight = this.scrollHeight;
-        this.value = savedValue;
-    })
-    .on('input.autoExpand', 'textarea.autoExpand', function(){
-        var minRows = this.getAttribute('data-min-rows')|0, rows;
-        this.rows = minRows;
-        rows = Math.ceil((this.scrollHeight - this.baseScrollHeight) / 16);
-        this.rows = minRows + rows;
-    });
-EXPAND;
-            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-            $this->hasExpandedAdded = true;
+        $id = $options['id'];
+        if (!empty($options['val'])) {
+            $options['val'] = $this->formatValue($options['val'], 'm/d/Y');
         }
-        return $options;
+        $this->Html->useScript([
+            'Scid.moment.min', 'Scid.daterangepicker',
+        ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useCssFile('Scid.daterangepicker');
+        $options['prepend'] = $this->Html->icon('calendar');
+        $options['type'] = 'text';
+        $defaultRangeOptions = [
+            'singleDatePicker' => TRUE,
+            'timePicker' => FALSE,
+            'locale' => ['format' => 'MM/DD/YYYY'],
+        ];
+        $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
+        $this->Html->scriptBlock("$(document).ready(function() {
+        $('#{$id}').daterangepicker({$rangeOptionString});
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+
+        return $options;
+    }
+
+    public function formatValue($sourceValue, $format = 'm/d/Y g:i a')
+    {
+        if (!empty($format) &&
+            (
+                $sourceValue instanceof Date ||
+                $sourceValue instanceof Time ||
+                $sourceValue instanceof FrozenTime ||
+                $sourceValue instanceof FrozenDate)) {
+            $sourceValue = $sourceValue->format($format);
+        }
+
+        return $sourceValue;
+    }
+
+    /**
+     * @url http://www.daterangepicker.com
+     * @param $options
+     * @param $rangeOptionString
+     */
+    private function __rangeOptions(&$options, $defaultOptions)
+    {
+        if (!empty($options['rangeOptions'])) {
+            $rangeOptions = $options['rangeOptions'];
+        } else {
+            $rangeOptions = [];
+        }
+        foreach ($defaultOptions as $key => $option) {
+            if (!isset($rangeOptions[$key])) {
+                $rangeOptions[$key] = $option;
+            }
+        }
+        $rangeOptionDateKeys = ['startDate', 'endDate', 'minDate', 'maxDate'];
+        if (!empty($options['startDate']) && !empty($options['endDate'])) {
+            $options['value'] =
+                CakeTime::format($options['startDate'], '%m/%d/%Y') . ' - ' . CakeTime::format($options['endDate'], '%m/%d/%Y');
+        }
+        foreach ($rangeOptionDateKeys as $key) {
+            if (!empty($options[$key])) {
+                $rangeOptions[$key] = $options[$key];
+                unset($options[$key]);
+            }
+        }
+        if (empty($rangeOptions)) {
+            $rangeOptionString = '';
+        } else {
+            $rangeOptionString = $this->__rangeOptionsString($rangeOptions);
+        }
+
+        return $rangeOptionString;
+    }
+
+    /**
+     * @param $rangeOptions
+     */
+    private function __rangeOptionsString($rangeOptions)
+    {
+        $result = json_encode($rangeOptions);
+        $result = str_replace('\/', '/', $result);
+        return $result;
+    }
+
+    /**
+     * @param $options
+     * @param $idForInput
+     *
+     * @return mixed
+     */
+    private function __bootstrapDateTimePicker($options)
+    {
+        $id = $options['id'];
+        if (!empty($options['val'])) {
+            $options['val'] = $this->formatValue($options['val']);
+        }
+        $this->Html->useScript([
+            'Scid.moment.min', 'Scid.daterangepicker',
+        ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useCssFile('Scid.daterangepicker');
+        $options['prepend'] = $this->Html->icon('calendar');
+        $options['type'] = 'text';
+        $defaultRangeOptions = [
+            'singleDatePicker' => TRUE,
+            'timePicker' => TRUE,
+            'locale' => ['format' => 'MM/DD/YYYY h:mm A'],
+        ];
+        $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
+
+        $this->Html->scriptBlock("$(document).ready(function() {
+        $('#{$id}').daterangepicker({$rangeOptionString});
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+
+        return $options;
+    }
+
+    /**
+     * @param $options
+     * @param $idForInput
+     *
+     * @return mixed
+     */
+    private function __timePicker($options)
+    {
+        $id = $options['id'];
+        if (!empty($options['val'])) {
+            $options['val'] = $this->formatValue($options['val'], 'g:i a');
+        }
+        $this->Html->useScript(['Scid.bootstrap-timepicker.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useCssFile('Scid.bootstrap-timepicker');
+        $options['prepend'] = $this->Html->icon('clock');
+        if (!empty($this->_inputDefaults['between'])) {
+            $options['between'] = $this->_inputDefaults['between'];
+            $options['between'] =
+                str_replace('input-group', 'input-group bootstrap-timepicker timepicker', $options['between']);
+        } else {
+            $options['between'] = "<div class=\"input-group bootstrap-timepicker timepicker\">";
+        }
+        $options['type'] = 'text';
+
+        $json =
+            [
+                'icons' => [
+                    'up' => 'far fa-chevron-up',
+                    'down' => 'far fa-chevron-down',
+                ],
+            ];
+        if (!empty($options['timepicker'])) {
+            $json = $json + $options['timepicker'];
+            unset($options['timepicker']);
+        }
+        $json = json_encode($json);
+        $this->Html->scriptBlock("$(document).ready(function() {
+        $('#{$id}').timepicker({$json});
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
+        return $options;
+    }
+
+    /**
+     * @param $options
+     *                                      $options can have a sub array 'rangeOptions' with the keys and values below
+     *                                      showDropdowns: (boolean) Show year and month select boxes above calendars to jump to a specific month and year
+     *                                      showWeekNumbers: (boolean) Show week numbers at the start of each week on the calendars
+     *                                      timePicker: (boolean) Allow selection of dates with times, not just dates
+     *                                      timePickerIncrement: (number) Increment of the minutes selection list for times (i.e. 30 to allow only selection of times ending in 0 or 30)
+     *                                      timePicker24Hour: (boolean) Use 24-hour instead of 12-hour times, removing the AM/PM selection
+     *                                      timePickerSeconds: (boolean) Show seconds in the timePicker
+     *                                      ranges: (object) Set predefined date ranges the user can select from.
+     *                                      Each key is the label for the range, and its value an array with two dates representing the bounds of the range
+     *                                      opens: (string: 'left'/'right'/'center') Whether the picker appears aligned to the left, to the right, or centered under the HTML element it's attached to
+     *                                      drops: (string: 'down' or 'up') Whether the picker appears below (default) or above the HTML element it's attached to
+     *                                      buttonClasses: (array) CSS class names that will be added to all buttons in the picker
+     *                                      applyClass: (string) CSS class string that will be added to the apply button
+     *                                      cancelClass: (string) CSS class string that will be added to the cancel button
+     *                                      locale: (object) Allows you to provide localized strings for buttons and labels,
+     *                                      customize the date display format, and change the first day of week for the calendars
+     *                                      singleDatePicker: (boolean) Show only a single calendar to choose one date,
+     *                                      instead of a range picker with two calendars;
+     *                                      the start and end dates provided to your callback will be the same single date chosen
+     *                                      autoApply: (boolean) Hide the apply and cancel buttons, and automatically apply a new date range as soon as two dates or a predefined range is selected
+     *                                      parentEl: (string) jQuery selector of the parent element that the date range picker will be added to, if not provided this will be 'body'
+     * @param $idForInput
+     *
+     * @return mixed
+     */
+    private function __dateRange($options)
+    {
+        $id = $options['id'];
+        $this->Html->useScript([
+            'Scid.moment.min', 'Scid.daterangepicker',
+        ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+        $this->Html->useCssFile('Scid.daterangepicker');
+        $options['prepend'] = $this->Html->icon('calendar');
+        $options['type'] = 'text';
+        $defaultRangeOptions = ['autoApply' => TRUE];
+        $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
+
+        $this->Html->scriptBlock("$(document).ready(function() {
+        $('#{$id}').daterangepicker({$rangeOptionString});
+    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
+        return $options;
     }
 
     /**
@@ -441,6 +620,336 @@ $("#{$id}").markdown({$markdownOptionsJson})
 SCRIPT;
         $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
         unset($options['markdown']);
+
+        return $options;
+    }
+
+    private function __expand($options)
+    {
+
+        $options = $this->injectClasses(['autoExpand'], $options);
+        if (!$this->hasExpandedAdded) {
+            $script = <<<EXPAND
+$(document)
+    .one('focus.autoExpand', 'textarea.autoExpand', function(){
+        var savedValue = this.value;
+        this.value = '';
+        this.baseScrollHeight = this.scrollHeight;
+        this.value = savedValue;
+    })
+    .on('input.autoExpand', 'textarea.autoExpand', function(){
+        var minRows = this.getAttribute('data-min-rows')|0, rows;
+        this.rows = minRows;
+        rows = Math.ceil((this.scrollHeight - this.baseScrollHeight) / 16);
+        this.rows = minRows + rows;
+    });
+EXPAND;
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $this->hasExpandedAdded = true;
+        }
+        return $options;
+
+    }
+
+    /**
+     * @param null|array $options
+     *
+     * @return null|array
+     */
+    private function __selectExtraOptions($options = NULL)
+    {
+        if (!empty($options['select-visible-div'])) {
+            $groupClass = $options['select-visible-div'];
+            unset($options['select-visible-div']);
+            $id = $options['id'];
+            if (!empty($options['id'])) {
+                $id = $options['id'];
+            }
+            $script = "$(document).ready(function(){
+                        $('select#${id}').change(function(){
+                            $(this).find('option:selected').each(function(){
+                                var optionValue = $(this).attr('value');
+                                if(optionValue){
+                                    $('.${groupClass}').not('.' + optionValue).hide();
+                                    $('.' + optionValue).show();
+                                } else{
+                                    $('.${groupClass}').hide();
+                                }
+                            });
+                        }).change();
+                    });";
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+        }
+
+        return $options;
+    }
+
+    private function __select2($options)
+    {
+        /**
+         * https://github.com/select2/select2
+         * and
+         * https://github.com/select2/select2-bootstrap-theme
+         * <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+         * <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+         */
+        $this->Html->useCssFile(['Scid.select2.min', 'Scid.select2-bootstrap.min']);
+        $this->Html->useScript('Scid.select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $options['type'] = 'select';
+        $id = $options['id'];
+
+        $useClass = false;
+        if (empty($options['select2'])) {
+            $selectOptions = ['minimumResultsForSearch' => 10];
+            $options = $this->Html->injectClasses('select2', $options);
+            $useClass = true;
+        } else {
+            $selectOptions = $options['select2'];
+            unset($options['select2']);
+        }
+        $selectOptions = json_encode($selectOptions);
+        if ($useClass && !$this->_hasSelect2Added) {
+            $script = "$(document).ready(function() {
+    $('.select2').select2({$selectOptions});
+});";
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $this->_hasSelect2Added = true;
+        } else {
+            $script = "$(document).ready(function() {
+    $('#{$id}').select2({$selectOptions});
+});";
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        }
+        return $options;
+    }
+
+    /**
+     * @param null|array $options
+     *
+     * @return null|array
+     */
+    private function __sortableSerialize($options)
+    {
+        $this->Html->useScript('Scid.jquery-sortable-min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $id = $options['id'];
+        $group = 'serialization';
+        if (!empty($options['sortable-serialize']['group'])) {
+            $group = $options['sortable-serialize']['group'];
+        }
+        $tag = 'ul';
+        if (!empty($options['sortable-serialize']['tag'])) {
+            $tag = $options['sortable-serialize']['tag'];
+        }
+        $script = "var group = $('${tag}.${group}').sortable({
+  group: '${group}',
+  delay: 500,
+  onDrop: function (\$item, container, _super) {
+    var data = group.sortable('serialize').get();
+
+    var jsonString = JSON.stringify(data, null, ' ');
+
+    $('#${id}').val(jsonString);
+    _super(\$item, container);
+  }
+});";
+        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+        if ($options['sortable-serialize']['test'] && $options['sortable-serialize']['test']) {
+            $options['type'] = 'textarea';
+            $options['label'] = 'Serialized ' . $group;
+        } else {
+            $options['type'] = 'hidden';
+            $this->unlockField($options['name']);
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param null|array $options
+     *
+     * @return null|array
+     */
+    private function __sortablePost($options)
+    {
+        $this->Html->useScript('Scid.jquery-sortable-min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $id = $options['id'];
+        $url = $options['url'];
+        if (is_array($url)) {
+            $url = $this->Url->build($url);
+        }
+        $group = 'serialization';
+        if (!empty($options['sortable-serialize']['group'])) {
+            $group = $options['sortable-serialize']['group'];
+        }
+        $tag = 'ul';
+        if (!empty($options['sortable-serialize']['tag'])) {
+            $tag = $options['sortable-serialize']['tag'];
+        }
+        $script = "var group = $('${tag}.${group}').sortable({
+  group: '${group}',
+  delay: 500,
+  onDrop: function (\$item, container, _super) {
+    var data = group.sortable('serialize').get();
+
+    var jsonString = JSON.stringify(data, null, ' ');
+
+    $.ajax({
+            data: jsonString,
+            type: 'POST',
+            url: '${url}'
+        });
+    _super(\$item, container);
+  }
+});";
+        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        if ($options['sortable-serialize']['test'] && $options['sortable-serialize']['test']) {
+            $options['type'] = 'textarea';
+            $options['label'] = 'Serialized ' . $group;
+        } else {
+            $options['type'] = 'hidden';
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param null|array $options
+     *
+     * @return null|array
+     */
+    private function __durationPicker($options)
+    {
+        $id = $options['id'];
+        $options['type'] = 'text';
+        $this->Html->useScript(['Scid.bootstrap-duration-picker',], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+        $showSeconds = 'false';
+        if (!empty($options['duration']['showSeconds'])) {
+            if ($options['duration']['showSeconds']) {
+                $showSeconds = 'true';
+            }
+        }
+        $showDays = 'true';
+        if (isset($options['duration']['showDays'])) {
+            if ($options['duration']['showDays']) {
+                $showDays = 'true';
+            } else {
+                $showDays = 'false';
+            }
+        }
+        $onChanged = '';
+        if (!empty($options['duration']['onChanged'])) {
+            $onChanged = ',
+                onChanged: function (value) {
+                ' . $options['duration']['onChanged'] . '
+                }';
+        }
+        $script = "$('#${id}').durationPicker({
+            // defines whether to show seconds or not
+            showSeconds: ${showSeconds},
+            // defines whether to show days or not
+            showDays: ${showDays}
+            ${onChanged}
+});";
+        unset($options['duration']);
+        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+
+        return $options;
+    }
+
+    /**
+     * https://pqina.nl/filepond/
+     *
+     * @param $fieldName
+     * @param $options
+     *
+     * @return array
+     */
+    private function __filepond($fieldName, $options)
+    {
+
+
+        $filepondOptions = [
+            'lableIdle' =>
+                'Drag & Drop your picture or <span class="filepond--label-action">Browse</span>',
+        ];
+
+        if (!empty($options['filepond'])) {
+            $filepondOptions = $options['filepond'];
+            unset($options['filepond']);
+        }
+        $this->Html->useScript('Scid.filepond.min');
+        $this->Html->useCssFile('Scid.filepond.min');
+        $options = $this->Html->injectClasses('filepond', $options);
+
+        foreach ($this->_filepondRequiredPlugins as $name) {
+            $this->_registerFilepondPlugin($name);
+        }
+        foreach ($filepondOptions as $option => $value) {
+            if (!empty($this->_filepondPluginCollections[$option])) {
+                $pluginCollection = $this->_filepondPluginCollections[$option];
+                foreach ($pluginCollection as $name) {
+                    $this->_registerFilepondPlugin($name);
+                }
+            }
+        }
+        $filepondOptions = json_encode($filepondOptions);
+        $options['type'] = 'file';
+        $id = $options['id'];
+        $script = "FilePond.create(
+  document.querySelector('#${id}'),
+  ${filepondOptions}
+);";
+        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+        $this->unlockField($fieldName . '.name');
+        $this->unlockField($fieldName . '.type');
+        $this->unlockField($fieldName . 'tmp_name');
+        $this->unlockField($fieldName . 'error');
+        $this->unlockField($fieldName . 'size');
+        $this->unlockField($fieldName);
+
+        return $options;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return void
+     */
+    private function _registerFilepondPlugin($name)
+    {
+        if (empty($this->_filePondPluginsRegistered[$name])) {
+            $value = $this->_filepondPlugins[$name];
+            $this->Html->useScript('Scid.filepond-plugin-' . $value['script'] . '.min');
+            if (!empty($value['css'])) {
+                $this->Html->useCssFile('Scid.filepond-plugin-' . $value['css'] . '.min');
+            }
+            $this->Html->scriptBlock("FilePond.registerPlugin($name);",
+                ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+            $this->_filePondPluginsRegistered[$name] = TRUE;
+        }
+    }
+
+    /**
+     *
+     * from https://www.cssscript.com/generic-country-state-dropdown-list-countries-js/#comments
+     *
+     * @param $options
+     *
+     * @return mixed
+     */
+    private function __countries($options)
+    {
+        $this->Html->useScript('Scid.countries');
+        if (empty($options['state_id'])) {
+            $statesId = 'state';
+        } else {
+            $statesId = $options['state_id'];
+            unset($options['state_id']);
+        }
+        $countriesId = $options['id'];
+        $options['type'] = 'select';
+        $script = "populateCountries(\"${countriesId}\", \"${statesId}\");";
+        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
 
         return $options;
     }
@@ -531,6 +1040,114 @@ SWITCH;
 
         $this->Html->scriptBlock($onSwitch, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
 
+        return $options;
+    }
+
+    /**
+     * Generate an ID suitable for use in an ID attribute.
+     *
+     * @param string $value The value to convert into an ID.
+     *
+     * @return string The generated id.
+     */
+    public function domId($value)
+    {
+        return $this->_domId($value);
+    }
+
+    private function __signature($fieldName, $options)
+    {
+        $id = $options['id'];
+        $wrapper_id = 'signature-pad-' . $id;
+        $options['templateVars']['id'] = $wrapper_id;
+        if (empty($options['templateVars']['canvasClass'])) {
+            $options['templateVars']['canvasClass'] = 'signature-pad-canvas';
+            $options['templateVars']['canvasId'] = 'signature-pad-canvas-' . $id;
+        }
+        if (!empty($options['signature'])) {
+            if (!empty($options['signature']['mime-type'])) {
+                $mimeType = $options['signature']['mime-type'];
+            } else {
+                $mimeType = 'image/svg+xml';
+            }
+            if (!empty($options['signature']['clear_id'])) {
+                $clear_id = $options['signature']['clear_id'];
+                $clear = "document.getElementById('{$clear_id}').addEventListener('click', function () {
+                        signaturePad.clear();
+                    });";
+                unset($options['signature']['clear']);
+            }
+            if (!empty($options['signature']['undo_id'])) {
+                $undo_id = $options['signature']['undo_id'];
+                $undo = "document.getElementById('{$undo_id}').addEventListener('click', function () {
+                        signaturePad.undo();
+                    });";
+                unset($options['signature']['undo_id']);
+            }
+            if (!empty($options['signature']['options'])) {
+                $signatureOptions = $options['signature']['options'];
+            }
+            unset($options['signature']);
+        }
+        if (empty($signatureOptions)) {
+            $signatureOptions = ["backgroundColor" => 'rgb(255, 255, 255)'];
+        }
+        $signatureOptions = json_encode($signatureOptions);
+        $signatureOptions = substr($signatureOptions, 0, -1);
+        $signatureOptions .= ",\n onEnd: function (event) {
+        var dataURL = signaturePad.toDataURL('{$mimeType}');
+        document.getElementById('{$id}').value = dataURL;
+    }
+            }";
+
+        $this->addWidget('signature',
+            ['Scid.Signature', 'text', 'label']);
+        $this->Html->useScript('/assets/npm-asset/signature_pad/dist/signature_pad.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $signatureBlock = /** @lang JavaScript 1.8 */
+            <<<SIGNATURE_SCRIPT
+var wrapper = document.getElementById("{$wrapper_id}");
+var canvas = wrapper.querySelector("canvas");
+var signaturePad = new SignaturePad(canvas, 
+    // It's Necessary to use an opaque color when saving image as JPEG;
+    // this option can be omitted if only saving as PNG or SVG
+    {$signatureOptions}
+);
+
+// Adjust canvas coordinate space taking into account pixel ratio,
+// to make it look crisp on mobile devices.
+// This also causes canvas to be cleared.
+function resizeCanvas() {
+    // When zoomed out to less than 100%, for some very strange reason,
+    // some browsers report devicePixelRatio as less than 1
+    // and only part of the canvas is cleared then.
+    var ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+    // This part causes the canvas to be cleared
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext("2d").scale(ratio, ratio);
+
+    // This library does not listen for canvas changes, so after the canvas is automatically
+    // cleared by the browser, SignaturePad#isEmpty might still return false, even though the
+    // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
+    // that the state of this library is consistent with visual state of the canvas, you
+    // have to clear it manually.
+    signaturePad.clear();
+}
+
+// On mobile devices it might make more sense to listen to orientation change,
+// rather than window resize events.
+window.onresize = resizeCanvas;
+resizeCanvas();
+SIGNATURE_SCRIPT;
+        $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        if (!empty($clear)) {
+            $this->Html->scriptBlock($clear, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        }
+        if (!empty($undo)) {
+            $this->Html->scriptBlock($undo, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        }
+        // $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rbg(1,1,1)','size'=>32]);
         return $options;
     }
 
@@ -728,234 +1345,6 @@ CHECK_ALL_SCRIPT;
 
     /**
      * @param $options
-     *                                      $options can have a sub array 'rangeOptions' with the keys and values below
-     *                                      showDropdowns: (boolean) Show year and month select boxes above calendars to jump to a specific month and year
-     *                                      showWeekNumbers: (boolean) Show week numbers at the start of each week on the calendars
-     *                                      timePicker: (boolean) Allow selection of dates with times, not just dates
-     *                                      timePickerIncrement: (number) Increment of the minutes selection list for times (i.e. 30 to allow only selection of times ending in 0 or 30)
-     *                                      timePicker24Hour: (boolean) Use 24-hour instead of 12-hour times, removing the AM/PM selection
-     *                                      timePickerSeconds: (boolean) Show seconds in the timePicker
-     *                                      ranges: (object) Set predefined date ranges the user can select from.
-     *                                      Each key is the label for the range, and its value an array with two dates representing the bounds of the range
-     *                                      opens: (string: 'left'/'right'/'center') Whether the picker appears aligned to the left, to the right, or centered under the HTML element it's attached to
-     *                                      drops: (string: 'down' or 'up') Whether the picker appears below (default) or above the HTML element it's attached to
-     *                                      buttonClasses: (array) CSS class names that will be added to all buttons in the picker
-     *                                      applyClass: (string) CSS class string that will be added to the apply button
-     *                                      cancelClass: (string) CSS class string that will be added to the cancel button
-     *                                      locale: (object) Allows you to provide localized strings for buttons and labels,
-     *                                      customize the date display format, and change the first day of week for the calendars
-     *                                      singleDatePicker: (boolean) Show only a single calendar to choose one date,
-     *                                      instead of a range picker with two calendars;
-     *                                      the start and end dates provided to your callback will be the same single date chosen
-     *                                      autoApply: (boolean) Hide the apply and cancel buttons, and automatically apply a new date range as soon as two dates or a predefined range is selected
-     *                                      parentEl: (string) jQuery selector of the parent element that the date range picker will be added to, if not provided this will be 'body'
-     * @param $idForInput
-     *
-     * @return mixed
-     */
-    private function __dateRange($options)
-    {
-        $id = $options['id'];
-        $this->Html->useScript([
-            'Scid.moment.min', 'Scid.daterangepicker',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-        $this->Html->useCssFile('Scid.daterangepicker');
-        $options['prepend'] = $this->Html->icon('calendar');
-        $options['type'] = 'text';
-        $defaultRangeOptions = ['autoApply' => TRUE];
-        $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
-
-        $this->Html->scriptBlock("$(document).ready(function() {
-        $('#{$id}').daterangepicker({$rangeOptionString});
-    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-
-        return $options;
-    }
-
-    /**
-     * @param $options
-     * @param $idForInput
-     *
-     * @return mixed
-     */
-    private function __bootstrapDateTimePicker($options)
-    {
-        $id = $options['id'];
-        if (!empty($options['val'])) {
-            $options['val'] = $this->formatValue($options['val']);
-        }
-        $this->Html->useScript([
-            'Scid.moment.min', 'Scid.daterangepicker',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        $this->Html->useCssFile('Scid.daterangepicker');
-        $options['prepend'] = $this->Html->icon('calendar');
-        $options['type'] = 'text';
-        $defaultRangeOptions = [
-            'singleDatePicker' => TRUE,
-            'timePicker' => TRUE,
-            'locale' => ['format' => 'MM/DD/YYYY h:mm A'],
-        ];
-        $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
-
-        $this->Html->scriptBlock("$(document).ready(function() {
-        $('#{$id}').daterangepicker({$rangeOptionString});
-    });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-
-        return $options;
-    }
-
-    /**
-     * @param $options
-     * @param $idForInput
-     *
-     * @return mixed
-     */
-    private function __timePicker($options)
-    {
-        $id = $options['id'];
-        if (!empty($options['val'])) {
-            $options['val'] = $this->formatValue($options['val'], 'g:i a');
-        }
-        $this->Html->useScript(['Scid.bootstrap-timepicker.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        $this->Html->useCssFile('Scid.bootstrap-timepicker');
-        $options['prepend'] = $this->Html->icon('clock');
-        if (!empty($this->_inputDefaults['between'])) {
-            $options['between'] = $this->_inputDefaults['between'];
-            $options['between'] =
-                str_replace('input-group', 'input-group bootstrap-timepicker timepicker', $options['between']);
-        } else {
-            $options['between'] = "<div class=\"input-group bootstrap-timepicker timepicker\">";
-        }
-        $options['type'] = 'text';
-
-        $json =
-            [
-                'icons' => [
-                    'up' => 'far fa-chevron-up',
-                    'down' => 'far fa-chevron-down',
-                ],
-            ];
-        if (!empty($options['timepicker'])) {
-            $json = $json + $options['timepicker'];
-            unset($options['timepicker']);
-        }
-        $json = json_encode($json);
-        $this->Html->scriptBlock("$(document).ready(function() {
-        $('#{$id}').timepicker({$json});
-    });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-
-        return $options;
-    }
-
-    /**
-     * @param $options
-     *
-     * @return mixed
-     */
-    private function __datamask($options)
-    {
-        $this->Html->useScript('/assets/npm-asset/jquery-mask-plugin/dist/jquery.mask.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        // could add options and build out the script rather then using attribute later
-        if (is_array($options['data-mask'])) {
-            $mask = $options['data-mask']['mask'];
-            $maskOptions = ',' . json_encode($options['data-mask']['options']);
-        } else {
-            $maskOptions = '';
-            $mask = $options['data-mask'];
-        }
-        unset($options['data-mask']);
-        switch ($mask) {
-            case 'phone':
-                $options = $this->injectClasses('phone',$options);
-                if (!in_array('phone', $this->_dataMaskType)) {
-                    $script = "$('.phone').mask('(000) 000-0000');";
-                    $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-                    $this->_dataMaskType[] = 'phone';
-
-
-                }
-                return $options;
-        }
-
-        $id = $options['id'];
-        $script = "$('#{$id}').mask('{$mask}' {$maskOptions});";
-        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-
-        return $options;
-    }
-
-    /**
-     * @param null|array $options
-     *
-     * @return null|array
-     */
-    private function __durationPicker($options)
-    {
-        $id = $options['id'];
-        $options['type'] = 'text';
-        $this->Html->useScript(['Scid.bootstrap-duration-picker',], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-        $showSeconds = 'false';
-        if (!empty($options['duration']['showSeconds'])) {
-            if ($options['duration']['showSeconds']) {
-                $showSeconds = 'true';
-            }
-        }
-        $showDays = 'true';
-        if (isset($options['duration']['showDays'])) {
-            if ($options['duration']['showDays']) {
-                $showDays = 'true';
-            } else {
-                $showDays = 'false';
-            }
-        }
-        $onChanged = '';
-        if (!empty($options['duration']['onChanged'])) {
-            $onChanged = ',
-                onChanged: function (value) {
-                ' . $options['duration']['onChanged'] . '
-                }';
-        }
-        $script = "$('#${id}').durationPicker({
-            // defines whether to show seconds or not
-            showSeconds: ${showSeconds},
-            // defines whether to show days or not
-            showDays: ${showDays}
-            ${onChanged}
-});";
-        unset($options['duration']);
-        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-
-        return $options;
-    }
-
-    private function __bootstrapDatePicker($options)
-    {
-        $id = $options['id'];
-        if (!empty($options['val'])) {
-            $options['val'] = $this->formatValue($options['val'], 'm/d/Y');
-        }
-        $this->Html->useScript([
-            'Scid.moment.min', 'Scid.daterangepicker',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        $this->Html->useCssFile('Scid.daterangepicker');
-        $options['prepend'] = $this->Html->icon('calendar');
-        $options['type'] = 'text';
-        $defaultRangeOptions = [
-            'singleDatePicker' => TRUE,
-            'timePicker' => FALSE,
-            'locale' => ['format' => 'MM/DD/YYYY'],
-        ];
-        $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
-
-        $this->Html->scriptBlock("$(document).ready(function() {
-        $('#{$id}').daterangepicker({$rangeOptionString});
-    });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-
-        return $options;
-    }
-
-    /**
-     * @param $options
      * @param $idForInput
      *
      * @return mixed
@@ -1039,398 +1428,6 @@ CHECK_ALL_SCRIPT;
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
 
         return $options;
-    }
-
-    /**
-     * @url http://www.daterangepicker.com
-     * @param $options
-     * @param $rangeOptionString
-     */
-    private function __rangeOptions(&$options, $defaultOptions)
-    {
-        if (!empty($options['rangeOptions'])) {
-            $rangeOptions = $options['rangeOptions'];
-        } else {
-            $rangeOptions = [];
-        }
-        foreach ($defaultOptions as $key => $option) {
-            if (!isset($rangeOptions[$key])) {
-                $rangeOptions[$key] = $option;
-            }
-        }
-        $rangeOptionDateKeys = ['startDate', 'endDate', 'minDate', 'maxDate'];
-        if (!empty($options['startDate']) && !empty($options['endDate'])) {
-            $options['value'] =
-                CakeTime::format($options['startDate'], '%m/%d/%Y') . ' - ' . CakeTime::format($options['endDate'], '%m/%d/%Y');
-        }
-        foreach ($rangeOptionDateKeys as $key) {
-            if (!empty($options[$key])) {
-                $rangeOptions[$key] = $options[$key];
-                unset($options[$key]);
-            }
-        }
-        if (empty($rangeOptions)) {
-            $rangeOptionString = '';
-        } else {
-            $rangeOptionString = $this->__rangeOptionsString($rangeOptions);
-        }
-
-        return $rangeOptionString;
-    }
-
-    /**
-     * @param $rangeOptions
-     */
-    private function __rangeOptionsString($rangeOptions)
-    {
-        $result = json_encode($rangeOptions);
-        $result = str_replace('\/', '/', $result);
-        return $result;
-    }
-
-    /**
-     * @param null|array $options
-     *
-     * @return null|array
-     */
-    private function __selectExtraOptions($options = NULL)
-    {
-        if (!empty($options['select-visible-div'])) {
-            $groupClass = $options['select-visible-div'];
-            unset($options['select-visible-div']);
-            $id = $options['id'];
-            if (!empty($options['id'])) {
-                $id = $options['id'];
-            }
-            $script = "$(document).ready(function(){
-                        $('select#${id}').change(function(){
-                            $(this).find('option:selected').each(function(){
-                                var optionValue = $(this).attr('value');
-                                if(optionValue){
-                                    $('.${groupClass}').not('.' + optionValue).hide();
-                                    $('.' + optionValue).show();
-                                } else{
-                                    $('.${groupClass}').hide();
-                                }
-                            });
-                        }).change();
-                    });";
-            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-        }
-
-        return $options;
-    }
-
-    /**
-     * https://pqina.nl/filepond/
-     *
-     * @param $fieldName
-     * @param $options
-     *
-     * @return array
-     */
-    private function __filepond($fieldName, $options)
-    {
-
-
-        $filepondOptions = [
-            'lableIdle' =>
-                'Drag & Drop your picture or <span class="filepond--label-action">Browse</span>',
-        ];
-
-        if (!empty($options['filepond'])) {
-            $filepondOptions = $options['filepond'];
-            unset($options['filepond']);
-        }
-        $this->Html->useScript('Scid.filepond.min');
-        $this->Html->useCssFile('Scid.filepond.min');
-        $options = $this->Html->injectClasses('filepond', $options);
-
-        foreach ($this->_filepondRequiredPlugins as $name) {
-            $this->_registerFilepondPlugin($name);
-        }
-        foreach ($filepondOptions as $option => $value) {
-            if (!empty($this->_filepondPluginCollections[$option])) {
-                $pluginCollection = $this->_filepondPluginCollections[$option];
-                foreach ($pluginCollection as $name) {
-                    $this->_registerFilepondPlugin($name);
-                }
-            }
-        }
-        $filepondOptions = json_encode($filepondOptions);
-        $options['type'] = 'file';
-        $id = $options['id'];
-        $script = "FilePond.create(
-  document.querySelector('#${id}'),
-  ${filepondOptions}
-);";
-        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-        $this->unlockField($fieldName . '.name');
-        $this->unlockField($fieldName . '.type');
-        $this->unlockField($fieldName . 'tmp_name');
-        $this->unlockField($fieldName . 'error');
-        $this->unlockField($fieldName . 'size');
-        $this->unlockField($fieldName);
-
-        return $options;
-    }
-
-    /**
-     * @param null|array $options
-     *
-     * @return null|array
-     */
-    private function __sortableSerialize($options)
-    {
-        $this->Html->useScript('Scid.jquery-sortable-min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        $id = $options['id'];
-        $group = 'serialization';
-        if (!empty($options['sortable-serialize']['group'])) {
-            $group = $options['sortable-serialize']['group'];
-        }
-        $tag = 'ul';
-        if (!empty($options['sortable-serialize']['tag'])) {
-            $tag = $options['sortable-serialize']['tag'];
-        }
-        $script = "var group = $('${tag}.${group}').sortable({
-  group: '${group}',
-  delay: 500,
-  onDrop: function (\$item, container, _super) {
-    var data = group.sortable('serialize').get();
-
-    var jsonString = JSON.stringify(data, null, ' ');
-
-    $('#${id}').val(jsonString);
-    _super(\$item, container);
-  }
-});";
-        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-        if ($options['sortable-serialize']['test'] && $options['sortable-serialize']['test']) {
-            $options['type'] = 'textarea';
-            $options['label'] = 'Serialized ' . $group;
-        } else {
-            $options['type'] = 'hidden';
-            $this->unlockField($options['name']);
-        }
-
-        return $options;
-    }
-
-    private function __select2($options)
-    {
-        /**
-         * https://github.com/select2/select2
-         * and
-         * https://github.com/select2/select2-bootstrap-theme
-         * <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-         * <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-         */
-        $this->Html->useCssFile(['Scid.select2.min', 'Scid.select2-bootstrap.min']);
-        $this->Html->useScript('Scid.select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        $options['type'] = 'select';
-        $id = $options['id'];
-
-        $useClass = false;
-        if (empty($options['select2'])) {
-            $selectOptions = ['minimumResultsForSearch' => 10];
-            $options = $this->Html->injectClasses('select2', $options);
-            $useClass = true;
-        } else {
-            $selectOptions = $options['select2'];
-            unset($options['select2']);
-        }
-        $selectOptions = json_encode($selectOptions);
-        if ($useClass && !$this->_hasSelect2Added) {
-            $script = "$(document).ready(function() {
-    $('.select2').select2({$selectOptions});
-});";
-            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-            $this->_hasSelect2Added = true;
-        } else {
-            $script = "$(document).ready(function() {
-    $('#{$id}').select2({$selectOptions});
-});";
-            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        }
-        return $options;
-    }
-
-    private function __signature($fieldName, $options)
-    {
-        $id = $options['id'];
-        $wrapper_id = 'signature-pad-' . $id;
-        $options['templateVars']['id'] = $wrapper_id;
-        if (empty($options['templateVars']['canvasClass'])) {
-            $options['templateVars']['canvasClass'] = 'signature-pad-canvas';
-            $options['templateVars']['canvasId'] = 'signature-pad-canvas-' . $id;
-        }
-        if (!empty($options['signature'])) {
-            if (!empty($options['signature']['mime-type'])) {
-                $mimeType = $options['signature']['mime-type'];
-            } else {
-                $mimeType = 'image/svg+xml';
-            }
-            if (!empty($options['signature']['clear_id'])) {
-                $clear_id = $options['signature']['clear_id'];
-                $clear = "document.getElementById('{$clear_id}').addEventListener('click', function () {
-                        signaturePad.clear();
-                    });";
-                unset($options['signature']['clear']);
-            }
-            if (!empty($options['signature']['undo_id'])) {
-                $undo_id = $options['signature']['undo_id'];
-                $undo = "document.getElementById('{$undo_id}').addEventListener('click', function () {
-                        signaturePad.undo();
-                    });";
-                unset($options['signature']['undo_id']);
-            }
-            if (!empty($options['signature']['options'])) {
-                $signatureOptions = $options['signature']['options'];
-            }
-            unset($options['signature']);
-        }
-        if (empty($signatureOptions)) {
-            $signatureOptions = ["backgroundColor" => 'rgb(255, 255, 255)'];
-        }
-        $signatureOptions = json_encode($signatureOptions);
-        $signatureOptions = substr($signatureOptions, 0, -1);
-        $signatureOptions .= ",\n onEnd: function (event) {
-        var dataURL = signaturePad.toDataURL('{$mimeType}');
-        document.getElementById('{$id}').value = dataURL;
-    }
-            }";
-
-        $this->addWidget('signature',
-            ['Scid.Signature', 'text', 'label']);
-        $this->Html->useScript('/assets/npm-asset/signature_pad/dist/signature_pad.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        $signatureBlock = /** @lang JavaScript 1.8 */
-            <<<SIGNATURE_SCRIPT
-var wrapper = document.getElementById("{$wrapper_id}");
-var canvas = wrapper.querySelector("canvas");
-var signaturePad = new SignaturePad(canvas, 
-    // It's Necessary to use an opaque color when saving image as JPEG;
-    // this option can be omitted if only saving as PNG or SVG
-    {$signatureOptions}
-);
-
-// Adjust canvas coordinate space taking into account pixel ratio,
-// to make it look crisp on mobile devices.
-// This also causes canvas to be cleared.
-function resizeCanvas() {
-    // When zoomed out to less than 100%, for some very strange reason,
-    // some browsers report devicePixelRatio as less than 1
-    // and only part of the canvas is cleared then.
-    var ratio = Math.max(window.devicePixelRatio || 1, 1);
-
-    // This part causes the canvas to be cleared
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext("2d").scale(ratio, ratio);
-
-    // This library does not listen for canvas changes, so after the canvas is automatically
-    // cleared by the browser, SignaturePad#isEmpty might still return false, even though the
-    // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
-    // that the state of this library is consistent with visual state of the canvas, you
-    // have to clear it manually.
-    signaturePad.clear();
-}
-
-// On mobile devices it might make more sense to listen to orientation change,
-// rather than window resize events.
-window.onresize = resizeCanvas;
-resizeCanvas();
-SIGNATURE_SCRIPT;
-        $this->Html->scriptBlock($signatureBlock, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        if (!empty($clear)) {
-            $this->Html->scriptBlock($clear, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        }
-        if (!empty($undo)) {
-            $this->Html->scriptBlock($undo, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        }
-        // $this->Html->fontCursor('#'.$wrapper_id, 'pencil',['hotspot'=>'bottom left','color'=>'brown','outline'=>'rbg(1,1,1)','size'=>32]);
-        return $options;
-    }
-
-    /**
-     * @param null|array $options
-     *
-     * @return null|array
-     */
-    private function __sortablePost($options)
-    {
-        $this->Html->useScript('Scid.jquery-sortable-min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        $id = $options['id'];
-        $url = $options['url'];
-        if (is_array($url)) {
-            $url = $this->Url->build($url);
-        }
-        $group = 'serialization';
-        if (!empty($options['sortable-serialize']['group'])) {
-            $group = $options['sortable-serialize']['group'];
-        }
-        $tag = 'ul';
-        if (!empty($options['sortable-serialize']['tag'])) {
-            $tag = $options['sortable-serialize']['tag'];
-        }
-        $script = "var group = $('${tag}.${group}').sortable({
-  group: '${group}',
-  delay: 500,
-  onDrop: function (\$item, container, _super) {
-    var data = group.sortable('serialize').get();
-
-    var jsonString = JSON.stringify(data, null, ' ');
-
-    $.ajax({
-            data: jsonString,
-            type: 'POST',
-            url: '${url}'
-        });
-    _super(\$item, container);
-  }
-});";
-        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-        if ($options['sortable-serialize']['test'] && $options['sortable-serialize']['test']) {
-            $options['type'] = 'textarea';
-            $options['label'] = 'Serialized ' . $group;
-        } else {
-            $options['type'] = 'hidden';
-        }
-
-        return $options;
-    }
-
-    /**
-     * @param $name
-     *
-     * @return void
-     */
-    private function _registerFilepondPlugin($name)
-    {
-        if (empty($this->_filePondPluginsRegistered[$name])) {
-            $value = $this->_filepondPlugins[$name];
-            $this->Html->useScript('Scid.filepond-plugin-' . $value['script'] . '.min');
-            if (!empty($value['css'])) {
-                $this->Html->useCssFile('Scid.filepond-plugin-' . $value['css'] . '.min');
-            }
-            $this->Html->scriptBlock("FilePond.registerPlugin($name);",
-                ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-            $this->_filePondPluginsRegistered[$name] = TRUE;
-        }
-    }
-
-
-    public function formatValue($sourceValue, $format = 'm/d/Y g:i a')
-    {
-        if (!empty($format) &&
-            (
-                $sourceValue instanceof Date ||
-                $sourceValue instanceof Time ||
-                $sourceValue instanceof FrozenTime ||
-                $sourceValue instanceof FrozenDate)) {
-            $sourceValue = $sourceValue->format($format);
-        }
-
-        return $sourceValue;
     }
 
 
