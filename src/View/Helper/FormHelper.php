@@ -25,7 +25,9 @@ class FormHelper extends Helper
     public $helpers = ['Url', 'Scid.Html'];
 
     protected $hasExpandedAdded = false;
+    protected $_hasSelect2Added = false;
     protected $_scidType = null;
+    protected $_dataMaskType = [];
     /**
      * A list of allowed styles for buttons.
      *
@@ -862,6 +864,17 @@ CHECK_ALL_SCRIPT;
             $mask = $options['data-mask'];
         }
         unset($options['data-mask']);
+        switch ($mask) {
+            case 'phone':
+                if (!in_array('phone', $this->_dataMaskType)) {
+                    $script = "$(.phone).mask('(000) 000-0000');";
+                    $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+                    $this->_dataMaskType[] = 'phone';
+                    $options = $this->injectClasses('phone',$options);
+                    return $options;
+                }
+        }
+
         $id = $options['id'];
         $script = "$('#{$id}').mask('{$mask}' {$maskOptions});";
         $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
@@ -1214,18 +1227,29 @@ CHECK_ALL_SCRIPT;
         $this->Html->useScript('Scid.select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $options['type'] = 'select';
         $id = $options['id'];
+
+        $useClass = false;
         if (empty($options['select2'])) {
             $selectOptions = ['minimumResultsForSearch' => 10];
+            $options = $this->Html->injectClasses('select2', $options);
+            $useClass = true;
         } else {
             $selectOptions = $options['select2'];
             unset($options['select2']);
         }
         $selectOptions = json_encode($selectOptions);
-        $script = "$(document).ready(function() {
+        if ($useClass && !$this->_hasSelect2Added) {
+            $script = "$(document).ready(function() {
+    $('.select2').select2({$selectOptions});
+});";
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $this->_hasSelect2Added = true;
+        } else {
+            $script = "$(document).ready(function() {
     $('#{$id}').select2({$selectOptions});
 });";
-        $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        }
         return $options;
     }
 
