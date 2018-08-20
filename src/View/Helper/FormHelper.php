@@ -866,13 +866,15 @@ CHECK_ALL_SCRIPT;
         unset($options['data-mask']);
         switch ($mask) {
             case 'phone':
+                $options = $this->injectClasses('phone',$options);
                 if (!in_array('phone', $this->_dataMaskType)) {
-                    $script = "$(.phone).mask('(000) 000-0000');";
+                    $script = "$('.phone').mask('(000) 000-0000');";
                     $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
                     $this->_dataMaskType[] = 'phone';
-                    $options = $this->injectClasses('phone',$options);
-                    return $options;
+
+
                 }
+                return $options;
         }
 
         $id = $options['id'];
