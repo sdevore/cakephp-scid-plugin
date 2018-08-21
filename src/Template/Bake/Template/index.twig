@@ -21,7 +21,7 @@
         {% for field in fields %}
             <th scope="col"><?= $this->Paginator->sort('{{ field }}') ?></th>
         {% endfor %}
-        <th scope="col" class="actions"><?= __('Actions') ?></th>
+        <th scope="col" class="text-muted text-center"><?= __('Actions') ?></th>
     </tr>
     </thead>
     <tbody>
@@ -47,8 +47,8 @@
         {% set pk = '$' ~ singularVar ~ '->' ~ primaryKey[0] %}
         <td class="actions">
                 <span class="btn-group">
-                <?= $this->Html->button(__('View'), ['action' => 'view', {{ pk|raw }}], ['title' => __('View'), 'class' => 'primary','icon'=>'add']) ?>
-                    <?= $this->Html->button(__('Edit'), ['action' => 'edit', {{ pk|raw }}], ['title' => __('Edit'), 'class' => 'info','icon'=>'view']) ?>
+                <?= $this->Html->button(__('View'), ['action' => 'view', {{ pk|raw }}], ['title' => __('View'), 'class' => 'primary','icon'=>'view']) ?>
+                    <?= $this->Html->button(__('Edit'), ['action' => 'edit', {{ pk|raw }}], ['title' => __('Edit'), 'class' => 'info','icon'=>'edit']) ?>
                     <?= $this->Form->postButton(__('Delete'), ['action' => 'delete', {{ pk|raw }}], ['confirm' => __('Are you sure you want to delete # {0}?', {{ pk|raw }}), 'title' => __('Delete'), 'class' => 'danger','icon'=>'delete']) ?>
                     </span>
         </td>
