@@ -21,7 +21,7 @@
         {% for field in fields %}
             <th scope="col"><?= $this->Paginator->sort('{{ field }}') ?></th>
         {% endfor %}
-        <th scope="col" class="text-muted text-center"><?= __('Actions') ?></th>
+        <th scope="col" class="action"><?= __('Actions') ?></th>
     </tr>
     </thead>
     <tbody>
