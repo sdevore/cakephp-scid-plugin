@@ -58,6 +58,15 @@
 
         }
 
+
+        public function authorize($data, $member, $options = []) {
+
+        }
+
+        public function capture($data, $member, $options = []) {
+
+        }
+
         /**
          * @param \App\Model\Entity\Payment $payment
          * @param array $data
