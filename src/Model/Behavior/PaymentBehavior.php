@@ -501,7 +501,7 @@ class PaymentBehavior extends Behavior
      * @return bool
      */
     public function void($payment) {
-        $transactionType = self::TRANSACTION_TYPE_VOID
+        $transactionType = self::TRANSACTION_TYPE_VOID;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         if ($payment->state != self::STATE_APPROVED) {
             $payment->setError('state', [__('Only payments that are approved can be voided')]);
@@ -757,7 +757,7 @@ class PaymentBehavior extends Behavior
     /**
      * @return string
      */
-    protected function __getReferenceId(): void {
+    protected function __getReferenceId() {
         return 'ref' . time();
     }
 
