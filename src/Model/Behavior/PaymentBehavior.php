@@ -155,7 +155,8 @@ class PaymentBehavior extends Behavior
         // Assemble the complete transaction request
         $request = new AnetAPI\CreateTransactionRequest();
         $request->setMerchantAuthentication($merchantAuthentication);
-        $request->setRefId($this->__getReferenceId());
+        $payment->scid_ref_id = $this->__getReferenceId();
+        $request->setRefId($payment->scid_ref_id);
         $request->setTransactionRequest($transactionRequestType);
         // Create the controller and get the response
         $controller = new AnetController\CreateTransactionController($request);
@@ -178,7 +179,7 @@ class PaymentBehavior extends Behavior
                     if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
                         $payment->transactionNumber = $tresponse->getTransId();
                         $payment->authorizationNumber = $tresponse->getAuthCode();
-                        $payment->state = self::STATE_APPROVED;
+                        $payment->scid_state = self::STATE_APPROVED;
                         $result['failed'] = FALSE;
                         $result['transaction_id'] = $tresponse->getTransId();
                         $result['response_code'] = $tresponse->getResponseCode();
@@ -187,7 +188,7 @@ class PaymentBehavior extends Behavior
                         $result['description'] = $tresponse->getMessages()[0]->getDescription();
 
                     } else {
-                        $payment->state = self::STATE_FAILED;
+                        $payment->scid_state = self::STATE_FAILED;
 
                         $result['failed'] = TRUE;
                         if ($tresponse->getErrors() != NULL) {
@@ -206,7 +207,7 @@ class PaymentBehavior extends Behavior
                 } else {
                     $result['failed'] = TRUE;
                     $tresponse = $response->getTransactionResponse();
-                    $payment->state = self::STATE_FAILED;
+                    $payment->scid_state = self::STATE_FAILED;
                     if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
                         $errorCode = $tresponse->getErrors()[0]->getErrorCode();
 
@@ -227,15 +228,15 @@ class PaymentBehavior extends Behavior
                     }
                 }
             } else {
-                $payment->state = self::STATE_FAILED;
+                $payment->scid_state = self::STATE_FAILED;
                 $result['error_message'] = __('No reponse received');
                 $payment->setError('credit_card_number', [__('No reponse received')]);
             }
             $payment->set('response', $result);
         } else {
-            $payment->state = self::STATE_FAILED;
+            $payment->scid_state = self::STATE_FAILED;
         }
-        if ($payment->state == self::STATE_FAILED) {
+        if ($payment->scid_state == self::STATE_FAILED) {
             return FALSE;
         }
         return $payment;
@@ -275,14 +276,15 @@ class PaymentBehavior extends Behavior
             $transactionRequestType->setRefTransId($payment->transactionNumber);
         } else {
             $payment->setError('transactionNumber', [__('Transaction for capture is not set')]);
-            $payment->state = self::STATE_FAILED;
+            $payment->scid_state = self::STATE_FAILED;
         }
         $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
 
         // Assemble the complete transaction request
         $request = new AnetAPI\CreateTransactionRequest();
         $request->setMerchantAuthentication($merchantAuthentication);
-        $request->setRefId($this->__getReferenceId());
+        $payment->scid_ref_id = $this->__getReferenceId();
+        $request->setRefId($payment->scid_ref_id);
         $request->setTransactionRequest($transactionRequestType);
         // Create the controller and get the response
         $controller = new AnetController\CreateTransactionController($request);
@@ -305,7 +307,7 @@ class PaymentBehavior extends Behavior
                     if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
                         $payment->transactionNumber = $tresponse->getTransId();
                         $payment->authorizationNumber = $tresponse->getAuthCode();
-                        $payment->state = self::STATE_CAPTURED;
+                        $payment->scid_state = self::STATE_CAPTURED;
                         $result['failed'] = FALSE;
                         $result['transaction_id'] = $tresponse->getTransId();
                         $result['response_code'] = $tresponse->getResponseCode();
@@ -314,7 +316,7 @@ class PaymentBehavior extends Behavior
                         $result['description'] = $tresponse->getMessages()[0]->getDescription();
 
                     } else {
-                        $payment->state = self::STATE_FAILED;
+                        $payment->scid_state = self::STATE_FAILED;
 
                         $result['failed'] = TRUE;
                         if ($tresponse->getErrors() != NULL) {
@@ -333,7 +335,7 @@ class PaymentBehavior extends Behavior
                 } else {
                     $result['failed'] = TRUE;
                     $tresponse = $response->getTransactionResponse();
-                    $payment->state = self::STATE_FAILED;
+                    $payment->scid_state = self::STATE_FAILED;
                     if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
                         $errorCode = $tresponse->getErrors()[0]->getErrorCode();
 
@@ -354,15 +356,15 @@ class PaymentBehavior extends Behavior
                     }
                 }
             } else {
-                $payment->state = self::STATE_FAILED;
+                $payment->scid_state = self::STATE_FAILED;
                 $result['error_message'] = __('No reponse received');
                 $payment->setError('credit_card_number', [__('No reponse received')]);
             }
             $payment->set('response', $result);
         } else {
-            $payment->state = self::STATE_FAILED;
+            $payment->scid_state = self::STATE_FAILED;
         }
-        if ($payment->state == self::STATE_FAILED) {
+        if ($payment->scid_state == self::STATE_FAILED) {
             return FALSE;
         }
 
@@ -409,7 +411,8 @@ class PaymentBehavior extends Behavior
         // Assemble the complete transaction request
         $request = new AnetAPI\CreateTransactionRequest();
         $request->setMerchantAuthentication($merchantAuthentication);
-        $request->setRefId($this->__getReferenceId());
+        $payment->scid_ref_id = $this->__getReferenceId();
+        $request->setRefId($payment->scid_ref_id);
         $request->setTransactionRequest($transactionRequestType);
         // Create the controller and get the response
         $controller = new AnetController\CreateTransactionController($request);
@@ -432,7 +435,7 @@ class PaymentBehavior extends Behavior
                     if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
                         $payment->transactionNumber = $tresponse->getTransId();
                         $payment->authorizationNumber = $tresponse->getAuthCode();
-                        $payment->state = self::STATE_APPROVED;
+                        $payment->scid_state = self::STATE_APPROVED;
                         $result['failed'] = FALSE;
                         $result['transaction_id'] = $tresponse->getTransId();
                         $result['response_code'] = $tresponse->getResponseCode();
@@ -441,7 +444,7 @@ class PaymentBehavior extends Behavior
                         $result['description'] = $tresponse->getMessages()[0]->getDescription();
 
                     } else {
-                        $payment->state = self::STATE_FAILED;
+                        $payment->scid_state = self::STATE_FAILED;
 
                         $result['failed'] = TRUE;
                         if ($tresponse->getErrors() != NULL) {
@@ -460,7 +463,7 @@ class PaymentBehavior extends Behavior
                 } else {
                     $result['failed'] = TRUE;
                     $tresponse = $response->getTransactionResponse();
-                    $payment->state = self::STATE_CAPTURED;
+                    $payment->scid_state = self::STATE_CAPTURED;
                     if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
                         $errorCode = $tresponse->getErrors()[0]->getErrorCode();
 
@@ -481,15 +484,15 @@ class PaymentBehavior extends Behavior
                     }
                 }
             } else {
-                $payment->state = self::STATE_FAILED;
+                $payment->scid_state = self::STATE_FAILED;
                 $result['error_message'] = __('No reponse received');
                 $payment->setError('credit_card_number', [__('No reponse received')]);
             }
             $payment->set('response', $result);
         } else {
-            $payment->state = self::STATE_FAILED;
+            $payment->scid_state = self::STATE_FAILED;
         }
-        if ($payment->state == self::STATE_FAILED) {
+        if ($payment->scid_state == self::STATE_FAILED) {
             return FALSE;
         }
         return $payment;
@@ -503,7 +506,7 @@ class PaymentBehavior extends Behavior
     public function void($payment) {
         $transactionType = self::TRANSACTION_TYPE_VOID;
         $merchantAuthentication = $this->__getMerchantAuthentication();
-        if ($payment->state != self::STATE_APPROVED) {
+        if ($payment->scid_state != self::STATE_APPROVED) {
             $payment->setError('state', [__('Only payments that are approved can be voided')]);
         }
 
@@ -520,13 +523,14 @@ class PaymentBehavior extends Behavior
            $transactionRequestType->setRefTransId($payment->transactionNumber);
        } else {
            $payment->setError('transactionNumber', [__('Transaction for capture is not set')]);
-           $payment->state = self::STATE_FAILED;
+           $payment->scid_state = self::STATE_FAILED;
        }
         // Assemble the complete transaction request
         $request = new AnetAPI\CreateTransactionRequest();
         $request->setMerchantAuthentication($merchantAuthentication);
-        $request->setRefId($this->__getReferenceId());
 
+        $payment->scid_ref_id = $this->__getReferenceId();
+        $request->setRefId($payment->scid_ref_id);
         $request->setTransactionRequest($transactionRequestType);
         // Create the controller and get the response
         $controller = new AnetController\CreateTransactionController($request);
@@ -549,7 +553,7 @@ class PaymentBehavior extends Behavior
                     if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
                         $payment->transactionNumber = $tresponse->getTransId();
                         $payment->authorizationNumber = $tresponse->getAuthCode();
-                        $payment->state = self::STATE_APPROVED;
+                        $payment->scid_state = self::STATE_APPROVED;
                         $result['failed'] = FALSE;
                         $result['transaction_id'] = $tresponse->getTransId();
                         $result['response_code'] = $tresponse->getResponseCode();
@@ -558,7 +562,7 @@ class PaymentBehavior extends Behavior
                         $result['description'] = $tresponse->getMessages()[0]->getDescription();
 
                     } else {
-                        $payment->state = self::STATE_FAILED;
+                        $payment->scid_state = self::STATE_FAILED;
 
                         $result['failed'] = TRUE;
                         if ($tresponse->getErrors() != NULL) {
@@ -577,7 +581,7 @@ class PaymentBehavior extends Behavior
                 } else {
                     $result['failed'] = TRUE;
                     $tresponse = $response->getTransactionResponse();
-                    $payment->state = self::STATE_FAILED;
+                    $payment->scid_state = self::STATE_FAILED;
                     if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
                         $errorCode = $tresponse->getErrors()[0]->getErrorCode();
 
@@ -598,15 +602,15 @@ class PaymentBehavior extends Behavior
                     }
                 }
             } else {
-                $payment->state = self::STATE_FAILED;
+                $payment->scid_state = self::STATE_FAILED;
                 $result['error_message'] = __('No reponse received');
                 $payment->setError('credit_card_number', [__('No reponse received')]);
             }
             $payment->set('response', $result);
         } else {
-            $payment->state = self::STATE_FAILED;
+            $payment->scid_state = self::STATE_FAILED;
         }
-        if ($payment->state == self::STATE_FAILED) {
+        if ($payment->scid_state == self::STATE_FAILED) {
             return FALSE;
         }
         return $payment;
