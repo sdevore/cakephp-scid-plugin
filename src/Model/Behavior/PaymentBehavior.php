@@ -272,7 +272,7 @@ class PaymentBehavior extends Behavior
         $transactionRequestType->setAmount($amount);
         $transactionRequestType->setOrder($order);
         if (!empty($payment->transactionNumber)) {
-            $transactionRequestType->setRefTransId($payment->transactionNumber)
+            $transactionRequestType->setRefTransId($payment->transactionNumber);
         } else {
             $payment->setError('transactionNumber', [__('Transaction for capture is not set')]);
             $payment->state = self::STATE_FAILED;
@@ -375,6 +375,7 @@ class PaymentBehavior extends Behavior
      * @return Payment|boolean
      */
     public function charge($payment) {
+        $transactionType = self::TRANSACTION_TYPE_AUTH_CAPTURE;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $authPayment = $this->__getAuthPayment($payment);
         $order = new AnetAPI\OrderType();
