@@ -13,7 +13,7 @@
  * @property   AnetAPI\LineItemType[]|array $lineItems
  */
 
-namespace Scid\Entity;
+namespace Scid\Model\Entity;
 
 use ArrayObject;
 use Cake\I18n\Date;
