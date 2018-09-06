@@ -43,6 +43,7 @@ class PaymentBehavior extends Behavior
 
     protected $_sandbox = TRUE;
 
+    const TRANSACTION_TYPE_KEY = 'transactionType';
     const TRANSACTION_TYPE_AUTHORIZE = 'authOnlyTransaction';
     const TRANSACTION_TYPE_AUTH_CAPTURE = 'authCaptureTransaction';
     const TRANSACTION_TYPE_CAPTURE = 'priorAuthCaptureTransaction';
@@ -85,8 +86,8 @@ class PaymentBehavior extends Behavior
      * @return void
      */
     public function beforeSave(Event $event, EntityInterface $payment, ArrayObject $options) {
-        if (!empty($options['transactionType'])) {
-            switch ($options['transactionType']) {
+        if (!empty($options[self::TRANSACTION_TYPE_KEY])) {
+            switch ($options[self::TRANSACTION_TYPE_KEY]) {
                 case self::TRANSACTION_TYPE_AUTHORIZE:
                     if (!$this->authorize($payment)) {
                         $event->stopPropagation();
