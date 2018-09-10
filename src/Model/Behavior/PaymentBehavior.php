@@ -80,10 +80,10 @@ class PaymentBehavior extends Behavior
     }
 
     /**
-     * @param Event       $event
-     * @param EntityInterface     $payment
-     * @param ArrayObject $options
-     * @return void
+     * @param Event           $event
+     * @param EntityInterface $payment
+     * @param ArrayObject     $options
+     * @return void|boolean
      */
     public function beforeSave(Event $event, EntityInterface $payment, ArrayObject $options) {
         if (!empty($options[self::TRANSACTION_TYPE_KEY])) {
@@ -91,27 +91,31 @@ class PaymentBehavior extends Behavior
                 case self::TRANSACTION_TYPE_AUTHORIZE:
                     if (!$this->authorize($payment)) {
                         $event->stopPropagation();
+                        return FALSE;
                     }
                     break;
                 case self::TRANSACTION_TYPE_CAPTURE:
                     if (!$this->capture($payment)) {
                         $event->stopPropagation();
+                        return FALSE;
                     }
                     break;
                 case self::TRANSACTION_TYPE_AUTH_CAPTURE:
                     if (!$this->charge($payment)) {
                         $event->stopPropagation();
+                        return FALSE;
                     }
                     break;
                 case self::TRANSACTION_TYPE_VOID:
                     if (!$this->void($payment)) {
                         $event->stopPropagation();
+                        return FALSE;
                     }
                     break;
                 case self::TRANSACTION_TYPE_REFUND:
                     $payment->setError('type', [__('Refund not supported at this time')]);
                     $event->stopPropagation();
-
+                    return;
                     break;
             }
         }
@@ -215,22 +219,18 @@ class PaymentBehavior extends Behavior
                         $errorText = $tresponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
-                        $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                     [$errorCode,
-                                                                      $errorText])]);
+                        $this->__setError($payment, $errorCode, $errorText);
                     } else {
-                        $code = $response->getMessages()->getMessage()[0]->getCode();
-                        $result['error_code'] = $code;
-                        $text = $response->getMessages()->getMessage()[0]->getText();
-                        $result['error_message'] = $text;
-                        $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                     [code,
-                                                                      $text])]);
+                        $errorCode = $response->getMessages()->getMessage()[0]->getCode();
+                        $result['error_code'] = $errorCode;
+                        $errorText = $response->getMessages()->getMessage()[0]->getText();
+                        $result['error_message'] = $errorText;
+                        $this->__setError($payment, $errorCode, $errorText);
                     }
                 }
             } else {
                 $payment->scid_state = self::STATE_FAILED;
-                $result['error_message'] = __('No reponse received');
+                $result['error_message'] = __('No response received');
                 $payment->setError('credit_card_number', [__('No reponse received')]);
             }
             $payment->set('response', $result);
@@ -325,9 +325,7 @@ class PaymentBehavior extends Behavior
                             $errorText = $tresponse->getErrors()[0]->getErrorText();
                             $result['error_code'] = $errorCode;
                             $result['error_message'] = $errorText;
-                            $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                         [$errorCode,
-                                                                          $errorText])]);
+                            $this->__setError($payment, $errorCode, $errorText);
                         } else {
                             $payment->setError('credit_card_number', ['Transaction failed']);
                         }
@@ -343,17 +341,13 @@ class PaymentBehavior extends Behavior
                         $errorText = $tresponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
-                        $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                     [$errorCode,
-                                                                      $errorText])]);
+                        $this->__setError($payment, $errorCode, $errorText);
                     } else {
-                        $code = $response->getMessages()->getMessage()[0]->getCode();
-                        $result['error_code'] = $code;
-                        $text = $response->getMessages()->getMessage()[0]->getText();
-                        $result['error_message'] = $text;
-                        $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                     [code,
-                                                                      $text])]);
+                        $errorCode = $response->getMessages()->getMessage()[0]->getCode();
+                        $result['error_code'] = $errorCode;
+                        $errorText = $response->getMessages()->getMessage()[0]->getText();
+                        $result['error_message'] = $errorText;
+                        $this->__setError($payment, $errorCode, $errorText);
                     }
                 }
             } else {
@@ -436,7 +430,7 @@ class PaymentBehavior extends Behavior
                     if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
                         $payment->transactionNumber = $tresponse->getTransId();
                         $payment->authorizationNumber = $tresponse->getAuthCode();
-                        $payment->scid_state = self::STATE_APPROVED;
+                        $payment->scid_state = self::STATE_CAPTURED;
                         $result['failed'] = FALSE;
                         $result['transaction_id'] = $tresponse->getTransId();
                         $result['response_code'] = $tresponse->getResponseCode();
@@ -453,9 +447,7 @@ class PaymentBehavior extends Behavior
                             $errorText = $tresponse->getErrors()[0]->getErrorText();
                             $result['error_code'] = $errorCode;
                             $result['error_message'] = $errorText;
-                            $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                         [$errorCode,
-                                                                          $errorText])]);
+                            $this->__setError($payment, $errorCode, $errorText);
                         } else {
                             $payment->setError('credit_card_number', ['Transaction failed']);
                         }
@@ -464,24 +456,20 @@ class PaymentBehavior extends Behavior
                 } else {
                     $result['failed'] = TRUE;
                     $tresponse = $response->getTransactionResponse();
-                    $payment->scid_state = self::STATE_CAPTURED;
+                    $payment->scid_state = self::STATE_FAILED;
                     if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
                         $errorCode = $tresponse->getErrors()[0]->getErrorCode();
 
                         $errorText = $tresponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
-                        $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                     [$errorCode,
-                                                                      $errorText])]);
+                        $this->__setError($payment, $errorCode, $errorText);
                     } else {
-                        $code = $response->getMessages()->getMessage()[0]->getCode();
-                        $result['error_code'] = $code;
-                        $text = $response->getMessages()->getMessage()[0]->getText();
-                        $result['error_message'] = $text;
-                        $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                     [code,
-                                                                      $text])]);
+                        $errorCode = $response->getMessages()->getMessage()[0]->getCode();
+                        $result['error_code'] = $errorCode;
+                        $errorText = $response->getMessages()->getMessage()[0]->getText();
+                        $result['error_message'] = $errorText;
+                        $this->__setError($payment, $errorCode, $errorText);
                     }
                 }
             } else {
@@ -520,12 +508,12 @@ class PaymentBehavior extends Behavior
         $transactionRequestType->setTransactionType($transactionType);
 
         $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
-       if (!empty($payment->transactionNumber)) {
-           $transactionRequestType->setRefTransId($payment->transactionNumber);
-       } else {
-           $payment->setError('transactionNumber', [__('Transaction for capture is not set')]);
-           $payment->scid_state = self::STATE_FAILED;
-       }
+        if (!empty($payment->transactionNumber)) {
+            $transactionRequestType->setRefTransId($payment->transactionNumber);
+        } else {
+            $payment->setError('transactionNumber', [__('Transaction for capture is not set')]);
+            $payment->scid_state = self::STATE_FAILED;
+        }
         // Assemble the complete transaction request
         $request = new AnetAPI\CreateTransactionRequest();
         $request->setMerchantAuthentication($merchantAuthentication);
@@ -554,7 +542,7 @@ class PaymentBehavior extends Behavior
                     if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
                         $payment->transactionNumber = $tresponse->getTransId();
                         $payment->authorizationNumber = $tresponse->getAuthCode();
-                        $payment->scid_state = self::STATE_APPROVED;
+                        $payment->scid_state = self::STATE_VOIDED;
                         $result['failed'] = FALSE;
                         $result['transaction_id'] = $tresponse->getTransId();
                         $result['response_code'] = $tresponse->getResponseCode();
@@ -571,9 +559,7 @@ class PaymentBehavior extends Behavior
                             $errorText = $tresponse->getErrors()[0]->getErrorText();
                             $result['error_code'] = $errorCode;
                             $result['error_message'] = $errorText;
-                            $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                         [$errorCode,
-                                                                          $errorText])]);
+                            $this->__setError($payment, $errorCode, $errorText);
                         } else {
                             $payment->setError('credit_card_number', ['Transaction failed']);
                         }
@@ -589,23 +575,19 @@ class PaymentBehavior extends Behavior
                         $errorText = $tresponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
-                        $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                     [$errorCode,
-                                                                      $errorText])]);
+                        $this->__setError($payment, $errorCode, $errorText);
                     } else {
-                        $code = $response->getMessages()->getMessage()[0]->getCode();
-                        $result['error_code'] = $code;
-                        $text = $response->getMessages()->getMessage()[0]->getText();
-                        $result['error_message'] = $text;
-                        $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                     [code,
-                                                                      $text])]);
+                        $errorCode = $response->getMessages()->getMessage()[0]->getCode();
+                        $result['error_code'] = $errorCode;
+                        $errorText = $response->getMessages()->getMessage()[0]->getText();
+                        $result['error_message'] = $errorText;
+                        $this->__setError($payment, $errorCode, $errorText);
                     }
                 }
             } else {
                 $payment->scid_state = self::STATE_FAILED;
                 $result['error_message'] = __('No reponse received');
-                $payment->setError('credit_card_number', [__('No reponse received')]);
+                $payment->setError('credit_card_number', [__('No response received')]);
             }
             $payment->set('response', $result);
         } else {
@@ -870,7 +852,9 @@ class PaymentBehavior extends Behavior
         } else {
             $card = new AnetAPI\CreditCardType();
             if (!empty($payment->credit_card_number)) {
-                $card->setCardNumber($payment->credit_card_number);
+                $number = preg_replace('/\D+/', '', $payment->credit_card_number);
+                $card->setCardNumber($number);
+                $payment->number = substr($number, -4);
             } else {
                 $payment->setError('credit_card_number', [__('credit card number is required')]);
             }
@@ -887,6 +871,44 @@ class PaymentBehavior extends Behavior
             $paymentOne->setCreditCard($card);
         }
         return $paymentOne;
+    }
+
+    /**
+     * @param Payment $payment
+     * @param integer $errorCode
+     * @param string  $errorText
+     * @return void
+     */
+    protected function __setError($payment, $errorCode, $errorText): void {
+        switch ($errorCode) {
+            case 5:
+                $payment->setError('amountPaid', $errorText);
+                break;
+            case 6:
+                $payment->setError('credit_card_number', $errorText);
+                break;
+            case 7:
+            case 8:
+                $payment->setError('expMonth', $errorText);
+                $payment->setError('expYear', $errorText);
+                break;
+            case 9:
+                $payment->setError('routing_number', $errorText);
+                break;
+            case 10:
+                $payment->setError('account_number', $errorText);
+                break;
+            case 11:
+                $payment->setError('credit_card_number', $errorText);
+                break;
+            case 12:
+                $payment->setError('card_code', $errorText);
+                break;
+            default:
+                $payment->setError('credit_card_number', [__('{0}: {1}',
+                                                             [$errorCode,
+                                                              $errorText])]);
+        }
     }
 
 }

@@ -17,6 +17,8 @@ namespace Scid\Model\Entity;
 
 use ArrayObject;
 use Cake\I18n\Date;
+use Cake\I18n\FrozenDate;
+use Cake\I18n\FrozenTime;
 use Cake\I18n\Time;
 use net\authorize\api\contract\v1 as AnetAPI;
 use Scid\Database\I18n\Money;
@@ -62,36 +64,18 @@ trait ScidPaymentTrait
         return $this->_invoice_items;
     }
 
-    protected function _getCreditCardNumber() {
-        if (!empty($this->_properties['credit_card_number'])) {
-            return $this->_properties['credit_card_number'];
-        } else {
-            return NULL;
-        }
 
-    }
 
-    protected function _setCreditCardNumber($value) {
-        $this->_properties['credit_card_number'] = preg_replace('/\D+/', '', $value);
-        $this->set('number', substr($this->_properties['credit_card_number'], -4));
-        $this->setDirty('number');
-    }
-
-    protected function _getCardCode() {
-        if (!empty($this->_properties['card_code'])) {
-            return $this->_properties['card_code'];
-        } else {
-            return NULL;
-        }
-    }
-
-    protected function _setCardCode($code) {
-        $this->set('card_code', $code);
+    public function setExpMonthYear($month, $year) {
+        $this->expDate = __('{0}/{1}', $month, $year);
     }
 
     protected function _getExpirationDate() {
+        if (!empty($this->_properties['expMonth']) && !empty($this->_properties['expYear'])) {
+            $this->setExpMonthYear($this->_properties['expMonth'], $this->_properties['expYear']);
+        }
         try {
-            $date = FrozenDate::parseDate($this->expDate, 'm/Y');
+            return FrozenDate::createFromFormat( 'm/Y',$this->expDate);
         } catch (Exception $e) {
             return NULL;
         }
