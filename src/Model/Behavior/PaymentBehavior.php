@@ -4,7 +4,7 @@ namespace Scid\Model\Behavior;
 
 use App\Model\Entity\Payment;
 use App\Model\Table\PaymentsTable;
-use App\Model\Traits\MoneyEntityTrait;
+use Scid\Model\Entity\MoneyEntityTrait;
 use ArrayObject;
 use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;

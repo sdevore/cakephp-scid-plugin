@@ -8,12 +8,11 @@
 
     namespace Scid\Database\Type;
 
-    use App\Model\Traits\MoneyEntityTrait;
+    use Scid\Model\Entity\MoneyEntityTrait;
     use Cake\Database\Driver;
     use Cake\Database\Type;
     use Money\Currency;
     use Scid\Database\I18n\Money;
-    use PDO;
 
     class MoneyType extends Type
     {
