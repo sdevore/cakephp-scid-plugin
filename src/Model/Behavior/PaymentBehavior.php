@@ -4,6 +4,7 @@ namespace Scid\Model\Behavior;
 
 use App\Model\Entity\Payment;
 use App\Model\Table\PaymentsTable;
+use Money\Number;
 use Scid\Model\Entity\MoneyEntityTrait;
 use ArrayObject;
 use Cake\Core\Configure;
@@ -268,7 +269,8 @@ class PaymentBehavior extends Behavior
         $transactionRequestType = new AnetAPI\TransactionRequestType();
 
         $transactionRequestType->setTransactionType($transactionType);
-        $amount = $this->cleanMoney($payment->amountPaid);
+        $sub = new \Scid\Database\I18n\Money(10);
+        $amount = $this->cleanMoney($payment->amountPaid->subtract($sub));
         $transactionRequestType->setAmount($amount);
         $transactionRequestType->setOrder($order);
         if (!empty($payment->transactionNumber)) {
