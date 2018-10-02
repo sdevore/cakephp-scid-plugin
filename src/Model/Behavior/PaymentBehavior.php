@@ -142,8 +142,7 @@ class PaymentBehavior extends Behavior
         $customerData = $this->__getCustomerData($payment);
         $customerAddress = $this->__getCustomerAddress($payment);
 
-        // Add values for transaction settings
-        $duplicateWindowSetting = $this->__duplicateWindowSetting();
+
 
         // Create a TransactionRequestType object and add the previous objects to it
         $transactionRequestType = new AnetAPI\TransactionRequestType();
@@ -155,13 +154,14 @@ class PaymentBehavior extends Behavior
         $transactionRequestType->setPayment($authPayment);
         $transactionRequestType->setCustomer($customerData);
         $transactionRequestType->setBillTo($customerAddress);
-        $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
-
+        $transactionRequestType->addToTransactionSettings($this->__duplicateWindowSetting());
+        $transactionRequestType->addToTransactionSettings($this->__emailCustomerSetting(false));
         // Assemble the complete transaction request
         $request = new AnetAPI\CreateTransactionRequest();
         $request->setMerchantAuthentication($merchantAuthentication);
         $payment->scid_ref_id = $this->__getReferenceId();
         $request->setRefId($payment->scid_ref_id);
+
         $request->setTransactionRequest($transactionRequestType);
         // Create the controller and get the response
         $controller = new AnetController\CreateTransactionController($request);
@@ -263,8 +263,6 @@ class PaymentBehavior extends Behavior
             $order->setDescription(__('CFSD 16 Community Schools Payment'));
         }
 
-        // Add values for transaction settings
-        $duplicateWindowSetting = $this->__duplicateWindowSetting();
 
         // Create a TransactionRequestType object and add the previous objects to it
         $transactionRequestType = new AnetAPI\TransactionRequestType();
@@ -279,7 +277,10 @@ class PaymentBehavior extends Behavior
             $payment->setError('transactionNumber', [__('Transaction for capture is not set')]);
             $payment->scid_state = self::STATE_FAILED;
         }
-        $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
+        $customerData = $this->__getCustomerData($payment);
+        $transactionRequestType->setCustomer($customerData);
+        $transactionRequestType->addToTransactionSettings($this->__duplicateWindowSetting());
+        $transactionRequestType->addToTransactionSettings($this->__emailCustomerSetting(true));
 
         // Assemble the complete transaction request
         $request = new AnetAPI\CreateTransactionRequest();
@@ -757,6 +758,13 @@ class PaymentBehavior extends Behavior
         $duplicateWindowSetting->setSettingName("duplicateWindow");
         $duplicateWindowSetting->setSettingValue("60");
         return $duplicateWindowSetting;
+    }
+    
+    protected function __emailCustomerSetting($value = false):AnetAPI\SettingType {
+        $setting = new AnetAPI\SettingType();
+        $setting->setSettingName("emailCustomer");
+        $setting->setSettingValue($value);
+        return $setting;
     }
 
     /**
