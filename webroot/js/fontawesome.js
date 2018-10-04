@@ -1,5 +1,5 @@
 /*!
- * Font Awesome Pro 5.2.0 by @fontawesome - https://fontawesome.com
+ * Font Awesome Pro 5.3.1 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license (Commercial License)
  */
 (function () {
@@ -688,7 +688,7 @@ function makeLayersCounterAbstract(params) {
 
 var noop$2 = function noop() {};
 var p = config.measurePerformance && PERFORMANCE && PERFORMANCE.mark && PERFORMANCE.measure ? PERFORMANCE : { mark: noop$2, measure: noop$2 };
-var preamble = 'FA "5.2.0"';
+var preamble = 'FA "5.3.1"';
 
 var begin = function begin(name) {
   p.mark(preamble + ' ' + name + ' begins');
