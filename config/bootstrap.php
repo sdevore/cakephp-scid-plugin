@@ -16,5 +16,3 @@
         Configure::load($file);
     });
 
-    Plugin::load('Robotusers/Excel');
-    Plugin::load('CsvView');
