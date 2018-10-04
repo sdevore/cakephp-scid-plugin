@@ -269,8 +269,7 @@ class PaymentBehavior extends Behavior
         $transactionRequestType = new AnetAPI\TransactionRequestType();
 
         $transactionRequestType->setTransactionType($transactionType);
-        $sub = new \Scid\Database\I18n\Money(10);
-        $amount = $this->cleanMoney($payment->amountPaid->subtract($sub));
+        $amount = $this->cleanMoney($payment->amountPaid);
         $transactionRequestType->setAmount($amount);
         $transactionRequestType->setOrder($order);
         if (!empty($payment->transactionNumber)) {
