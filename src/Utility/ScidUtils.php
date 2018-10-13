@@ -301,4 +301,34 @@
         ]) {
             return self::dateTime($time, $format);
         }
+
+        /**
+         * @param       $boolean
+         * @param array $options
+         */
+        public  static function boolean($boolean, $options = ['type' => 'yes-no']) {
+            if (empty($options['type'])) {
+                $options['type'] = 'check';
+            }
+            $true = 'true';
+            $false = 'false';
+            switch ($options['type']) {
+                case 'check':
+                    $true = '&#10004;';
+                    $false ='';
+                case 'checkbox':
+                    $true = '&#9745;';
+                    $false = '&#9744;';
+                    break;
+                case 'yes-no':
+                    $true = 'Yes';
+                    $false = 'No';
+                    break;
+                case 'array':
+                    $true = $options['true'];
+                    $false = $options['false'];
+            }
+
+            return $boolean ? $true : $false;
+        }
     }
