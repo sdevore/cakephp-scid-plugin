@@ -13,16 +13,22 @@ class AddStateAndRefIdToPayments extends AbstractMigration
     public function change()
     {
         $table = $this->table('payments');
-        $table->addColumn('scid_state', 'string', [
-            'default' => null,
-            'limit' => 32,
-            'null' => true,
-        ]);
-        $table->addColumn('scid_ref_id', 'string', [
-            'default' => null,
-            'limit' => 20,
-            'null' => true,
-        ]);
+        $column = $table->hasColumn('scid_state');
+        if (!$column) {
+            $table->addColumn('scid_state', 'string', [
+                'default' => null,
+                'limit' => 32,
+                'null' => true,
+            ]);
+        }
+        $column = $table->hasColumn('scid_ref_id');
+        if (!$column) {
+            $table->addColumn('scid_ref_id', 'string', [
+                'default' => NULL,
+                'limit'   => 20,
+                'null'    => TRUE,
+            ]);
+        }
         $table->update();
     }
 }
