@@ -461,9 +461,10 @@ DRIVER_TOUR_BLOCK;
                 $icon = $options['icon'];
             }
             $icon += [
-                'icon-class' => 'd-md-none d-lg-inline',
-                'title-class' => 'd-none d-md-inline',
+                'icon-class'  => 'd-xs-none d-lg-inline',
+                'title-class' => 'd-sm-inline',
             ];
+
 
             // add icon to left of title
             $title =
