@@ -487,7 +487,7 @@ DRIVER_TOUR_BLOCK;
     public function icon($name, array $options = [])
     {
         // TODO: one could be more judicious in only loading the styles requested
-        $this->useScript('Scid.all', ['block' => self::SCRIPT_BOTTOM]);
+        $this->useScript('Scid.all.min', ['block' => self::SCRIPT_BOTTOM]);
         $options += [
             'tag' => 'i',
             'iconSet' => 'fa',
