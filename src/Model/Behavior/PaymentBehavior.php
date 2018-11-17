@@ -44,6 +44,8 @@ class PaymentBehavior extends Behavior
 
     protected $_sandbox = TRUE;
 
+    const TRANSACTION_ID_PREFIX_KEY = 'id-prefix';
+    const TRANSACTION_TRANSACTIONKEY_KEY = 'transaction-key';
     const TRANSACTION_TYPE_KEY = 'transactionType';
     const TRANSACTION_TYPE_AUTHORIZE = 'authOnlyTransaction';
     const TRANSACTION_TYPE_AUTH_CAPTURE = 'authCaptureTransaction';
@@ -87,6 +89,12 @@ class PaymentBehavior extends Behavior
      * @return void|boolean
      */
     public function beforeSave(Event $event, EntityInterface $payment, ArrayObject $options) {
+        if (!empty($options[self::TRANSACTION_TRANSACTIONKEY_KEY])) {
+            $this->_options['transaction_key'] = $options[self::TRANSACTION_TRANSACTIONKEY_KEY];
+        }
+        if (!empty($options[self::TRANSACTION_ID_PREFIX_KEY])) {
+            $this->_options[self::TRANSACTION_ID_PREFIX_KEY] = $options[self::TRANSACTION_ID_PREFIX_KEY];
+        }
         if (!empty($options[self::TRANSACTION_TYPE_KEY])) {
             switch ($options[self::TRANSACTION_TYPE_KEY]) {
                 case self::TRANSACTION_TYPE_AUTHORIZE:
@@ -130,15 +138,7 @@ class PaymentBehavior extends Behavior
         $transactionType = self::TRANSACTION_TYPE_AUTHORIZE;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $authPayment = $this->__getAuthPayment($payment);
-        $order = new AnetAPI\OrderType();
-        if (!empty($payment->registrationID)) {
-            $order->setInvoiceNumber($payment->registrationID);
-        }
-        if (!empty($payment->note)) {
-            $order->setDescription(Text::truncate($payment->note, 230));
-        } else {
-            $order->setDescription(__('CFSD 16 Community Schools Payment'));
-        }
+        $order = $this->__getOrder($payment);
 
         $customerData = $this->__getCustomerData($payment);
         $customerAddress = $this->__getCustomerAddress($payment);
@@ -254,15 +254,7 @@ class PaymentBehavior extends Behavior
         $transactionType = self::TRANSACTION_TYPE_CAPTURE;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $authPayment = $this->__getAuthPayment($payment);
-        $order = new AnetAPI\OrderType();
-        if (!empty($payment->registrationID)) {
-            $order->setInvoiceNumber($payment->registrationID);
-        }
-        if (!empty($payment->note)) {
-            $order->setDescription(Text::truncate($payment->note, 230));
-        } else {
-            $order->setDescription(__('CFSD 16 Community Schools Payment'));
-        }
+        $order = $this->__getOrder($payment);
 
 
         // Create a TransactionRequestType object and add the previous objects to it
@@ -377,15 +369,7 @@ class PaymentBehavior extends Behavior
         $transactionType = self::TRANSACTION_TYPE_AUTH_CAPTURE;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $authPayment = $this->__getAuthPayment($payment);
-        $order = new AnetAPI\OrderType();
-        if (!empty($payment->registrationID)) {
-            $order->setInvoiceNumber($payment->registrationID);
-        }
-        if (!empty($payment->note)) {
-            $order->setDescription(Text::truncate($payment->note, 230));
-        } else {
-            $order->setDescription(__('CFSD 16 Community Schools Payment'));
-        }
+        $order = $this->__getOrder($payment);
 
         $customerData = $this->__getCustomerData($payment);
         $customerAddress = $this->__getCustomerAddress($payment);
@@ -918,6 +902,28 @@ class PaymentBehavior extends Behavior
                                                              [$errorCode,
                                                               $errorText])]);
         }
+    }
+
+    /**
+     * @param $payment
+     *
+     * @return AnetAPI\OrderType
+     */
+    protected function __getOrder($payment): AnetAPI\OrderType {
+        $order = new AnetAPI\OrderType();
+        if (!empty($payment->registrationID)) {
+            $invoiceNumber = $payment->registrationID;
+            if (!empty($this->_options[self::TRANSACTION_ID_PREFIX_KEY])) {
+                $invoiceNumber = $this->_options[self::TRANSACTION_ID_PREFIX_KEY] . '-' . $invoiceNumber;
+            }
+            $order->setInvoiceNumber($invoiceNumber);
+        }
+        if (!empty($payment->note)) {
+            $order->setDescription(Text::truncate($payment->note, 230));
+        } else {
+            $order->setDescription(__('CFSD 16 Community Schools Payment'));
+        }
+        return $order;
     }
 
 }
