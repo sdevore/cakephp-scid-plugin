@@ -873,6 +873,7 @@ class PaymentBehavior extends Behavior
      * @return void
      */
     protected function __setError($payment, $errorCode, $errorText): void {
+        $errorText = [$errorText];
         switch ($errorCode) {
             case 5:
                 $payment->setError('amountPaid', $errorText);
