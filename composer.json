@@ -17,7 +17,7 @@
         "twbs/bootstrap": "^4.1.0",
         "bower-asset/json2": "dev-master",
         "npm-asset/bootstrap-toggle": "^2.2",
-        "bootstrap-markdown-editor-4"
+        "bootstrap-markdown-editor-4",
         "npm-asset/checkboxes.js":"^1.2",
         "npm-asset/flatpickr": "^4.5",
         "npm-asset/leaflet": "^1.3",
