@@ -11,6 +11,7 @@
         "friendsofcake/bootstrap-ui": "dev-develop",
         "fzaninotto/faker": "^1.7",
         "gourmet/email": "~3.0",
+        "mikehaertl/php-pdftk": "^0.5.0",
         "moneyphp/money": "^3.1.0",
         "picqer/php-barcode-generator": "^0.2.2",
         "tijsverkoyen/css-to-inline-styles": "^2.2",
