@@ -130,7 +130,7 @@ class NodeAssetsTask extends Shell
                 $dir = $this->_jsDir;
             }
 
-            if ($file->copy($dir->path . DS . $file->name)) {
+            if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
                 $this->success($file->name . ' successfully copied.');
             } else {
                 $this->warn($file->name . ' could not be copied.');
