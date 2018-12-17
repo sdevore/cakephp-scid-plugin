@@ -25,3 +25,4 @@
 /vendors/*
 /webroot/assets
 /node_modules
+/webroot/node
