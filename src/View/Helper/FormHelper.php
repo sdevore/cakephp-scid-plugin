@@ -704,8 +704,8 @@ EXPAND;
          * <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
          * <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
          */
-        $this->Html->useCssFile(['Scid.select2.min', 'Scid.select2-bootstrap.min']);
-        $this->Html->useScript('/node_modules/select2/dist/select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useCssFile(['/node_modules/select2/dist/css/select2.min', 'Scid.select2-bootstrap.min']);
+        $this->Html->useScript('/node_modules/select2/dist/js/select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $options['type'] = 'select';
         $id = $options['id'];
 
