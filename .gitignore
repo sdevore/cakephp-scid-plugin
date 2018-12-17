@@ -24,3 +24,4 @@
 /app/Config/database.php
 /vendors/*
 /webroot/assets
+/node_modules
