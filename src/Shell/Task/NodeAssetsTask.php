@@ -24,8 +24,9 @@ class NodeAssetsTask extends Shell
     public function __construct()
     {
         parent::__construct();
-        $this->_assetDir = new Folder(Plugin::path('Scid') . 'webroot' . DS . 'node', true);
+        $this->_assetDir = new Folder(Plugin::path('Scid') . 'webroot' , true);
         $this->_nodeDir = new Folder(Plugin::path('Scid') . 'node_modules', true);
+
         $this->_cssDir = new Folder($this->_assetDir->path . DS . 'css', true);
         $this->_jsDir = new Folder($this->_assetDir->path . DS . 'js', true);
     }
@@ -67,9 +68,9 @@ class NodeAssetsTask extends Shell
     public function copyAssets()
     {
         $this->info('Clearing webroot and copying assets...');
-        if ($this->_clear($this->_assetDir, '^(?!cover)(?!dashboard)(?!signin)(?!baked-with-cakephp.svg).*$')) {
-            $this->success('All files cleared...');
-        }
+//        if ($this->_clear($this->_assetDir, '^(?!cover)(?!dashboard)(?!signin)(?!baked-with-cakephp.svg).*$')) {
+//            $this->success('All files cleared...');
+//        }
 
         $files = [];
         $folders = [];
