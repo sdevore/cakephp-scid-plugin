@@ -16,7 +16,7 @@ use InvalidArgumentException;
 /**
  * Form helper
  *
- * @property \Cake\View\Helper\UrlHelper $Url
+ * @property \Cake\View\Helper\UrlHelper  $Url
  * @property \Scid\View\Helper\HtmlHelper $Html
  */
 class FormHelper extends Helper
@@ -55,41 +55,41 @@ class FormHelper extends Helper
      * @var array
      */
     public $buttonClassAliases = [
-        'default' => 'btn-default',
-        'success' => 'btn-success',
-        'warning' => 'btn-warning',
-        'danger' => 'btn-danger',
-        'info' => 'btn-info',
-        'primary' => 'btn-primary',
-        'hotlist' => 'btn-hotlist',
-        'company' => 'btn-company',
-        'busy' => 'btn-busy',
-        'available' => 'btn-available',
-        'company-accepted' => 'btn-company-accepted',
-        'pending' => 'btn-pending',
-        'opened' => 'btn-opened',
-        'expired' => 'btn-expired',
-        'accepted' => 'btn-accepted',
-        'accepted-pending' => 'btn-accepted-pending',
+        'default'           => 'btn-default',
+        'success'           => 'btn-success',
+        'warning'           => 'btn-warning',
+        'danger'            => 'btn-danger',
+        'info'              => 'btn-info',
+        'primary'           => 'btn-primary',
+        'hotlist'           => 'btn-hotlist',
+        'company'           => 'btn-company',
+        'busy'              => 'btn-busy',
+        'available'         => 'btn-available',
+        'company-accepted'  => 'btn-company-accepted',
+        'pending'           => 'btn-pending',
+        'opened'            => 'btn-opened',
+        'expired'           => 'btn-expired',
+        'accepted'          => 'btn-accepted',
+        'accepted-pending'  => 'btn-accepted-pending',
         'accepted-no-block' => 'btn-accepted-no-block',
-        'declined' => 'btn-declined',
+        'declined'          => 'btn-declined',
     ];
-    protected $hasExpandedAdded = false;
-    protected $_hasSelect2Added = false;
-    protected $_scidType = null;
+    protected $hasExpandedAdded = FALSE;
+    protected $_hasSelect2Added = FALSE;
+    protected $_scidType = NULL;
     protected $_dataMaskType = [];
     protected $_filepondPlugins = [
-        'FilePondPluginFileEncode' => ['script' => 'file-encode'],
-        'FilePondPluginFileValidateType' => ['script' => 'file-validate-type'],
-        'FilePondPluginFileValidateSize' => ['script' => 'file-validate-size'],
+        'FilePondPluginFileEncode'           => ['script' => 'file-encode'],
+        'FilePondPluginFileValidateType'     => ['script' => 'file-validate-type'],
+        'FilePondPluginFileValidateSize'     => ['script' => 'file-validate-size'],
         'FilePondPluginImageExifOrientation' => ['script' => 'image-exif-orientation'],
-        'FilePondPluginImagePreview' => [
+        'FilePondPluginImagePreview'         => [
             'script' => 'image-preview',
-            'css' => 'image-preview',
+            'css'    => 'image-preview',
         ],
-        'FilePondPluginImageCrop' => ['script' => 'image-crop'],
-        'FilePondPluginImageResize' => ['script' => 'image-resize'],
-        'FilePondPluginImageTransform' => ['script' => 'image-transform'],
+        'FilePondPluginImageCrop'            => ['script' => 'image-crop'],
+        'FilePondPluginImageResize'          => ['script' => 'image-resize'],
+        'FilePondPluginImageTransform'       => ['script' => 'image-transform'],
 
     ];
     protected $_filepondRequiredPlugins = [
@@ -100,27 +100,27 @@ class FormHelper extends Helper
     ];
 
     protected $_filepondPluginCollections = [
-        'imageCropAspectRatio' => [
+        'imageCropAspectRatio'         => [
             'FilePondPluginImageTransform', 'FilePondPluginImageCrop',
             'FilePondPluginImageResize',
         ],
-        'imagePreviewHeight' => [
+        'imagePreviewHeight'           => [
             'FilePondPluginImagePreview', 'FilePondPluginImageTransform',
         ],
-        'imagePreviewMinHeight' => [
+        'imagePreviewMinHeight'        => [
             'FilePondPluginImageTransform', 'FilePondPluginImageResize',
         ],
-        'imagePreviewMaxHeight' => [
+        'imagePreviewMaxHeight'        => [
             'FilePondPluginImageTransform', 'FilePondPluginImageResize',
         ],
-        'imagePreviewMaxFileSize' => [
+        'imagePreviewMaxFileSize'      => [
             'FilePondPluginImageTransform', 'FilePondPluginImageResize',
         ],
-        'imageResizeTargetWidth' => [
+        'imageResizeTargetWidth'       => [
             'FilePondPluginImageTransform', 'FilePondPluginImageResize',
         ],
-        'imageTransformOutputQuality' => ['FilePondPluginImageTransform'],
-        'imageResizeMode' => [
+        'imageTransformOutputQuality'  => ['FilePondPluginImageTransform'],
+        'imageResizeMode'              => [
             'FilePondPluginImageTransform', 'FilePondPluginImageResize',
         ],
         'imageTransformOutputMimeType' => [
@@ -141,14 +141,13 @@ class FormHelper extends Helper
      * - `escape` - HTML entity encode the $title of the button. Defaults to false.
      * - `confirm` - Confirm message to show. Form execution will only continue if confirmed then.
      *
-     * @param string $title The button's caption. Not automatically HTML encoded
-     * @param array $options Array of options and HTML attributes.
+     * @param string $title   The button's caption. Not automatically HTML encoded
+     * @param array  $options Array of options and HTML attributes.
      *
      * @return string A HTML button tag.
      * @link https://book.cakephp.org/3.0/en/views/helpers/form.html#creating-button-elements
      */
-    public function button($title, array $options = [])
-    {
+    public function button($title, array $options = []) {
         $title = $this->Html->titleFromOptions($title, $options);
 
         return parent::button($title, $options);
@@ -171,7 +170,7 @@ class FormHelper extends Helper
 });
 CHECK_ALL;
 
-$options['type']= 'button';
+        $options['type'] = 'button';
         $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         return $this->button($title, $options);
     }
@@ -181,8 +180,7 @@ $options['type']= 'button';
         return parent::submit($caption, $options); // TODO: Change the autogenerated stub
     }
 
-    public function postButton($title, $url, array $options = [])
-    {
+    public function postButton($title, $url, array $options = []) {
         if (!empty($options['icon'])) {
 
             $options['escape'] = FALSE;
@@ -194,8 +192,7 @@ $options['type']= 'button';
         return $this->postLink($title, $url, $options); // TODO: Change the autogenerated stub
     }
 
-    public function postLink($title, $url = NULL, array $options = [])
-    {
+    public function postLink($title, $url = NULL, array $options = []) {
         if (!empty($options['button'])) {
             $style = $options['button'];
             unset($options['button']);
@@ -214,8 +211,7 @@ $options['type']= 'button';
      *
      * @return void
      */
-    public function checkboxesLimit($context, $max)
-    {
+    public function checkboxesLimit($context, $max) {
         $this->Html->useScript('/assets/npm-asset/checkboxes.js/dist/jquery.checkboxes-1.2.2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $script = <<<CHECKBOX_LIMIT
 jQuery(function($) {
@@ -231,8 +227,7 @@ CHECKBOX_LIMIT;
      *
      * @return void
      */
-    public function checkboxesRange($context)
-    {
+    public function checkboxesRange($context) {
         $this->Html->useScript('/assets/npm-asset/checkboxes.js/dist/jquery.checkboxes-1.2.2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $script = <<<CHECKBOX_LIMIT
 jQuery(function($) {
@@ -250,13 +245,12 @@ CHECKBOX_LIMIT;
      * Adds markdown options for textarea
      *
      * @param string $fieldName This should be "Modelname.fieldname".
-     * @param array $options Each type of input takes different options.
+     * @param array  $options   Each type of input takes different options.
      *
      * @return string Completed form widget.
      * @deprecated Use control() instead.
      */
-    public function input($fieldName, array $options = [])
-    {
+    public function input($fieldName, array $options = []) {
         return $this->control($fieldName, $options); // TODO: Change the autogenerated stub
     }
 
@@ -268,12 +262,11 @@ CHECKBOX_LIMIT;
      * Adds markdown options for textarea
      *
      * @param string $fieldName This should be "Modelname.fieldname".
-     * @param array $options Each type of input takes different options.
+     * @param array  $options   Each type of input takes different options.
      *
      * @return string Completed form widget.
      */
-    public function control($fieldName, array $options = [])
-    {
+    public function control($fieldName, array $options = []) {
         if (!empty($options['type'])) {
             if (!isset($options['id'])) {
                 $options['id'] = TRUE;
@@ -310,6 +303,9 @@ CHECKBOX_LIMIT;
                     break;
                 case 'select2':
                     $options = $this->__select2($options);
+                    break;
+                case 'select2sortable':
+                    $options = $this->__select2Sortable($options);
                     break;
                 case 'sortable-serialize':
                     $options = $this->__sortableSerialize($options);
@@ -351,8 +347,7 @@ CHECKBOX_LIMIT;
      *
      * @return mixed
      */
-    private function __datamask($options)
-    {
+    private function __datamask($options) {
         $this->Html->useScript('/assets/npm-asset/jquery-mask-plugin/dist/jquery.mask.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         // could add options and build out the script rather then using attribute later
         if (is_array($options['data-mask'])) {
@@ -383,22 +378,21 @@ CHECKBOX_LIMIT;
         return $options;
     }
 
-    private function __bootstrapDatePicker($options)
-    {
+    private function __bootstrapDatePicker($options) {
         $id = $options['id'];
         if (!empty($options['val'])) {
             $options['val'] = $this->formatValue($options['val'], 'm/d/Y');
         }
         $this->Html->useScript([
-            'Scid.moment.min', 'Scid.daterangepicker',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+                                   'Scid.moment.min', 'Scid.daterangepicker',
+                               ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $this->Html->useCssFile('Scid.daterangepicker');
         $options['prepend'] = $this->Html->icon('calendar');
         $options['type'] = 'text';
         $defaultRangeOptions = [
             'singleDatePicker' => TRUE,
-            'timePicker' => FALSE,
-            'locale' => ['format' => 'MM/DD/YYYY'],
+            'timePicker'       => FALSE,
+            'locale'           => ['format' => 'MM/DD/YYYY'],
         ];
         $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
@@ -409,8 +403,7 @@ CHECKBOX_LIMIT;
         return $options;
     }
 
-    public function formatValue($sourceValue, $format = 'm/d/Y g:i a')
-    {
+    public function formatValue($sourceValue, $format = 'm/d/Y g:i a') {
         if (!empty($format) &&
             (
                 $sourceValue instanceof Date ||
@@ -428,8 +421,7 @@ CHECKBOX_LIMIT;
      * @param $options
      * @param $rangeOptionString
      */
-    private function __rangeOptions(&$options, $defaultOptions)
-    {
+    private function __rangeOptions(&$options, $defaultOptions) {
         if (!empty($options['rangeOptions'])) {
             $rangeOptions = $options['rangeOptions'];
         } else {
@@ -463,8 +455,7 @@ CHECKBOX_LIMIT;
     /**
      * @param $rangeOptions
      */
-    private function __rangeOptionsString($rangeOptions)
-    {
+    private function __rangeOptionsString($rangeOptions) {
         $result = json_encode($rangeOptions);
         $result = str_replace('\/', '/', $result);
         return $result;
@@ -476,22 +467,21 @@ CHECKBOX_LIMIT;
      *
      * @return mixed
      */
-    private function __bootstrapDateTimePicker($options)
-    {
+    private function __bootstrapDateTimePicker($options) {
         $id = $options['id'];
         if (!empty($options['val'])) {
             $options['val'] = $this->formatValue($options['val']);
         }
         $this->Html->useScript([
-            'Scid.moment.min', 'Scid.daterangepicker',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+                                   'Scid.moment.min', 'Scid.daterangepicker',
+                               ], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $this->Html->useCssFile('Scid.daterangepicker');
         $options['prepend'] = $this->Html->icon('calendar');
         $options['type'] = 'text';
         $defaultRangeOptions = [
             'singleDatePicker' => TRUE,
-            'timePicker' => TRUE,
-            'locale' => ['format' => 'MM/DD/YYYY h:mm A'],
+            'timePicker'       => TRUE,
+            'locale'           => ['format' => 'MM/DD/YYYY h:mm A'],
         ];
         $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
@@ -508,8 +498,7 @@ CHECKBOX_LIMIT;
      *
      * @return mixed
      */
-    private function __timePicker($options)
-    {
+    private function __timePicker($options) {
         $id = $options['id'];
         if (!empty($options['val'])) {
             $options['val'] = $this->formatValue($options['val'], 'g:i a');
@@ -529,7 +518,7 @@ CHECKBOX_LIMIT;
         $json =
             [
                 'icons' => [
-                    'up' => 'far fa-chevron-up',
+                    'up'   => 'far fa-chevron-up',
                     'down' => 'far fa-chevron-down',
                 ],
             ];
@@ -572,12 +561,11 @@ CHECKBOX_LIMIT;
      *
      * @return mixed
      */
-    private function __dateRange($options)
-    {
+    private function __dateRange($options) {
         $id = $options['id'];
         $this->Html->useScript([
-            'Scid.moment.min', 'Scid.daterangepicker',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+                                   'Scid.moment.min', 'Scid.daterangepicker',
+                               ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
         $this->Html->useCssFile('Scid.daterangepicker');
         $options['prepend'] = $this->Html->icon('calendar');
         $options['type'] = 'text';
@@ -596,15 +584,14 @@ CHECKBOX_LIMIT;
      *
      * @return mixed
      */
-    private function __markdown($options)
-    {
+    private function __markdown($options) {
         $id = $options['id'];
         // note we use a slightly modified from the upstream bootstrap-markdown
         // to fix icon for picture
         $this->Html->useScript([
-            'Scid.bootstrap-markdown.scid', 'Scid.markdown',
-            'Scid.to-markdown',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+                                   'Scid.bootstrap-markdown.scid', 'Scid.markdown',
+                                   'Scid.to-markdown',
+                               ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
         if (!isset($options['rows'])) {
             $options['row'] = 15;
         }
@@ -622,10 +609,10 @@ CHECKBOX_LIMIT;
             foreach ($options['markdown']['snippets'] as $name => $value) {
                 $btnName = Inflector::camelize($name);
                 $btn = [
-                    'name' => "cmd{$btnName}",
-                    'toggle' => FALSE,
-                    'title' => $name,
-                    'btnText' => $name,
+                    'name'     => "cmd{$btnName}",
+                    'toggle'   => FALSE,
+                    'title'    => $name,
+                    'btnText'  => $name,
                     'callback' => "function(e){
               // Replace selection with some drinks
 
@@ -651,8 +638,7 @@ SCRIPT;
         return $options;
     }
 
-    private function __expand($options)
-    {
+    private function __expand($options) {
 
         $options = $this->injectClasses(['autoExpand'], $options);
         if (!$this->hasExpandedAdded) {
@@ -672,7 +658,7 @@ $(document)
     });
 EXPAND;
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-            $this->hasExpandedAdded = true;
+            $this->hasExpandedAdded = TRUE;
         }
         return $options;
 
@@ -683,8 +669,7 @@ EXPAND;
      *
      * @return null|array
      */
-    private function __selectExtraOptions($options = NULL)
-    {
+    private function __selectExtraOptions($options = NULL) {
         if (!empty($options['select-visible-div'])) {
             $groupClass = $options['select-visible-div'];
             unset($options['select-visible-div']);
@@ -711,8 +696,7 @@ EXPAND;
         return $options;
     }
 
-    private function __select2($options)
-    {
+    private function __select2($options) {
         /**
          * https://github.com/select2/select2
          * and
@@ -721,15 +705,15 @@ EXPAND;
          * <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
          */
         $this->Html->useCssFile(['Scid.select2.min', 'Scid.select2-bootstrap.min']);
-        $this->Html->useScript('Scid.select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useScript('/node_modules/select2/dist/select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $options['type'] = 'select';
         $id = $options['id'];
 
-        $useClass = false;
+        $useClass = FALSE;
         if (empty($options['select2'])) {
             $selectOptions = ['minimumResultsForSearch' => 10];
             $options = $this->Html->injectClasses('select2', $options);
-            $useClass = true;
+            $useClass = TRUE;
         } else {
             $selectOptions = $options['select2'];
             unset($options['select2']);
@@ -740,7 +724,66 @@ EXPAND;
     $('.select2').select2({$selectOptions});
 });";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
-            $this->_hasSelect2Added = true;
+            $this->_hasSelect2Added = TRUE;
+        } else {
+            $script = "$(document).ready(function() {
+    $('#{$id}').select2({$selectOptions});
+});";
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        }
+        return $options;
+    }
+
+    private function __select2Sortable($options) {
+        $this->Html->useCssFile(['/node_modules/select2/dist/css/select2.min', 'Scid.select2-bootstrap.min']);
+        $this->Html->useScript(['/node_modules/select2/dist/js/select2.min',  'Scid.jquery-ui.min'], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $options['type'] = 'select';
+        $id = $options['id'];
+
+        $useClass = FALSE;
+        if (empty($options['select2'])) {
+            $selectOptions = ['minimumResultsForSearch' => 10];
+            $options = $this->Html->injectClasses('select2', $options);
+            $useClass = TRUE;
+        } else {
+            $selectOptions = $options['select2'];
+            unset($options['select2']);
+        }
+        $selectOptions = json_encode($selectOptions);
+        if ($useClass && !$this->_hasSelect2Added) {
+            $script = <<<SELECT_2_SORTABLE_USE
+$(document).ready(function() {
+    $('#{$id}').select2({$selectOptions});
+    
+ 
+  function select2_sortable(\$select2){
+        var ul = \$select2.next('.select2-container').first('ul.select2-selection__rendered');
+        ul.sortable({
+            placeholder : 'ui-state-highlight',
+            forcePlaceholderSize: true,
+            items       : 'li:not(.select2-search__field)',
+            tolerance   : 'pointer',
+            stop: function() {
+                $($(ul).find('.select2-selection__choice').get().reverse()).each(function() {
+                    var title = $(this).data('title');
+                    function hasTitle(title, value) {
+  return $(this).html() == title;
+}
+                    var option = $('#test option').filter(function () { 
+                    return $(this).html() == title;
+                     }).val();
+                    \$select2.prepend(option);
+                });
+                
+            }
+        });
+    }
+    
+    select2_sortable($("#{$id}"));
+});
+SELECT_2_SORTABLE_USE;
+            $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+            $this->_hasSelect2Added = TRUE;
         } else {
             $script = "$(document).ready(function() {
     $('#{$id}').select2({$selectOptions});
@@ -755,8 +798,7 @@ EXPAND;
      *
      * @return null|array
      */
-    private function __sortableSerialize($options)
-    {
+    private function __sortableSerialize($options) {
         $this->Html->useScript('Scid.jquery-sortable-min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $id = $options['id'];
         $group = 'serialization';
@@ -796,8 +838,7 @@ EXPAND;
      *
      * @return null|array
      */
-    private function __sortablePost($options)
-    {
+    private function __sortablePost($options) {
         $this->Html->useScript('Scid.jquery-sortable-min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $id = $options['id'];
         $url = $options['url'];
@@ -844,8 +885,7 @@ EXPAND;
      *
      * @return null|array
      */
-    private function __durationPicker($options)
-    {
+    private function __durationPicker($options) {
         $id = $options['id'];
         $options['type'] = 'text';
         $this->Html->useScript(['Scid.bootstrap-duration-picker',], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
@@ -891,8 +931,7 @@ EXPAND;
      *
      * @return array
      */
-    private function __filepond($fieldName, $options)
-    {
+    private function __filepond($fieldName, $options) {
 
 
         $filepondOptions = [
@@ -942,8 +981,7 @@ EXPAND;
      *
      * @return void
      */
-    private function _registerFilepondPlugin($name)
-    {
+    private function _registerFilepondPlugin($name) {
         if (empty($this->_filePondPluginsRegistered[$name])) {
             $value = $this->_filepondPlugins[$name];
             $this->Html->useScript('Scid.filepond-plugin-' . $value['script'] . '.min');
@@ -951,7 +989,7 @@ EXPAND;
                 $this->Html->useCssFile('Scid.filepond-plugin-' . $value['css'] . '.min');
             }
             $this->Html->scriptBlock("FilePond.registerPlugin($name);",
-                ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+                                     ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
             $this->_filePondPluginsRegistered[$name] = TRUE;
         }
     }
@@ -964,8 +1002,7 @@ EXPAND;
      *
      * @return mixed
      */
-    private function __countries($options)
-    {
+    private function __countries($options) {
         $this->Html->useScript('Scid.countries');
         if (empty($options['state_id'])) {
             $statesId = 'state';
@@ -988,16 +1025,15 @@ EXPAND;
      *
      * @return string
      */
-    private function __bootstrapToggle($fieldName, $options)
-    {
+    private function __bootstrapToggle($fieldName, $options) {
         $idForInput = $this->domId($fieldName);
         $options['type'] = 'checkbox';
         $options['label'] = FALSE;
         $this->Html->useScript(['Scid.bootstrap-toggle.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
         $this->Html->useCssFile([
-            'Scid.bootstrap-toggle.min',
-            'Scid.bootstrap-toggle-bootstrap4fix',
-        ]);
+                                    'Scid.bootstrap-toggle.min',
+                                    'Scid.bootstrap-toggle-bootstrap4fix',
+                                ]);
         if (!empty($options['value']) && $options['value']) {
             $options['checked'] = 'checked';
         }
@@ -1077,13 +1113,11 @@ SWITCH;
      *
      * @return string The generated id.
      */
-    public function domId($value)
-    {
+    public function domId($value) {
         return $this->_domId($value);
     }
 
-    private function __signature($fieldName, $options)
-    {
+    private function __signature($fieldName, $options) {
         $id = $options['id'];
         $wrapper_id = 'signature-pad-' . $id;
         $options['templateVars']['id'] = $wrapper_id;
@@ -1128,7 +1162,7 @@ SWITCH;
             }";
 
         $this->addWidget('signature',
-            ['Scid.Signature', 'text', 'label']);
+                         ['Scid.Signature', 'text', 'label']);
         $this->Html->useScript('/assets/npm-asset/signature_pad/dist/signature_pad.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $signatureBlock = /** @lang JavaScript 1.8 */
             <<<SIGNATURE_SCRIPT
@@ -1187,8 +1221,7 @@ SIGNATURE_SCRIPT;
      * @deprecated use boostrapToggle instead
      * @return string
      */
-    private function __bootstrapSwitch($fieldName, $options)
-    {
+    private function __bootstrapSwitch($fieldName, $options) {
         $idForInput = $this->domId($fieldName);
         $this->Html->useScript(['Scid.bootstrap-switch.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
         $this->Html->useCssFile('Scid.bootstrap-switch.min');
@@ -1243,15 +1276,14 @@ SWITCH;
      *
      * @return string
      */
-    private function __bootstrapCheckbox($fieldName, $options)
-    {
+    private function __bootstrapCheckbox($fieldName, $options) {
         $this->Html->useScript('Scid.jquery.checkboxes-1.0.5.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $text = NULL;
         $idForInput = $this->domId($fieldName);
 
         if (!empty($options['label']['text']) && is_array($options['label'])) {
             $text = $options['label']['text'];
-        } elseif (!empty($options['label']) && is_string($options['label'])) {
+        } else if (!empty($options['label']) && is_string($options['label'])) {
             $text = $options['label'];
         }
         if ($text === NULL) {
@@ -1285,8 +1317,8 @@ SWITCH;
         }
         $options['class'] = implode(' ', $class);
         $html = parent::label($fieldName,
-            parent::checkbox($fieldName,
-                $options) . ' ' . $text, $options);
+                              parent::checkbox($fieldName,
+                                               $options) . ' ' . $text, $options);
 
         if (!empty($errMsg)) {
             $html .= '<br />' . $errMsg;
@@ -1309,14 +1341,13 @@ SWITCH;
      *
      * @return string
      */
-    private function __bootstrapCheckAll($fieldName, $options)
-    {
+    private function __bootstrapCheckAll($fieldName, $options) {
         $text = NULL;
         $idForInput = $this->domId($fieldName);
 
         if (!empty($options['label']['text']) && is_array($options['label'])) {
             $text = $options['label']['text'];
-        } elseif (!empty($options['label']) && is_string($options['label'])) {
+        } else if (!empty($options['label']) && is_string($options['label'])) {
             $text = $options['label'];
         }
         if ($text === NULL) {
@@ -1346,8 +1377,8 @@ SWITCH;
             }
         }
         $html = parent::label($fieldName,
-            parent::checkbox($fieldName,
-                $options) . ' ' . $text, $options);
+                              parent::checkbox($fieldName,
+                                               $options) . ' ' . $text, $options);
 
         if (!empty($errMsg)) {
             $html .= '<br />' . $errMsg;
@@ -1376,12 +1407,11 @@ CHECK_ALL_SCRIPT;
      *
      * @return mixed
      */
-    private function __bootstrapDateTimePickerOld($options, $idForInput)
-    {
+    private function __bootstrapDateTimePickerOld($options, $idForInput) {
         $this->Html->useScript([
-            'Scid.moment.min',
-            'Scid.bootstrap-datetimepicker.min',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+                                   'Scid.moment.min',
+                                   'Scid.bootstrap-datetimepicker.min',
+                               ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
         $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
         if (!empty($this->_inputDefaults['after'])) {
             $options['after'] = $this->_inputDefaults['after'];
@@ -1404,12 +1434,11 @@ CHECK_ALL_SCRIPT;
      *
      * @return mixed
      */
-    private function __bootstrapMonthPicker($options, $idForInput)
-    {
+    private function __bootstrapMonthPicker($options, $idForInput) {
         $this->Html->useScript([
-            'Scid.moment.min',
-            'Scid.bootstrap-datetimepicker.min',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+                                   'Scid.moment.min',
+                                   'Scid.bootstrap-datetimepicker.min',
+                               ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
         $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
         if (!empty($this->_inputDefaults['after'])) {
             $options['after'] = $this->_inputDefaults['after'];
@@ -1433,12 +1462,11 @@ CHECK_ALL_SCRIPT;
      *
      * @return mixed
      */
-    private function __bootstrapTimePickerOld($options, $idForInput)
-    {
+    private function __bootstrapTimePickerOld($options, $idForInput) {
         $this->Html->useScript([
-            'Scid.moment.min',
-            'Scid.bootstrap-datetimepicker.min',
-        ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
+                                   'Scid.moment.min',
+                                   'Scid.bootstrap-datetimepicker.min',
+                               ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
         $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
         if (!empty($this->_inputDefaults['after'])) {
             $options['after'] = $this->_inputDefaults['after'];
