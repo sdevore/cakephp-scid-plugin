@@ -6,6 +6,7 @@ use Cake\I18n\Date;
 use Cake\I18n\FrozenDate;
 use Cake\I18n\FrozenTime;
 use Cake\I18n\Time;
+use Cake\Utility\Text;
 use Cake\View\View;
 use Cake\Core\Configure\Engine\PhpConfig;
 use Cake\Utility\Hash;
@@ -726,17 +727,19 @@ EXPAND;
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $this->_hasSelect2Added = TRUE;
         } else {
+
             $script = "$(document).ready(function() {
     $('#{$id}').select2({$selectOptions});
 });";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         }
+        $options = $this->__selectMultipleButtons($options, $id);
         return $options;
     }
 
     private function __select2Sortable($options) {
         $this->Html->useCssFile(['/node_modules/select2/dist/css/select2.min', 'Scid.select2-bootstrap.min']);
-        $this->Html->useScript(['/node_modules/select2/dist/js/select2.min',  'Scid.jquery-ui.min'], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useScript(['/node_modules/select2/dist/js/select2.min', 'Scid.jquery-ui.min'], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $options['type'] = 'select';
         $id = $options['id'];
 
@@ -845,6 +848,7 @@ SELECT_2_SORTABLE_USE;
         if (is_array($url)) {
             $url = $this->Url->build($url);
         }
+        unset($options['url']);
         $group = 'serialization';
         if (!empty($options['sortable-serialize']['group'])) {
             $group = $options['sortable-serialize']['group'];
@@ -853,22 +857,40 @@ SELECT_2_SORTABLE_USE;
         if (!empty($options['sortable-serialize']['tag'])) {
             $tag = $options['sortable-serialize']['tag'];
         }
-        $script = "var group = $('${tag}.${group}').sortable({
-  group: '${group}',
-  delay: 500,
-  onDrop: function (\$item, container, _super) {
+        if (!empty($options['sortable-serialize']['target_id'])) {
+            $target_id = $options['sortable-serialize']['target_id'];
+        }
+        $script = <<<TAG
+var group = $('${tag}.${group}').sortable({
+    group: '${group}',
+    delay: 500,
+    onDrop: function (\$item, container, _super
+)
+{
     var data = group.sortable('serialize').get();
-
+var token = $('[name="_csrfToken"]').val();
     var jsonString = JSON.stringify(data, null, ' ');
-
+    $('#${id}').val(jsonString);
+    
     $.ajax({
-            data: jsonString,
-            type: 'POST',
-            url: '${url}'
-        });
-    _super(\$item, container);
-  }
-});";
+        beforeSend: function (xhr) { // Add this line
+            xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
+        },
+        data: jsonString,
+        type: 'POST',
+        url: '${url}',
+        dataType: "html",
+        success: function(data, textStatus) {
+        $("#{$target_id}").html(data);    
+    },
+    });
+    _super(\$item, container
+)
+    ;
+}
+})
+;
+TAG;
         $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         if ($options['sortable-serialize']['test'] && $options['sortable-serialize']['test']) {
             $options['type'] = 'textarea';
@@ -1482,6 +1504,53 @@ CHECK_ALL_SCRIPT;
                 });
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
 
+        return $options;
+    }
+
+    /**
+     * @param $options
+     * @param $id
+     *
+     * @return mixed
+     */
+    private function __selectMultipleButtons($options, $id) {
+        if (!empty($options['select-buttons']) && !empty($options['multiple']) && $options['select-buttons'] && $options['multiple']) {
+            $var_id = str_replace('-', '_', $id);
+            $label = '';
+            if (!empty($options['label'])) {
+                $label = $options['label'];
+            }
+            $buttons = ['<span class = "btn-group btn-group-sm">'];
+
+            $script = ['var ' . $var_id . ' = $("#' . $id . '").select2();'];
+            foreach ($options['options'] as $level => $group) {
+                $buttonID = uniqid('select-buttons-');
+                $words = explode(" ", $level);
+                $level = "";
+                foreach ($words as $w) {
+                    $level .= $w[0];
+                }
+                $buttons[] = $this->Html->button(h($level), '#', ['class' => ['info', 'btn-truncate-text'], 'id' => $buttonID]);
+                $values = json_encode(array_keys($group));
+
+                $script[] = /** @lang JavaScript */
+                    <<<SELECT_BUTTONS
+$('#${buttonID}').on('click', function () {
+    var selected = {$var_id}.select2('data');
+    var result = selected.map(a => a.id);
+
+    result = result.concat(${values});
+    {$var_id}.val(result).trigger('change');
+});
+                            
+SELECT_BUTTONS;
+            }
+            $script = implode("\r", $script);
+
+            $this->Html->scriptBlock($script, ['block' => \Scid\View\Helper\HtmlHelper::SCRIPT_BOTTOM]);
+            $buttons[] = '</span>';
+            $options['label'] = ['text' => $label . ' ' . implode("\r", $buttons), 'escape' => FALSE];
+        }
         return $options;
     }
 
