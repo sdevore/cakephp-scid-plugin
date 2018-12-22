@@ -1523,15 +1523,31 @@ CHECK_ALL_SCRIPT;
             $buttons = ['<span class = "btn-group btn-group-sm">'];
 
             $script = ['var ' . $var_id . ' = $("#' . $id . '").select2();'];
-            foreach ($options['options'] as $level => $group) {
+            $buttonOptions = $options['options'];
+            $specifiesButtons = FALSE;
+            if (is_array($options['select-buttons'])) {
+                $buttonOptions = $options['select-buttons'];
+                $specifiesButtons = True;
+            }
+            foreach ($buttonOptions as $level => $group) {
                 $buttonID = uniqid('select-buttons-');
-                $words = explode(" ", $level);
-                $level = "";
-                foreach ($words as $w) {
-                    $level .= $w[0];
+                if (!$specifiesButtons) {
+                    // use abbreviation of levels
+                    $words = explode(" ", $level);
+                    $level = "";
+                    foreach ($words as $w) {
+                        $level .= $w[0];
+                    }
                 }
+
                 $buttons[] = $this->Html->button(h($level), '#', ['class' => ['info', 'btn-truncate-text'], 'id' => $buttonID]);
-                $values = json_encode(array_keys($group));
+                if ($specifiesButtons) {
+                    $values = json_encode($group);
+                }
+                else {
+                    $values = json_encode(array_keys($group));
+                }
+
 
                 $script[] = /** @lang JavaScript */
                     <<<SELECT_BUTTONS
@@ -1541,6 +1557,7 @@ $('#${buttonID}').on('click', function () {
 
     result = result.concat(${values});
     {$var_id}.val(result).trigger('change');
+return false;
 });
                             
 SELECT_BUTTONS;
@@ -1551,6 +1568,7 @@ SELECT_BUTTONS;
             $buttons[] = '</span>';
             $options['label'] = ['text' => $label . ' ' . implode("\r", $buttons), 'escape' => FALSE];
         }
+        unset($options['select-buttons']);
         return $options;
     }
 
