@@ -25,8 +25,10 @@ class ScidShell extends Shell
      */
     public function install()
     {
-        $this->NodeAssets->installAssets();
+        //$this->NodeAssets->installAssets();
+        $this->NodeAssets->copyFontAwesomePro();
         $this->NodeAssets->copyAssets();
+
         $this->Assets->remove('Scid');
         $this->Assets->symlink('Scid');
     }
