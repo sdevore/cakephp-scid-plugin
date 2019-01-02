@@ -194,3 +194,5 @@
 /webroot/css/all.min.css
 /webroot/css/all.css
 /webroot/sprites
+/webroot/npm
+/webroot/js/vue.*
