@@ -1098,6 +1098,14 @@ ENABLETOOLTIP;
         }
     }
 
+    function sticky ($id, $options) {
+        $this->useScript('Scid.sticky-sidebar.min', ['block' => self::SCRIPT_BOTTOM]);
+        $options = $this->buildJSArray($options);
+        $script ="var sidebar = new StickySidebar('#{$id}', $options);";
+
+        $this->scriptBlock($script, ['block'=>self::SCRIPT_BOTTOM]);
+    }
+
     /**
      * @param        $id
      * @param string $up

@@ -55,6 +55,7 @@
             exec('npm install --verbose', $output, $return);
             $this->out($output);
             if ($return === 0) {
+
                 $this->success('Scid assets installed successfully.');
             }
             else {
@@ -131,6 +132,8 @@
             $folders[] = new Folder($this->_nodeDir->path . DS . 'markitup/dist');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'select2/dist');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'vue/dist');
+            $folders[] = new Folder($this->_nodeDir->path . DS . 'sticky-sidebar/dist');
+
             foreach ($folders as $folder) {
                 foreach ($folder->findRecursive() as $file) {
                     $files[] = new File($file);

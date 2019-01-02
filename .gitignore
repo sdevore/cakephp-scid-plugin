@@ -196,3 +196,4 @@
 /webroot/sprites
 /webroot/npm
 /webroot/js/vue.*
+/webroot/js/*sticky-sidebar.*
