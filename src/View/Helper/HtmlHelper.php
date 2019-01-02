@@ -1098,7 +1098,14 @@ ENABLETOOLTIP;
         }
     }
 
-    function sticky ($id, $options) {
+    /**
+     * sticky-sidebar extenstion ($this version is independent of jquery
+     * @see https://abouolia.github.io/sticky-sidebar
+     * @param $id
+     * @param $options @see https://abouolia.github.io/sticky-sidebar/#options
+     * @return void
+     */
+    function stickySidebar ($id, $options) {
         $this->useScript('Scid.sticky-sidebar.min', ['block' => self::SCRIPT_BOTTOM]);
         $options = $this->buildJSArray($options);
         $script ="var sidebar = new StickySidebar('#{$id}', $options);";
