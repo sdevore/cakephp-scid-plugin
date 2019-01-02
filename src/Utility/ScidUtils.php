@@ -10,6 +10,7 @@ namespace Scid\Utility;
 
 use Cake\Chronos\Chronos;
 use Cake\Chronos\ChronosInterface;
+use Cake\Collection\Collection;
 use Cake\I18n\Date;
 use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
@@ -239,6 +240,9 @@ class ScidUtils
      * @return array
      */
     static function getKeyedRanges($source, $separator = '-') {
+        if ($source instanceof Collection) {
+            $source = $source->toArray();
+        }
         $keys = array_keys($source);
         $ranges = ScidUtils::getRanges($keys);
         $result = [];
