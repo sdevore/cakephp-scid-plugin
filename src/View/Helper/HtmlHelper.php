@@ -1131,5 +1131,12 @@ atag.addEventListener('click', function () {
 TOGGLE_HEADING_ICON;
         $this->scriptBlock($script, [self::SCRIPT_BOTTOM]);
     }
+
+    public function scriptBlock($script, array $options = []) {
+        if (empty($options['block'])) {
+            $options['block'] = self::SCRIPT_BOTTOM;
+        }
+        return parent::scriptBlock($script, $options);
+    }
 }
 

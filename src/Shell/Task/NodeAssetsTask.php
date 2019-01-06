@@ -128,11 +128,13 @@
             $folders[] = new Folder($this->_nodeDir->path . DS . 'bootstrap-markdown-editor/dist');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'bootstrap-toggle');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'checkboxes.js/dist');
+            $folders[] = new Folder($this->_nodeDir->path . DS . 'datepair.js/dist');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'jquery-mask-plugin/dist');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'markitup/dist');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'select2/dist');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'vue/dist');
             $folders[] = new Folder($this->_nodeDir->path . DS . 'sticky-sidebar/dist');
+            $folders[] = new Folder($this->_nodeDir->path . DS . 'timepicker/dist');
 
             foreach ($folders as $folder) {
                 foreach ($folder->findRecursive() as $file) {
