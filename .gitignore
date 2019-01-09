@@ -196,3 +196,7 @@
 /webroot/sprites
 /webroot/npm
 /webroot/js/vue.*
+/webroot/js/*sticky-sidebar.*
+/webroot/js/*timepicker.*
+/webroot/css/*timepicker.*
+/webroot/js/*datepair.*

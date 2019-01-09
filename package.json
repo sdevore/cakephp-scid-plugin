@@ -26,6 +26,8 @@
     "bootstrap-markdown-editor": "^2.2.4",
     "bootstrap-toggle": "^2.2.2",
     "checkboxes.js": "^1.2.2",
+    "datepair.js": "^0.4.16",
+    "element-ui": "^2.4.11",
     "jquery": "^3.3.1",
     "jquery-mask-plugin": "^1.14.15",
     "jquery-ui": "^1.12.1",
@@ -33,6 +35,7 @@
     "popper.js": "^1.14.0",
     "select2": "^4.0.6-rc.1",
     "sticky-sidebar": "^3.3.1",
+    "timepicker": "^1.11.14",
     "vue": "^2.5.21"
   }
 }

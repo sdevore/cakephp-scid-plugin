@@ -1099,6 +1099,21 @@ ENABLETOOLTIP;
     }
 
     /**
+     * sticky-sidebar extenstion ($this version is independent of jquery
+     * @see https://abouolia.github.io/sticky-sidebar
+     * @param $id
+     * @param $options @see https://abouolia.github.io/sticky-sidebar/#options
+     * @return void
+     */
+    function stickySidebar ($id, $options) {
+        $this->useScript('Scid.sticky-sidebar.min', ['block' => self::SCRIPT_BOTTOM]);
+        $options = $this->buildJSArray($options);
+        $script ="var sidebar = new StickySidebar('#{$id}', $options);";
+
+        $this->scriptBlock($script, ['block'=>self::SCRIPT_BOTTOM]);
+    }
+
+    /**
      * @param        $id
      * @param string $up
      * @param string $down
@@ -1115,6 +1130,13 @@ atag.addEventListener('click', function () {
 });
 TOGGLE_HEADING_ICON;
         $this->scriptBlock($script, [self::SCRIPT_BOTTOM]);
+    }
+
+    public function scriptBlock($script, array $options = []) {
+        if (empty($options['block'])) {
+            $options['block'] = self::SCRIPT_BOTTOM;
+        }
+        return parent::scriptBlock($script, $options);
     }
 }
 

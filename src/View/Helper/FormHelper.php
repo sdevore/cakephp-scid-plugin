@@ -13,6 +13,7 @@ use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
 use BootstrapUI\View\Helper\FormHelper as Helper;
 use InvalidArgumentException;
+use PHP_CodeSniffer\Generators\HTML;
 
 /**
  * Form helper
@@ -286,6 +287,12 @@ CHECKBOX_LIMIT;
                 case 'timepicker':
                     $options = $this->__timePicker($options);
                     break;
+                case 'timepicker2':
+                    $options = $this->__timePicker2($options);
+                    break;
+                case 'timerange':
+                    $options = $this->__timerange($options);
+                    break;
                 case 'daterange':
                     $options = $this->__dateRange($options);
                     break;
@@ -490,6 +497,89 @@ CHECKBOX_LIMIT;
         $('#{$id}').daterangepicker({$rangeOptionString});
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
 
+        return $options;
+    }
+
+    /**
+     * @param $options
+     * @return array
+     */
+    private function __timePicker2($options) {
+        $id = $options['id'];
+        $this->Html->useScript(['Scid.jquery.timepicker.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useCssFile('Scid.jquery.timepicker');
+        $options['prepend'] = $this->Html->icon('clock');
+        $options['type'] = 'text';
+        if (empty($options['width'])) {
+            $options['width'] = 8;
+        }
+        if (empty($options['timepicker'])) {
+            $options['timepicker'] = [];
+        }
+        $defaultOptions = ['timeFormat' => 'g:ia', 'showDuration' => TRUE];
+        $timepickerOptions = $defaultOptions + $options['timepicker'];
+        $timeKeys = ['minTime', 'maxTime', 'durationTime'];
+        if (empty($timepickerOptions['noneOption']) && !empty($options['empty'])) {
+            $timepickerOptions['noneOption'] = $options['empty'];
+            unset($options['empty']);
+        }
+        foreach ($timeKeys as $timeKey) {
+            if (isset($timepickerOptions[$timeKey]) && ($timepickerOptions[$timeKey] instanceof FrozenTime || $timepickerOptions[$timeKey] instanceof FrozenTime)) {
+                /** @var FrozenTime $time */
+                $time = $timepickerOptions[$timeKey];
+                $timepickerOptions[$timeKey] = $time->format('h:ia');
+            }
+        }
+
+        $jsonOptions = json_encode($timepickerOptions);
+        unset($options['timepicker']);
+        $script = /** @lang JavaScript */
+            <<<TIMEPICKER
+$('#{$id}').timepicker({$jsonOptions});
+TIMEPICKER;
+        $this->Html->scriptBlock($script);
+        return $options;
+    }
+
+    /**
+     * @param $options
+     * @return array
+     */
+    private function __timerange($options) {
+        $id = $options['id'];
+        $this->Html->useScript(['Scid.jquery.timepicker.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useScript(['Scid.timerange.min',], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useCssFile('Scid.jquery.timepicker');
+        $options['prepend'] = $this->Html->icon('clock');
+        $options['type'] = 'text';
+        if (empty($options['width'])) {
+            $options['width'] = 8;
+        }
+        if (empty($options['timepicker'])) {
+            $options['timepicker'] = [];
+        }
+        $defaultOptions = ['timeFormat' => 'g:ia', 'showDuration' => TRUE];
+        $timepickerOptions = $defaultOptions + $options['timepicker'];
+        $timeKeys = ['minTime', 'maxTime', 'durationTime'];
+        if (empty($timepickerOptions['noneOption']) && !empty($options['empty'])) {
+            $timepickerOptions['noneOption'] = $options['empty'];
+            unset($options['empty']);
+        }
+        foreach ($timeKeys as $timeKey) {
+            if (isset($timepickerOptions[$timeKey]) && ($timepickerOptions[$timeKey] instanceof FrozenTime || $timepickerOptions[$timeKey] instanceof FrozenTime)) {
+                /** @var FrozenTime $time */
+                $time = $timepickerOptions[$timeKey];
+                $timepickerOptions[$timeKey] = $time->format('h:ia');
+            }
+        }
+
+        $jsonOptions = json_encode($timepickerOptions);
+        unset($options['timepicker']);
+        $script = /** @lang JavaScript */
+            <<<TIMEPICKER
+$('#{$id}').timepicker({$jsonOptions});
+TIMEPICKER;
+        $this->Html->scriptBlock($script);
         return $options;
     }
 
@@ -1527,7 +1617,7 @@ CHECK_ALL_SCRIPT;
             $specifiesButtons = FALSE;
             if (is_array($options['select-buttons'])) {
                 $buttonOptions = $options['select-buttons'];
-                $specifiesButtons = True;
+                $specifiesButtons = TRUE;
             }
             foreach ($buttonOptions as $level => $group) {
                 $buttonID = uniqid('select-buttons-');
@@ -1543,8 +1633,7 @@ CHECK_ALL_SCRIPT;
                 $buttons[] = $this->Html->button(h($level), '#', ['class' => ['info', 'btn-truncate-text'], 'id' => $buttonID]);
                 if ($specifiesButtons) {
                     $values = json_encode($group);
-                }
-                else {
+                } else {
                     $values = json_encode(array_keys($group));
                 }
 
