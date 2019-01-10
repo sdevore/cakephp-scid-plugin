@@ -24,10 +24,14 @@ class NodeAssetsTask extends Shell
      */
     public function __construct() {
         parent::__construct();
-        $this->_assetDir = new Folder(Plugin::path('Scid') . 'webroot' . DS . 'node', TRUE);
+        $this->_assetDir = new Folder(Plugin::path('Scid') . 'webroot', TRUE);
         $this->_nodeDir = new Folder(Plugin::path('Scid') . 'node_modules', TRUE);
+
         $this->_cssDir = new Folder($this->_assetDir->path . DS . 'css', TRUE);
         $this->_jsDir = new Folder($this->_assetDir->path . DS . 'js', TRUE);
+        $this->_webfontsDir = new Folder($this->_assetDir->path . DS . 'webfonts', TRUE);
+        $this->_spritesDir = new Folder($this->_assetDir->path . DS . 'sprites', TRUE);
+        $this->_svgsDir = new Folder($this->_assetDir->path . DS . 'svgs', TRUE);
     }
 
     /**
@@ -44,11 +48,13 @@ class NodeAssetsTask extends Shell
             } else if (file_exists('/usr/local/bin/npm')) {
                 $npm = '/usr/local/bin/npm';
             } else {
-            $this->abort('NPM (https://www.npmjs.com/) is required, but not installed. Aborting.');
-        }
+                $this->abort('NPM (https://www.npmjs.com/) is required, but not installed. Aborting.');
+            }
         }
 
+        $this->_createNpmrc();
         chdir(Plugin::path('Scid'));
+
         $node_mod = new Folder('node_modules');
         if ($node_mod->delete()) {
             $this->success('Cleared node_modules...');
@@ -93,8 +99,8 @@ class NodeAssetsTask extends Shell
                     $dir = $this->_cssDir;
                 } else if (preg_match('/.js|.min.map/', $file->name)) {
                     $dir = $this->_jsDir;
-        }
-    }
+                }
+            }
 
             if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
                 $this->success($file->name . ' successfully copied.');
@@ -146,12 +152,14 @@ class NodeAssetsTask extends Shell
      * Copy sample layouts to app's layout dir
      *
      * @param string $target The destination path
+     *
      * @return void
      */
     public
     function copyLayouts($target = NULL) {
         $this->info('Copying sample layouts...');
-        $layoutDir = new Folder(Plugin::path('BootstrapUI') . 'src' . DS . 'Template' . DS . 'Layout' . DS . 'examples');
+        $layoutDir =
+            new Folder(Plugin::path('BootstrapUI') . 'src' . DS . 'Template' . DS . 'Layout' . DS . 'examples');
 
         if ($target == NULL) {
             $target = APP . 'Template' . DS . 'Layout' . DS . 'TwitterBootstrap';
@@ -167,6 +175,7 @@ class NodeAssetsTask extends Shell
      * Copy files to assetdir's css/js path
      *
      * @param array $files Assetfiles to copy
+     *
      * @return void
      */
     protected
@@ -178,13 +187,11 @@ class NodeAssetsTask extends Shell
             } else if (preg_match('/.js|.min.map/', $file->name)) {
                 $dir = $this->_jsDir;
             }
-            if (!empty($dir)) {
-                if ($file->copy($dir->path . DS . $file->name)) {
-                    $this->success($file->name . ' successfully copied.');
-                } else {
-                    $this->warn($file->name . ' could not be copied.');
+            if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
+                $this->success($file->name . ' successfully copied.');
+            } else {
+                $this->warn($file->name . ' could not be copied.');
             }
-
         }
     }
 
@@ -206,5 +213,21 @@ class NodeAssetsTask extends Shell
         }
 
         return TRUE;
+    }
+
+    /**
+     * @return void
+     */
+    protected function _createNpmrc(): void {
+        $npmrc = new File(Plugin::path('Scid') . DS . '.npmrc');
+        if ($npmrc->exists()) {
+            $npmrc->delete();
+        }
+        $token = Configure::read('Scid.font-awesome-token');
+        if (!empty($token)) {
+            $npmrc->create();
+            $npmrc->write(__("@fortawesome:registry=https://npm.fontawesome.com/
+//npm.fontawesome.com/:_authToken={0}", [$token]));
+        }
     }
 }
