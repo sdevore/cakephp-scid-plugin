@@ -52,7 +52,9 @@ class NodeAssetsTask extends Shell
             }
         }
 
+        $this->_createNpmrc();
         chdir(Plugin::path('Scid'));
+
         $node_mod = new Folder('node_modules');
         if ($node_mod->delete()) {
             $this->success('Cleared node_modules...');
@@ -198,7 +200,6 @@ class NodeAssetsTask extends Shell
      *
      * @param \Cake\Filesystem\Folder $folder Folder to clear
      * @param string                  $except Files to skip
-     *
      * @return bool
      */
     protected
@@ -212,5 +213,21 @@ class NodeAssetsTask extends Shell
         }
 
         return TRUE;
+    }
+
+    /**
+     * @return void
+     */
+    protected function _createNpmrc(): void {
+        $npmrc = new File(Plugin::path('Scid') . DS . '.npmrc');
+        if ($npmrc->exists()) {
+            $npmrc->delete();
+        }
+        $token = Configure::read('Scid.font-awesome-token');
+        if (!empty($token)) {
+            $npmrc->create();
+            $npmrc->write(__("@fortawesome:registry=https://npm.fontawesome.com/
+//npm.fontawesome.com/:_authToken={0}", [$token]));
+        }
     }
 }
