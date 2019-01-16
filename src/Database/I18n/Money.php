@@ -154,6 +154,15 @@
         }
 
         /**
+         * Returns the value represented by this object.
+         *
+         * @return string
+         */
+        public function getDouble() {
+            return $this->_money->getAmount()/100;
+        }
+
+        /**
          * Returns the currency of this object.
          *
          * @return Currency
