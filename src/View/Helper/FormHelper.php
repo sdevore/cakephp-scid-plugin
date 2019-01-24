@@ -12,6 +12,7 @@ use Cake\Core\Configure\Engine\PhpConfig;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
 use BootstrapUI\View\Helper\FormHelper as Helper;
+use CakeTime;
 use InvalidArgumentException;
 use PHP_CodeSniffer\Generators\HTML;
 
@@ -402,10 +403,16 @@ CHECKBOX_LIMIT;
             'timePicker'       => FALSE,
             'locale'           => ['format' => 'MM/DD/YYYY'],
         ];
+        $callback = '';
+        if(isset($options['rangeOptions']['default']) && $options['rangeOptions']['default'] === false) {
+            $callback = ", function(chosen_date) {
+  $('#{$id}').val(chosen_date.format('MM/DD/YYYY'));
+}";
+        }
         $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
         $this->Html->scriptBlock("$(document).ready(function() {
-        $('#{$id}').daterangepicker({$rangeOptionString});
+        $('#{$id}').daterangepicker({$rangeOptionString}{$callback});
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
 
         return $options;
@@ -451,6 +458,11 @@ CHECKBOX_LIMIT;
                 unset($options[$key]);
             }
         }
+        if (isset($rangeOptions['default']) && $rangeOptions['default'] === false) {
+            unset($rangeOptions['default']);
+           $rangeOptions['autoUpdateInput'] = false;
+        }
+
         if (empty($rangeOptions)) {
             $rangeOptionString = '';
         } else {
@@ -491,6 +503,7 @@ CHECKBOX_LIMIT;
             'timePicker'       => TRUE,
             'locale'           => ['format' => 'MM/DD/YYYY h:mm A'],
         ];
+
         $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
         $this->Html->scriptBlock("$(document).ready(function() {
