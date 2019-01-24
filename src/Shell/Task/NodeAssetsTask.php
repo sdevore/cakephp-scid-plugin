@@ -53,12 +53,7 @@ class NodeAssetsTask extends Shell
         }
 
         $this->_createNpmrc();
-        chdir(Plugin::path('Scid'));
-
-        $node_mod = new Folder('node_modules');
-        if ($node_mod->delete()) {
-            $this->success('Cleared node_modules...');
-        }
+        $this->cleanAssets();
 
         exec($npm . ' install --verbose', $output, $return);
         $this->out($output);
@@ -228,6 +223,18 @@ class NodeAssetsTask extends Shell
             $npmrc->create();
             $npmrc->write(__("@fortawesome:registry=https://npm.fontawesome.com/
 //npm.fontawesome.com/:_authToken={0}", [$token]));
+        }
+    }
+
+    /**
+     * @return void
+     */
+    protected function cleanAssets(): void {
+        chdir(Plugin::path('Scid'));
+
+        $node_mod = new Folder('node_modules');
+        if ($node_mod->delete()) {
+            $this->success('Cleared node_modules...');
         }
     }
 }
