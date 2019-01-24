@@ -229,7 +229,7 @@ class NodeAssetsTask extends Shell
     /**
      * @return void
      */
-    protected function cleanAssets(): void {
+    public function cleanAssets(): void {
         chdir(Plugin::path('Scid'));
 
         $node_mod = new Folder('node_modules');
