@@ -15,7 +15,7 @@
         "moneyphp/money": "^3.1.0",
         "picqer/php-barcode-generator": "^0.2.2",
         "tijsverkoyen/css-to-inline-styles": "^2.2",
-        "twbs/bootstrap": "^4.2.0",
+        "twbs/bootstrap": "^4.2",
         "bower-asset/json2": "dev-master",
         "npm-asset/bootstrap-toggle": "^2.2",
         "npm-asset/bootstrap-markdown-editor": "^2.2",
