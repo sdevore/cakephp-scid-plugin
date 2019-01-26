@@ -7,6 +7,7 @@ use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Filesystem\File;
 use Cake\Filesystem\Folder;
+use Cake\Utility\Text;
 
 /**
  * Task for installing Bootstrap assets and layouts to app.
@@ -26,6 +27,7 @@ class NodeAssetsTask extends Shell
         parent::__construct();
         $this->_assetDir = new Folder(Plugin::path('Scid') . 'webroot', TRUE);
         $this->_nodeDir = new Folder(Plugin::path('Scid') . 'node_modules', TRUE);
+        $this->_nodePreserveDir = new Folder(Plugin::path('Scid') . 'node_modules_preserve', TRUE);
 
         $this->_cssDir = new Folder($this->_assetDir->path . DS . 'css', TRUE);
         $this->_jsDir = new Folder($this->_assetDir->path . DS . 'js', TRUE);
@@ -188,6 +190,20 @@ class NodeAssetsTask extends Shell
                 $this->warn($file->name . ' could not be copied.');
             }
         }
+    }
+
+    public function perserveNodeModules($dirs = []) {
+        $this->info(__('Preserve {0} npm_modules that we don\'t want to clear...',[Text::toList($dirs)]));
+        foreach ($dirs as $dir) {
+            $path = $this->_nodePreserveDir->path;
+            $path = Folder::addPathElement($path,$dir);
+            $destination = new Folder($path, true);
+            $destination->delete();
+            $source = new Folder($this->_nodeDir->path . DS . $dir);
+            $source->copy($destination->path);
+
+        }
+        $this->success(__('{0} Directories moved to nmp_modules_preserve',[Text::toList($dirs)]));
     }
 
     /**

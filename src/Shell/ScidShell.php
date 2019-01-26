@@ -28,6 +28,7 @@ class ScidShell extends Shell
         $this->NodeAssets->installAssets();
         $this->NodeAssets->copyFontAwesomePro();
         $this->NodeAssets->copyAssets();
+        $this->NodeAssets->perserveNodeModules(['bootstrap']);
         $this->NodeAssets->cleanAssets();
         $this->Assets->remove('Scid');
         $this->Assets->symlink('Scid');
