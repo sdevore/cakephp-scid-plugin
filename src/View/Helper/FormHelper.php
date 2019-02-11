@@ -404,7 +404,7 @@ CHECKBOX_LIMIT;
             'locale'           => ['format' => 'MM/DD/YYYY'],
         ];
         $callback = '';
-        if(isset($options['rangeOptions']['default']) && $options['rangeOptions']['default'] === false) {
+        if (isset($options['rangeOptions']['default']) && $options['rangeOptions']['default'] === FALSE) {
             $callback = ", function(chosen_date) {
   $('#{$id}').val(chosen_date.format('MM/DD/YYYY'));
 }";
@@ -458,9 +458,9 @@ CHECKBOX_LIMIT;
                 unset($options[$key]);
             }
         }
-        if (isset($rangeOptions['default']) && $rangeOptions['default'] === false) {
+        if (isset($rangeOptions['default']) && $rangeOptions['default'] === FALSE) {
             unset($rangeOptions['default']);
-           $rangeOptions['autoUpdateInput'] = false;
+            $rangeOptions['autoUpdateInput'] = FALSE;
         }
 
         if (empty($rangeOptions)) {
@@ -800,6 +800,15 @@ EXPAND;
         return $options;
     }
 
+    private function __useFullBase() {
+        $view = $this->_View;
+        $request = $view->request;
+        if ($request->is(['pdf'])) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
     private function __select2($options) {
         /**
          * https://github.com/select2/select2
@@ -808,8 +817,9 @@ EXPAND;
          * <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
          * <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
          */
-        $this->Html->useCssFile(['/node_modules/select2/dist/css/select2.min', 'Scid.select2-bootstrap.min']);
-        $this->Html->useScript('/node_modules/select2/dist/js/select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $useFullBase = $this->__useFullBase();
+        $this->Html->useCssFile(['/node_modules/select2/dist/css/select2.min', 'Scid.select2-bootstrap.min'], ['fullBase' => $useFullBase]);
+        $this->Html->useScript('/node_modules/select2/dist/js/select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM, 'fullBase' => $useFullBase]);
         $options['type'] = 'select';
         $id = $options['id'];
 
@@ -1343,8 +1353,8 @@ SIGNATURE_SCRIPT;
      * @param $fieldName
      * @param $options
      *
-     * @deprecated use boostrapToggle instead
      * @return string
+     * @deprecated use boostrapToggle instead
      */
     private function __bootstrapSwitch($fieldName, $options) {
         $idForInput = $this->domId($fieldName);
