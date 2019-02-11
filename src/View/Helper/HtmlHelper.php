@@ -320,6 +320,9 @@ DRIVER_TOUR_BLOCK;
             $paths = [$paths];
         }
         $options['block'] = TRUE;
+        if ($this->__useFullBase()) {
+            $options['fullBase'] = true;
+        }
         foreach ($paths as $path) {
             if (empty($existingPaths[$path])) {
                 $existingPaths[$path] = $options;
@@ -327,6 +330,15 @@ DRIVER_TOUR_BLOCK;
             }
         }
         Configure::write($SCID_CSS_PATHS, $existingPaths);
+    }
+
+    private function __useFullBase() {
+        $view = $this->_View;
+        $request = $view->request;
+        if ($request->is(['pdf'])) {
+            return TRUE;
+        }
+        return FALSE;
     }
 
     /**
