@@ -902,7 +902,7 @@ class PaymentBehavior extends Behavior
             default:
                 $payment->setError('credit_card_number', [__('{0}: {1}',
                                                              [$errorCode,
-                                                              $errorText])]);
+                                                              $errorText[0]])]);
         }
     }
 
