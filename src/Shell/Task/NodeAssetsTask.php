@@ -2,6 +2,7 @@
 
 namespace Scid\Shell\Task;
 
+use Cake\Console\ConsoleIo;
 use Cake\Console\Shell;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
@@ -100,7 +101,7 @@ class NodeAssetsTask extends Shell
             }
 
             if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
-                $this->success($file->name . ' successfully copied.');
+                $this->success($file->name . ' successfully copied.',1,ConsoleIo::VERBOSE);
             } else {
                 $this->warn($file->name . ' could not be copied.');
             }
@@ -185,7 +186,7 @@ class NodeAssetsTask extends Shell
                 $dir = $this->_jsDir;
             }
             if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
-                $this->success($file->name . ' successfully copied.');
+                $this->verbose($file->name . ' successfully copied.');
             } else {
                 $this->warn($file->name . ' could not be copied.');
             }
