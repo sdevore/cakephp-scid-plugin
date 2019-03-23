@@ -20,10 +20,12 @@ class NodeAssetsTask extends Shell
     protected $_nodeDir;
     protected $_cssDir;
     protected $_jsDir;
+    private $_webfontsDir;
+    private $_spritesDir;
+    private $_svgsDir;
+    private $_nodePreserveDir;
 
-    /**
-     * TwbsAssetsTask constructor.
-     */
+
     public function __construct() {
         parent::__construct();
         $this->_assetDir = new Folder(Plugin::path('Scid') . 'webroot', TRUE);
@@ -71,7 +73,6 @@ class NodeAssetsTask extends Shell
     public
     function copyFontAwesomePro() {
         $files = [];
-        $folders = [];
         $folder = new Folder($this->_nodeDir->path . DS . '@fortawesome/fontawesome-pro');
         foreach ($folder->findRecursive() as $file) {
             $files[] = new File($file);
@@ -90,7 +91,6 @@ class NodeAssetsTask extends Shell
                 } else if ($parent->inPath($webfonts)) {
                     $dir = $this->_webfontsDir;
                 } else if ($parent->inPath($svgs)) {
-                    $info = $file->info();
                     $pInfo = pathinfo($parent->path);
                     $dir = new Folder(Folder::addPathElement($this->_svgsDir->path, $pInfo['basename']));
                 } else if (preg_match('/.css/', $file->name)) {
@@ -101,9 +101,9 @@ class NodeAssetsTask extends Shell
             }
 
             if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
-                $this->success($file->name . ' successfully copied.',1,ConsoleIo::VERBOSE);
+                $this->success($file->name . ' successfully copied.', 1, ConsoleIo::VERBOSE);
             } else {
-                $this->warn($file->name . ' could not be copied.');
+                $this->info($file->name . ' will not be copied.', 1, ConsoleIo::VERBOSE);
             }
         }
     }
@@ -194,17 +194,17 @@ class NodeAssetsTask extends Shell
     }
 
     public function perserveNodeModules($dirs = []) {
-        $this->info(__('Preserve {0} npm_modules that we don\'t want to clear...',[Text::toList($dirs)]));
+        $this->info(__('Preserve {0} npm_modules that we don\'t want to clear...', [Text::toList($dirs)]));
         foreach ($dirs as $dir) {
             $path = $this->_nodePreserveDir->path;
-            $path = Folder::addPathElement($path,$dir);
-            $destination = new Folder($path, true);
+            $path = Folder::addPathElement($path, $dir);
+            $destination = new Folder($path, TRUE);
             $destination->delete();
             $source = new Folder($this->_nodeDir->path . DS . $dir);
             $source->copy($destination->path);
 
         }
-        $this->success(__('{0} Directories moved to nmp_modules_preserve',[Text::toList($dirs)]));
+        $this->success(__('{0} Directories moved to nmp_modules_preserve', [Text::toList($dirs)]));
     }
 
     /**
