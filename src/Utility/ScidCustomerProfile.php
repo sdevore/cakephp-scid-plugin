@@ -7,45 +7,18 @@ namespace Scid\Utility;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\ORM\Table;
-use net\authorize\api\contract\v1 as AnetAPI;
-use net\authorize\api\controller as AnetController;
+use Scid\Utility\ScidPaymentsTrait;
+use Scid\Utility\ScidPaymentsInterface;
 
-class ScidCustomerProfiles
+
+class ScidCustomerProfile implements ScidPaymentsInterface
 {
-
-
-    private $_errors = [];
+    use ScidPaymentsTrait;
 
     /**
-     * Default configuration.
-     *
-     * @var array
+     * @var \net\authorize\api\contract\v1\CustomerProfileType
      */
-    protected $_defaultConfig = [
-        'type'    => 'AuthorizeDotNet',
-        'sandbox' => TRUE,
-    ];
-
-    protected $_options = [];
-
-    protected $_sandbox = TRUE;
-
-    const TRANSACTION_ID_PREFIX_KEY = 'id-prefix';
-    const TRANSACTION_TRANSACTIONKEY_KEY = 'transaction-key';
-    const TRANSACTION_TYPE_KEY = 'transactionType';
-    const TRANSACTION_TYPE_AUTHORIZE = 'authOnlyTransaction';
-    const TRANSACTION_TYPE_AUTH_CAPTURE = 'authCaptureTransaction';
-    const TRANSACTION_TYPE_CAPTURE = 'priorAuthCaptureTransaction';
-    const TRANSACTION_TYPE_VOID = 'voidTransaction';
-    const TRANSACTION_TYPE_REFUND = 'refundTransaction';
-
-    const STATE_PENDING = 'Pending';
-    const STATE_APPROVED = 'Approved';
-    const STATE_FAILED = 'Failed';
-    const STATE_CAPTURED = 'Captured';
-    const STATE_SETTLED = 'Settled';
-    const STATE_VOIDED = 'Voided';
-    const STATE_REFUNDED = 'Refunded';
+    private $_customerProfile;
 
 
 
@@ -65,6 +38,20 @@ class ScidCustomerProfiles
         if (!empty($config['sandbox'])) {
             $this->_sandbox = $config['sandbox'];
         }
+    }
+
+    /**
+     * @return \net\authorize\api\contract\v1\CustomerProfileType
+     */
+    public function getCustomerProfile(): \net\authorize\api\contract\v1\CustomerProfileType {
+        return $this->_customerProfile;
+    }
+
+    /**
+     * @param \net\authorize\api\contract\v1\CustomerProfileType $customerProfile
+     */
+    public function setCustomerProfile(\net\authorize\api\contract\v1\CustomerProfileType $customerProfile): void {
+        $this->_customerProfile = $customerProfile;
     }
 }
 

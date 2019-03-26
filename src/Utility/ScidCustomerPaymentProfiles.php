@@ -4,7 +4,7 @@
 namespace Scid\Utility;
 
 
-class ScidCustomerProfiles
+class ScidCustomerPaymentProfiles
 {
 
 }
