@@ -44,7 +44,7 @@ class CreateScidCustomerProfiles extends AbstractMigration
             'null' => false,
         ]);
         $table->addColumn('config', 'string', [
-            'default' => null,
+            'default' => 'default',
             'limit' => 20,
             'null' => false,
         ]);

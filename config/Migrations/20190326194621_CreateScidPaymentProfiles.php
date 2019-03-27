@@ -35,21 +35,21 @@ class CreateScidPaymentProfiles extends AbstractMigration
         ]);
         $table->addColumn('customer_profile_id', 'string', [
             'default' => null,
-            'limit' => 255,
+            'limit' => 64,
             'null' => false,
         ]);
         $table->addColumn('payment_profile_id', 'string', [
             'default' => null,
-            'limit' => 255,
+            'limit' => 64,
             'null' => false,
         ]);
         $table->addColumn('default', 'boolean', [
-            'default' => null,
+            'default' => 0,
             'null' => false,
         ]);
         $table->addColumn('card_number', 'string', [
             'default' => null,
-            'limit' => 255,
+            'limit' => 64,
             'null' => false,
         ]);
         $table->addColumn('expiration_date', 'string', [
@@ -59,7 +59,7 @@ class CreateScidPaymentProfiles extends AbstractMigration
         ]);
         $table->addColumn('card_type', 'string', [
             'default' => null,
-            'limit' => 255,
+            'limit' => 64,
             'null' => false,
         ]);
         $table->addPrimaryKey([
