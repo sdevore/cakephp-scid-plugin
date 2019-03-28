@@ -22,7 +22,7 @@
          *
          * @var array
          */
-        protected $_defaultConfig = [
+        protected $_defaultPaymentConfig = [
             'type'    => 'AuthorizeDotNet',
             'credentials' => 'default',
             'sandbox' => TRUE,
@@ -51,7 +51,7 @@
             if (!empty($config['credentials'])) {
                 $this->_credentials = $scid['credentials'];
             }
-            $type = $this->_defaultConfig['type'];
+            $type = $this->_defaultPaymentConfig['type'];
             if (!empty($scid['default_type'])) {
                 $type = $scid['default_type'];
             }
@@ -61,7 +61,7 @@
             if (!empty($scid[$this->_credentials][$type])) {
                 $this->_options = $scid[$this->_credentials][$type];
             } else {
-                $this->_options = $scid[$this->_defaultConfig['credentials']][$type];
+                $this->_options = $scid[$this->_defaultPaymentConfig['credentials']][$type];
             }
             if (isset($scid['sandbox'])) {
                 $this->_sandbox = $scid['sandbox'];
@@ -76,14 +76,14 @@
             $this->Form->unlockField('dataDescriptor');
             $this->Form->unlockField('dataValue');
             if (empty($options['payment'])) {
-                $payment = $this->_defaultConfig['payment'];
+                $payment = $this->_defaultPaymentConfig['payment'];
             }
             else {
                 $payment = $options['payment'];
             }
 
             if (empty($payment['fields'])) {
-                $fields = $this->_defaultConfig['payment']['fields'];
+                $fields = $this->_defaultPaymentConfig['payment']['fields'];
             }
             else {
                 $fields = $payment['fields'];

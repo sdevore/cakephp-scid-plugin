@@ -32,7 +32,7 @@ interface ScidPaymentsInterface
 
 trait ScidPaymentsTrait
 {
-    protected $_defaultConfig = [
+    protected $_defaultPaymentConfig = [
         'type'        => 'AuthorizeDotNet',
         'credentials' => 'default',
         'sandbox'     => TRUE,
@@ -50,7 +50,7 @@ trait ScidPaymentsTrait
         if (!empty($config['credentials'])) {
             $this->_credentials = $scid['credentials'];
         }
-        $type = $this->_defaultConfig['type'];
+        $type = $this->_defaultPaymentConfig['type'];
         if (!empty($scid['default_type'])) {
             $type = $scid['default_type'];
         }
@@ -60,7 +60,7 @@ trait ScidPaymentsTrait
         if (!empty($scid[$this->_credentials][$type])) {
             $this->_options = $scid[$this->_credentials][$type];
         } else {
-            $this->_options = $scid[$this->_defaultConfig['credentials']][$type];
+            $this->_options = $scid[$this->_defaultPaymentConfig['credentials']][$type];
         }
         if (isset($scid['sandbox'])) {
             $this->_sandbox = $scid['sandbox'];
@@ -86,11 +86,11 @@ trait ScidPaymentsTrait
 
     protected function __options($credentials, $type = null) {
         if (empty($credentials)) {
-            $credentials = $this->_defaultConfig['credentials'];
+            $credentials = $this->_defaultPaymentConfig['credentials'];
         }
         $scid = Configure::read('Scid.payment');
         if (empty($type)) {
-            $type = $this->_defaultConfig['type'];
+            $type = $this->_defaultPaymentConfig['type'];
             if (!empty($scid['default_type'])) {
                 $type = $scid['default_type'];
             }
@@ -98,7 +98,7 @@ trait ScidPaymentsTrait
         if (!empty($scid[$credentials][$type])) {
             $options = $scid[$credentials][$type];
         } else {
-            $options = $scid[$this->_defaultConfig['credentials']][$type];
+            $options = $scid[$this->_defaultPaymentConfig['credentials']][$type];
         }
         return $options;
     }
