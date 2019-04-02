@@ -211,6 +211,10 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         return $payment;
 
     }
+    
+    public function updateCustomerPaymentInformation($paymentInfo) {
+        return null;
+    }
 
     /**
      * @param Payment|EntityInterface $payment
