@@ -683,11 +683,11 @@ DRIVER_TOUR_BLOCK;
         $url = 'mailto:' . $email;
         $query = [];
         if (!empty($options['subject'])) {
-            $query[] = 'subject=' . $$options['subject'];
+            $query[] = 'subject=' . $options['subject'];
             unset($options['subject']);
         }
         if (!empty($options['body'])) {
-            $query[] = 'body=' . $$options['subject'];
+            $query[] = 'body=' . $options['body'];
             unset($options['body']);
         }
         if (!empty($query)) {
