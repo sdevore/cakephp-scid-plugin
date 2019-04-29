@@ -1174,6 +1174,10 @@ TAG;
         }
         $options['data-toggle'] = 'toggle';
         $onSwitch = '';
+        $method = 'GET';
+        if (!empty($options['method'])) {
+            $method = $options['method'];
+        }
         if (!empty($options['url'])) {
             $url = $options['url'];
             if (is_array($url)) {
@@ -1186,7 +1190,7 @@ TAG;
     $('#{$idForInput}').change(function() {
     var state=$(this).prop('checked');
       $.ajax({
-  type: "GET",
+  type: "{$method}",
   url: "{$url}&new_state=" + state,
   data: state,
   cache: false,
