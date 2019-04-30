@@ -1176,7 +1176,7 @@ TAG;
         $onSwitch = '';
         $method = 'GET';
         if (!empty($options['method'])) {
-            $method = $options['method'];
+            $method = strtoupper($options['method']);
         }
         if (!empty($options['url'])) {
             $url = $options['url'];
