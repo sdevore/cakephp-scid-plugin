@@ -1155,8 +1155,8 @@ TAG;
 
     /**
      * https://github.com/minhur/bootstrap-toggle
-     * @param $fieldName
-     * @param $options
+     * @param string $fieldName
+     * @param array $options can use $options['method'] to set POST or GET or PUT defaults to GET
      *
      * @return string
      */
