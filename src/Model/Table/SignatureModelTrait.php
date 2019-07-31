@@ -32,7 +32,7 @@
             }
             $array = [];
             if ($data) {
-                $fileName = uniqid('signature');
+                $fileName = uniqid('signature') . '.svg';
                 $file = new File(TMP . $fileName, TRUE);
                 $result = $file->write($data);
                 if ($result) {
