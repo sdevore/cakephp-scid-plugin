@@ -4,6 +4,7 @@ namespace Scid\Model\Behavior;
 
 use App\Model\Entity\Payment;
 use App\Model\Table\PaymentsTable;
+use Cake\Log\Log;
 use Money\Number;
 use Scid\Model\Entity\MoneyEntityTrait;
 use ArrayObject;
@@ -211,7 +212,7 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         return $payment;
 
     }
-    
+
     public function updateCustomerPaymentInformation($paymentInfo) {
         return null;
     }
@@ -934,6 +935,10 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                 $payment->setError('card_code', [__('credit card verification number is required')]);
             }
             if (!empty($payment->expiration_date)) {
+                $month = $payment->expiration_date->month;
+                $year = $payment->expiration_date->year;
+                //Log::debug( $year, 'payment_debug');
+                //Log::debug( $month, 'payment_debug');
                 $card->setExpirationDate($payment->expiration_date->format('Y-m'));
             } else {
                 $payment->setError('expiration_date', [__('no valid expiration date was set')]);

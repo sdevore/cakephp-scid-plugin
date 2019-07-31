@@ -75,7 +75,11 @@ trait ScidPaymentTrait
             $this->setExpMonthYear($this->_properties['expMonth'], $this->_properties['expYear']);
         }
         try {
-            return FrozenDate::createFromFormat( 'm/Y',$this->expDate);
+            $month = $this->_properties['expMonth'];
+            $year = $this->_properties['expYear'];
+            $date = new FrozenDate();
+            $date = $date->setDate($year, $month, 1);
+            return $date;
         } catch (Exception $e) {
             return NULL;
         }
