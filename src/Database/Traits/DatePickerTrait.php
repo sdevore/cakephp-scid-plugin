@@ -197,17 +197,6 @@
             ]);
         }
 
-        public function getDatesFromDurationString ($duration) {
-            if (strpos($duration, '-') !== FALSE) {
-                list($start, $end) = explode('-', $duration);
-                $start = trim($start);
-                $end = trim($end);
-                $start = Time::parse($start);
-                $end = Time::parse($end);
 
-                return ['start'=> $start, 'end'=>$end];
-            }
-            return null;
-        }
 
     }
