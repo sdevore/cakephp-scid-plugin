@@ -5,6 +5,8 @@ namespace Scid\Model\Behavior;
 use App\Model\Entity\Payment;
 use App\Model\Table\PaymentsTable;
 use Cake\Log\Log;
+use Cake\ORM\Locator\TableLocator;
+use Cake\ORM\TableRegistry;
 use Money\Number;
 use Scid\Model\Entity\MoneyEntityTrait;
 use ArrayObject;
@@ -34,6 +36,7 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
 
     use MoneyEntityTrait;
     use ScidPaymentsTrait;
+
     /**
      * Default configuration.
      *
@@ -94,17 +97,117 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                     break;
             }
             if (!empty($payment->save_payment_information) && $payment->save_payment_information) {
-                $this->saveCustomerAndPayment($payment);
+                if (!empty($options[self::TRANSACTION_TYPE_KEY])) {
+                    switch ($options[self::TRANSACTION_TYPE_KEY]) {
+                        case self::TRANSACTION_TYPE_CAPTURE:
+                        case self::TRANSACTION_TYPE_AUTH_CAPTURE:
+                            $test = $this->saveCustomerAndPayment($payment);
+                            if (!empty($test->getError('save_payment_information'))) {
+                                $payment->set('save_payment_information_error', $test->getError('save_payment_information'));
+                            }
+
+                    }
+                }
             }
         }
+    }
+
+
+    /**
+     * @param \App\Model\Entity\Payment $payment
+     * @return bool|\App\Model\Entity\Payment
+     */
+    function createCustomerProfileFromTransaction($payment) {
+        /* Create a merchantAuthenticationType object with authentication details
+           retrieved from the constants file */
+        $merchantAuthentication = $this->__getMerchantAuthentication();
+        // Set the transaction's refId
+        $refId = 'ref' . time();
+
+        $customerProfile = new AnetAPI\CustomerProfileBaseType();
+        $customerProfile->setMerchantCustomerId($payment->member_id);
+        $customerProfile->setEmail($payment->member->email);
+        $customerProfile->setDescription($payment->member->name);
+
+        $request = new AnetAPI\CreateCustomerProfileFromTransactionRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setTransId($payment->transactionNumber);
+
+        // You can either specify the customer information in form of customerProfileBaseType object
+        if (empty($payment->member->customer_profiles)) {
+            $request->setCustomer($customerProfile);
+        } else {
+            // find one that matches type
+            $found = FALSE;
+            foreach ($payment->member->customer_profiles as $customer_profile) {
+                if ($customer_profile->config == $this->_credentials) {
+                    $request->setCustomerProfileId($customer_profile->profile_id);
+                    $found = TRUE;
+                }
+            }
+            if (!$found) {
+                $request->setCustomer($customerProfile);
+            }
+        }
+        //  OR
+        // You can just provide the customer Profile ID
+        //$request->setCustomerProfileId("123343");
+
+        $controller = new AnetController\CreateCustomerProfileFromTransactionController($request);
+
+        /** @var \net\authorize\api\contract\v1\CreateCustomerProfileResponse $response */
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+        if (($response != NULL) && ($response->getMessages()->getResultCode() == "Ok")) {
+            /** @var \Scid\Model\Table\CustomerProfilesTable $customerProfiles */
+            $profile_id = $response->getCustomerProfileId();
+            $customerProfiles = TableRegistry::getTableLocator()->get('Scid.CustomerProfiles');
+            $profile = $customerProfiles->newEntity(
+                ['member_id'  => $payment->member->id,
+                 'profile_id' => $profile_id,
+                 'config'     => $this->_credentials,
+                 'email'      => $payment->member->email,
+                ]);
+            if (!empty($response->getCustomerPaymentProfileIdList())) {
+                $payment_profile_id_list = $response->getCustomerPaymentProfileIdList();
+                $id = array_shift($payment_profile_id_list);
+                $payment = $customerProfiles->PaymentProfiles->newEntity([
+                                                                             'member_id'           => $payment->member->id,
+                                                                             'customer_profile_id' => $profile_id,
+                                                                             'payment_profile_id'  => $id,
+                                                                             'card_number'         => $payment->credit_card_number,
+                                                                             'expiration_date'     => $payment->expDate,
+                                                                             'is_default'          => TRUE,
+                                                                         ]);
+                $profile->payment_profiles = [$payment];
+            }
+            if ($customerProfiles->save($profile)) {
+                $payment->set('customer_profiles', [$profile]);
+            } else {
+                $payment->setError('save_payment_information', $payment->getErrors());
+            }
+        } else {
+
+            $errorMessages = $response->getMessages()->getMessage();
+
+            $payment->setError('save_payment_information', $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText());
+        }
+        return $payment;
     }
 
     /**
      * @param EntityInterface|\App\Model\Entity\Payment $payment
      *
-     * @return bool
+     * @return bool|\App\Model\Entity\Payment
      */
-    public function saveCustomerAndPayment($payment) {
+    public
+    function saveCustomerAndPayment($payment) {
+
+        if (!empty($payment->transactionNumber)) {
+            return $this->createCustomerProfileFromTransaction($payment);
+        } else {
+
+        }
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $authPayment = $this->__getAuthPayment($payment);
         $order = $this->__getOrder($payment);
@@ -213,15 +316,17 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
 
     }
 
-    public function updateCustomerPaymentInformation($paymentInfo) {
-        return null;
+    public
+    function updateCustomerPaymentInformation($paymentInfo) {
+        return NULL;
     }
 
     /**
      * @param Payment|EntityInterface $payment
      * @return Payment|boolean
      */
-    public function authorize($payment) {
+    public
+    function authorize($payment) {
         $transactionType = self::TRANSACTION_TYPE_AUTHORIZE;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $authPayment = $this->__getAuthPayment($payment);
@@ -337,7 +442,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      * @param array                   $options
      * @return Payment|boolean
      */
-    public function capture($payment, $options = []) {
+    public
+    function capture($payment, $options = []) {
         $transactionType = self::TRANSACTION_TYPE_CAPTURE;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $authPayment = $this->__getAuthPayment($payment);
@@ -452,7 +558,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return Payment|boolean
      */
-    public function charge($payment) {
+    public
+    function charge($payment) {
         $transactionType = self::TRANSACTION_TYPE_AUTH_CAPTURE;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $authPayment = $this->__getAuthPayment($payment);
@@ -565,7 +672,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return bool
      */
-    public function void($payment) {
+    public
+    function void($payment) {
         $transactionType = self::TRANSACTION_TYPE_VOID;
         $merchantAuthentication = $this->__getMerchantAuthentication();
         if ($payment->scid_state != self::STATE_APPROVED) {
@@ -680,7 +788,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return array
      */
-    public function charge2($data, $member) {
+    public
+    function charge2($data, $member) {
         $merchantAuthentication = $this->__getMerchantAuthentication();
         $this->__getReferenceId();
 
@@ -808,14 +917,16 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
     /**
      * @return string
      */
-    protected function __getReferenceId() {
+    protected
+    function __getReferenceId() {
         return 'ref' . time();
     }
 
     /**
      * @return AnetAPI\SettingType
      */
-    protected function __duplicateWindowSetting(): AnetAPI\SettingType {
+    protected
+    function __duplicateWindowSetting(): AnetAPI\SettingType {
 // Add values for transaction settings
         $duplicateWindowSetting = new AnetAPI\SettingType();
         $duplicateWindowSetting->setSettingName("duplicateWindow");
@@ -823,7 +934,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         return $duplicateWindowSetting;
     }
 
-    protected function __emailCustomerSetting($value = FALSE): AnetAPI\SettingType {
+    protected
+    function __emailCustomerSetting($value = FALSE): AnetAPI\SettingType {
         $setting = new AnetAPI\SettingType();
         $setting->setSettingName("emailCustomer");
         $setting->setSettingValue($value);
@@ -835,7 +947,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return AnetAPI\CustomerDataType
      */
-    protected function __getCustomerData($payment): AnetAPI\CustomerDataType {
+    protected
+    function __getCustomerData($payment): AnetAPI\CustomerDataType {
         $customerData = new AnetAPI\CustomerDataType();
         $customerData->setType("individual");
         if (!empty($payment->email)) {
@@ -856,13 +969,24 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return AnetAPI\CustomerAddressType
      */
-    protected function __getCustomerAddress($payment): AnetAPI\CustomerAddressType {
+    protected
+    function __getCustomerAddress($payment): AnetAPI\CustomerAddressType {
         $customerAddress = new AnetAPI\CustomerAddressType();
         $customerAddress->setFirstName($payment->first);
         $customerAddress->setLastName($payment->last);
         if (!empty($payment->zip)) {
             $customerAddress->setZip($payment->zip);
         }
+        if (!empty($payment->address)) {
+            $customerAddress->setAddress($payment->address);
+        }
+        if (!empty($payment->city)) {
+            $customerAddress->setCity($payment->city);
+        }
+        if (!empty($payment->state)) {
+            $customerAddress->setState($payment->state);
+        }
+
         return $customerAddress;
     }
 
@@ -871,7 +995,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return array
      */
-    protected function __getPaymentItems($payment): array {
+    protected
+    function __getPaymentItems($payment): array {
         $items = [];
         if (!empty($payment->items)) {
             foreach ($payment->items as $index => $item) {
@@ -908,7 +1033,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return AnetAPI\PaymentType
      */
-    protected function __getAuthPayment($payment): AnetAPI\PaymentType {
+    protected
+    function __getAuthPayment($payment): AnetAPI\PaymentType {
         $paymentOne = new AnetAPI\PaymentType();
         // create the credit card
         $validatePayment = FALSE;
@@ -954,7 +1080,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      * @param string  $errorText
      * @return void
      */
-    protected function __setError($payment, $errorCode, $errorText): void {
+    protected
+    function __setError($payment, $errorCode, $errorText): void {
         $errorText = [$errorText];
         switch ($errorCode) {
             case 5:
@@ -992,7 +1119,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return AnetAPI\OrderType
      */
-    protected function __getOrder($payment): AnetAPI\OrderType {
+    protected
+    function __getOrder($payment): AnetAPI\OrderType {
         $order = new AnetAPI\OrderType();
         if (!empty($payment->registrationID)) {
             $invoiceNumber = $payment->registrationID;
@@ -1009,7 +1137,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         return $order;
     }
 
-    public function paymentStatuses() {
+    public
+    function paymentStatuses() {
         return [
             'Pending'  => 'Pending',
             'Approved' => 'Approved',
