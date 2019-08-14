@@ -48,7 +48,9 @@ class CustomerProfilesTable extends Table
             'joinType' => 'INNER',
             'className' => 'Members'
         ]);
-        $this->hasMany('Scid.PaymentProfiles');
+        $this->hasMany('Scid.PaymentProfiles')
+            ->setForeignKey('customer_profile_id')
+            ->setDependent(true);;
     }
 
 
