@@ -7,7 +7,7 @@ use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * ScidCustomerProfiles Model
+ * CustomerProfiles Model
  *
  * @property \Scid\Model\Table\MembersTable|\Cake\ORM\Association\BelongsTo $Members
  * @property \Scid\Model\Table\ProfilesTable|\Cake\ORM\Association\BelongsTo $Profiles
@@ -23,7 +23,7 @@ use Cake\Validation\Validator;
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
-class ScidCustomerProfilesTable extends Table
+class CustomerProfilesTable extends Table
 {
 
     /**
