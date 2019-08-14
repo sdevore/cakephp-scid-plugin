@@ -14,10 +14,11 @@ use Cake\ORM\Entity;
  * @property string $email
  * @property string $config
  *
- * @property \Scid\Model\Entity\Member $member
+ * @property \App\Model\Entity\Member $member
  * @property \Scid\Model\Entity\Profile $profile
+ * @property \Scid\Model\Entity\PaymentProfile[] $payment_profiles
  */
-class ScidCustomerProfile extends Entity
+class CustomerProfile extends Entity
 {
 
     /**

@@ -9,19 +9,20 @@ use Cake\Validation\Validator;
 /**
  * CustomerProfiles Model
  *
- * @property \Scid\Model\Table\MembersTable|\Cake\ORM\Association\BelongsTo $Members
+ * @property \App\Model\Table\MembersTable|\Cake\ORM\Association\BelongsTo $Members
  * @property \Scid\Model\Table\ProfilesTable|\Cake\ORM\Association\BelongsTo $Profiles
  *
- * @method \Scid\Model\Entity\ScidCustomerProfile get($primaryKey, $options = [])
- * @method \Scid\Model\Entity\ScidCustomerProfile newEntity($data = null, array $options = [])
- * @method \Scid\Model\Entity\ScidCustomerProfile[] newEntities(array $data, array $options = [])
- * @method \Scid\Model\Entity\ScidCustomerProfile|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Scid\Model\Entity\ScidCustomerProfile|bool saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Scid\Model\Entity\ScidCustomerProfile patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \Scid\Model\Entity\ScidCustomerProfile[] patchEntities($entities, array $data, array $options = [])
- * @method \Scid\Model\Entity\ScidCustomerProfile findOrCreate($search, callable $callback = null, $options = [])
+ * @method \Scid\Model\Entity\CustomerProfile get($primaryKey, $options = [])
+ * @method \Scid\Model\Entity\CustomerProfile newEntity($data = null, array $options = [])
+ * @method \Scid\Model\Entity\CustomerProfile[] newEntities(array $data, array $options = [])
+ * @method \Scid\Model\Entity\CustomerProfile|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \Scid\Model\Entity\CustomerProfile|bool saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \Scid\Model\Entity\CustomerProfile patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \Scid\Model\Entity\CustomerProfile[] patchEntities($entities, array $data, array $options = [])
+ * @method \Scid\Model\Entity\CustomerProfile findOrCreate($search, callable $callback = null, $options = [])
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
+ * @property \Scid\Model\Table\PaymentProfilesTable|\Cake\ORM\Association\HasMany $PaymentProfiles
  */
 class CustomerProfilesTable extends Table
 {
@@ -45,13 +46,9 @@ class CustomerProfilesTable extends Table
         $this->belongsTo('Members', [
             'foreignKey' => 'member_id',
             'joinType' => 'INNER',
-            'className' => 'Scid.Members'
+            'className' => 'Members'
         ]);
-        $this->belongsTo('Profiles', [
-            'foreignKey' => 'profile_id',
-            'joinType' => 'INNER',
-            'className' => 'Scid.Profiles'
-        ]);
+        $this->hasMany('Scid.PaymentProfiles');
     }
 
     /**
@@ -91,8 +88,6 @@ class CustomerProfilesTable extends Table
     {
         $rules->add($rules->isUnique(['email']));
         $rules->add($rules->existsIn(['member_id'], 'Members'));
-        $rules->add($rules->existsIn(['profile_id'], 'Profiles'));
-
         return $rules;
     }
 }

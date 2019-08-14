@@ -7,24 +7,24 @@ use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * ScidPaymentProfiles Model
+ * PaymentProfiles Model
  *
- * @property \Scid\Model\Table\MembersTable|\Cake\ORM\Association\BelongsTo $Members
+ * @property \Cake\ORM\Table|\Cake\ORM\Association\BelongsTo $Members
  * @property \Scid\Model\Table\CustomerProfilesTable|\Cake\ORM\Association\BelongsTo $CustomerProfiles
  * @property \Scid\Model\Table\PaymentProfilesTable|\Cake\ORM\Association\BelongsTo $PaymentProfiles
  *
- * @method \Scid\Model\Entity\ScidPaymentProfile get($primaryKey, $options = [])
- * @method \Scid\Model\Entity\ScidPaymentProfile newEntity($data = null, array $options = [])
- * @method \Scid\Model\Entity\ScidPaymentProfile[] newEntities(array $data, array $options = [])
- * @method \Scid\Model\Entity\ScidPaymentProfile|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Scid\Model\Entity\ScidPaymentProfile|bool saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Scid\Model\Entity\ScidPaymentProfile patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \Scid\Model\Entity\ScidPaymentProfile[] patchEntities($entities, array $data, array $options = [])
- * @method \Scid\Model\Entity\ScidPaymentProfile findOrCreate($search, callable $callback = null, $options = [])
+ * @method \Scid\Model\Entity\PaymentProfile get($primaryKey, $options = [])
+ * @method \Scid\Model\Entity\PaymentProfile newEntity($data = null, array $options = [])
+ * @method \Scid\Model\Entity\PaymentProfile[] newEntities(array $data, array $options = [])
+ * @method \Scid\Model\Entity\PaymentProfile|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \Scid\Model\Entity\PaymentProfile|bool saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \Scid\Model\Entity\PaymentProfile patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \Scid\Model\Entity\PaymentProfile[] patchEntities($entities, array $data, array $options = [])
+ * @method \Scid\Model\Entity\PaymentProfile findOrCreate($search, callable $callback = null, $options = [])
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
-class ScidPaymentProfilesTable extends Table
+class PaymentProfilesTable extends Table
 {
 
     /**
@@ -52,11 +52,6 @@ class ScidPaymentProfilesTable extends Table
             'foreignKey' => 'customer_profile_id',
             'joinType' => 'INNER',
             'className' => 'Scid.CustomerProfiles'
-        ]);
-        $this->belongsTo('PaymentProfiles', [
-            'foreignKey' => 'payment_profile_id',
-            'joinType' => 'INNER',
-            'className' => 'Scid.PaymentProfiles'
         ]);
     }
 
@@ -109,7 +104,6 @@ class ScidPaymentProfilesTable extends Table
     {
         $rules->add($rules->existsIn(['member_id'], 'Members'));
         $rules->add($rules->existsIn(['customer_profile_id'], 'CustomerProfiles'));
-        $rules->add($rules->existsIn(['payment_profile_id'], 'PaymentProfiles'));
 
         return $rules;
     }

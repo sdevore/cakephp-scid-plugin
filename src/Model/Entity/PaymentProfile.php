@@ -17,11 +17,11 @@ use Cake\ORM\Entity;
  * @property string $expiration_date
  * @property string $card_type
  *
- * @property \Scid\Model\Entity\Member $member
+ * @property \Cake\ORM\Entity $member
  * @property \Scid\Model\Entity\CustomerProfile $customer_profile
  * @property \Scid\Model\Entity\PaymentProfile $payment_profile
  */
-class ScidPaymentProfile extends Entity
+class PaymentProfile extends Entity
 {
 
     /**

@@ -3,7 +3,7 @@ namespace Scid\Test\TestCase\Model\Table;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
-use Scid\Model\Table\ScidPaymentProfilesTable;
+use Scid\Model\Table\PaymentProfilesTable;
 
 /**
  * Scid\Model\Table\ScidPaymentProfilesTable Test Case
@@ -14,7 +14,7 @@ class ScidPaymentProfilesTableTest extends TestCase
     /**
      * Test subject
      *
-     * @var \Scid\Model\Table\ScidPaymentProfilesTable
+     * @var \Scid\Model\Table\PaymentProfilesTable
      */
     public $ScidPaymentProfiles;
 
@@ -38,7 +38,7 @@ class ScidPaymentProfilesTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::getTableLocator()->exists('ScidPaymentProfiles') ? [] : ['className' => ScidPaymentProfilesTable::class];
+        $config = TableRegistry::getTableLocator()->exists('ScidPaymentProfiles') ? [] : ['className' => PaymentProfilesTable::class];
         $this->ScidPaymentProfiles = TableRegistry::getTableLocator()->get('ScidPaymentProfiles', $config);
     }
 
