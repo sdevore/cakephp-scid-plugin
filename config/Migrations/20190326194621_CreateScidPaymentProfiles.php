@@ -43,7 +43,7 @@ class CreateScidPaymentProfiles extends AbstractMigration
             'limit' => 64,
             'null' => false,
         ]);
-        $table->addColumn('default', 'boolean', [
+        $table->addColumn('is_default', 'boolean', [
             'default' => 0,
             'null' => false,
         ]);

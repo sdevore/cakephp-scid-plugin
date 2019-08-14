@@ -42,7 +42,11 @@ class PaymentProfilesTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
-
+        $this->addBehavior('Tools.Toggle', [
+            'field' => 'is_default',
+            'scopeFields' => ['customer_profile_id'],
+            'scope' => [],
+        ]);
         $this->belongsTo('Members', [
             'foreignKey' => 'member_id',
             'joinType' => 'INNER',
@@ -68,9 +72,7 @@ class PaymentProfilesTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
-            ->boolean('default')
-            ->requirePresence('default', 'create')
-            ->notEmpty('default');
+            ->boolean('is_default');
 
         $validator
             ->scalar('card_number')
@@ -83,12 +85,6 @@ class PaymentProfilesTable extends Table
             ->maxLength('expiration_date', 7)
             ->requirePresence('expiration_date', 'create')
             ->notEmpty('expiration_date');
-
-        $validator
-            ->scalar('card_type')
-            ->maxLength('card_type', 64)
-            ->requirePresence('card_type', 'create')
-            ->notEmpty('card_type');
 
         return $validator;
     }

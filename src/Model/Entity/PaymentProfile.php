@@ -12,7 +12,7 @@ use Cake\ORM\Entity;
  * @property int $member_id
  * @property string $customer_profile_id
  * @property string $payment_profile_id
- * @property bool $default
+ * @property bool $primary
  * @property string $card_number
  * @property string $expiration_date
  * @property string $card_type
@@ -39,7 +39,7 @@ class PaymentProfile extends Entity
         'member_id' => true,
         'customer_profile_id' => true,
         'payment_profile_id' => true,
-        'default' => true,
+        'primary' => true,
         'card_number' => true,
         'expiration_date' => true,
         'card_type' => true,

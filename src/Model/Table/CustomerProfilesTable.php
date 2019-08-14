@@ -51,6 +51,8 @@ class CustomerProfilesTable extends Table
         $this->hasMany('Scid.PaymentProfiles');
     }
 
+
+
     /**
      * Default validation rules.
      *
