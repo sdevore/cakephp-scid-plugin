@@ -268,17 +268,17 @@
         }
 
         /**
-         * @return MoneyPHP
+         * @return Money
          */
         public function absolute() {
-            return $this->_money->absolute();
+            return new Money($this->_money->absolute());
         }
 
         /**
-         * @return MoneyPHP
+         * @return Money
          */
         public function negative() {
-            return $this->_money->negative();
+            return new Money($this->_money->negative());
         }
 
         /**
