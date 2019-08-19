@@ -1033,8 +1033,7 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
      *
      * @return AnetAPI\PaymentType
      */
-    protected
-    function __getAuthPayment($payment): AnetAPI\PaymentType {
+    protected function __getAuthPayment($payment): AnetAPI\PaymentType {
         $paymentOne = new AnetAPI\PaymentType();
         // create the credit card
         $validatePayment = FALSE;
