@@ -8,29 +8,6 @@ use Cake\I18n\FrozenDate;
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
 
-interface ScidPaymentsInterface
-{
-
-
-    const TRANSACTION_ID_PREFIX_KEY = 'id-prefix';
-    const TRANSACTION_TRANSACTION_KEY_KEY = 'transaction-key';
-    const TRANSACTION_TYPE_KEY = 'transactionType';
-    const TRANSACTION_TYPE_AUTHORIZE = 'authOnlyTransaction';
-    const TRANSACTION_TYPE_AUTH_CAPTURE = 'authCaptureTransaction';
-    const TRANSACTION_TYPE_CAPTURE = 'priorAuthCaptureTransaction';
-    const TRANSACTION_TYPE_VOID = 'voidTransaction';
-    const TRANSACTION_TYPE_REFUND = 'refundTransaction';
-
-    const STATE_PENDING = 'Pending';
-    const STATE_APPROVED = 'Approved';
-    const STATE_FAILED = 'Failed';
-    const STATE_CAPTURED = 'Captured';
-    const STATE_SETTLED = 'Settled';
-    const STATE_VOIDED = 'Voided';
-    const STATE_REFUNDED = 'Refunded';
-
-}
-
 trait ScidPaymentsTrait
 {
     protected $_defaultPaymentConfig = [
@@ -44,6 +21,24 @@ trait ScidPaymentsTrait
     protected $_credentials = 'default';
 
     protected $_sandbox = TRUE;
+
+    /**
+     * @return AnetAPI\MerchantAuthenticationType
+     */
+    protected function __getMerchantAuthentication($credentials = NULL): AnetAPI\MerchantAuthenticationType {
+        if (empty($this->_options)) {
+            $this->_initialize([]);
+        }
+        $options = $this->_options;
+        if (!empty($configuration)) {
+            $options = $this->__options($credentials);
+        }
+
+        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+        $merchantAuthentication->setName($options['login_id']);
+        $merchantAuthentication->setTransactionKey($options['transaction_key']);
+        return $merchantAuthentication;
+    }
 
     public function _initialize(array $config) {
         $scid = Configure::read('Scid.payment');
@@ -71,22 +66,23 @@ trait ScidPaymentsTrait
         }
     }
 
-    /**
-     * @return AnetAPI\MerchantAuthenticationType
-     */
-    protected function __getMerchantAuthentication($credentials = null): AnetAPI\MerchantAuthenticationType {
-        if (empty($this->_options)) {
-            $this->_initialize([]);
+    protected function __options($credentials, $type = NULL) {
+        if (empty($credentials)) {
+            $credentials = $this->_defaultPaymentConfig['credentials'];
         }
-        $options = $this->_options;
-        if (!empty($configuration)) {
-            $options = $this->__options($credentials);
+        $scid = Configure::read('Scid.payment');
+        if (empty($type)) {
+            $type = $this->_defaultPaymentConfig['type'];
+            if (!empty($scid['default_type'])) {
+                $type = $scid['default_type'];
+            }
         }
-
-        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
-        $merchantAuthentication->setName($options['login_id']);
-        $merchantAuthentication->setTransactionKey($options['transaction_key']);
-        return $merchantAuthentication;
+        if (!empty($scid[$credentials][$type])) {
+            $options = $scid[$credentials][$type];
+        } else {
+            $options = $scid[$this->_defaultPaymentConfig['credentials']][$type];
+        }
+        return $options;
     }
 
     /**
@@ -126,14 +122,13 @@ trait ScidPaymentsTrait
                 //Log::debug( $year, 'payment_debug');
                 //Log::debug( $month, 'payment_debug');
                 $card->setExpirationDate($entity->expiration_date->format('Y-m'));
-            } elseif (!empty($entity->expMonth) && !empty($entity->expYear)) {
+            } else if (!empty($entity->expMonth) && !empty($entity->expYear)) {
                 $month = $entity->expMonth;
                 $year = $entity->expYear;
                 $date = new FrozenDate();
                 $date = $date->setDate($year, $month, 1);
                 $card->setExpirationDate($date->format('Y-m'));
-            }
-            else {
+            } else {
                 $entity->setError('expiration_date', [__('no valid expiration date was set')]);
             }
             $paymentOne->setCreditCard($card);
@@ -141,32 +136,35 @@ trait ScidPaymentsTrait
         return $paymentOne;
     }
 
-    protected function __options($credentials, $type = null) {
-        if (empty($credentials)) {
-            $credentials = $this->_defaultPaymentConfig['credentials'];
-        }
-        $scid = Configure::read('Scid.payment');
-        if (empty($type)) {
-            $type = $this->_defaultPaymentConfig['type'];
-            if (!empty($scid['default_type'])) {
-                $type = $scid['default_type'];
-            }
-        }
-        if (!empty($scid[$credentials][$type])) {
-            $options = $scid[$credentials][$type];
-        } else {
-            $options = $scid[$this->_defaultPaymentConfig['credentials']][$type];
-        }
-        return $options;
-    }
-
     protected function getEndpoint() {
         if ($this->_sandbox) {
             $endPoint = \net\authorize\api\constants\ANetEnvironment::SANDBOX;
-        }
-        else {
+        } else {
             $endPoint = \net\authorize\api\constants\ANetEnvironment::PRODUCTION;
         }
         return $endPoint;
     }
+}
+
+interface ScidPaymentsInterface
+{
+
+
+    const TRANSACTION_ID_PREFIX_KEY = 'id-prefix';
+    const TRANSACTION_TRANSACTION_KEY_KEY = 'transaction-key';
+    const TRANSACTION_TYPE_KEY = 'transactionType';
+    const TRANSACTION_TYPE_AUTHORIZE = 'authOnlyTransaction';
+    const TRANSACTION_TYPE_AUTH_CAPTURE = 'authCaptureTransaction';
+    const TRANSACTION_TYPE_CAPTURE = 'priorAuthCaptureTransaction';
+    const TRANSACTION_TYPE_VOID = 'voidTransaction';
+    const TRANSACTION_TYPE_REFUND = 'refundTransaction';
+
+    const STATE_PENDING = 'Pending';
+    const STATE_APPROVED = 'Approved';
+    const STATE_FAILED = 'Failed';
+    const STATE_CAPTURED = 'Captured';
+    const STATE_SETTLED = 'Settled';
+    const STATE_VOIDED = 'Voided';
+    const STATE_REFUNDED = 'Refunded';
+
 }
