@@ -90,6 +90,9 @@ class PaymentProfile extends Entity
 
 
     public function updateFromRemote() {
+        if (empty($this->customer_profile)) {
+            return false;
+        }
         $auth = $this->__getMerchantAuthentication();
 
         // Set the transaction's refId
