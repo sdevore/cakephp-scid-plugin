@@ -1,16 +1,23 @@
 <?php
+
 namespace Scid\Model\Table;
 
+use ArrayObject;
+use Cake\Datasource\EntityInterface;
+use Cake\Event\Event;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Scid\Utility\ScidPaymentsTrait;
+use net\authorize\api\contract\v1 as AnetAPI;
+use net\authorize\api\controller as AnetController;
 
 /**
  * CustomerProfiles Model
  *
- * @property \App\Model\Table\MembersTable|\Cake\ORM\Association\BelongsTo $Members
- * @property \Scid\Model\Table\ProfilesTable|\Cake\ORM\Association\BelongsTo $Profiles
+ * @property \App\Model\Table\MembersTable|\Cake\ORM\Association\BelongsTo        $Members
+ * @property \Scid\Model\Table\ProfilesTable|\Cake\ORM\Association\BelongsTo      $Profiles
  *
  * @method \Scid\Model\Entity\CustomerProfile get($primaryKey, $options = [])
  * @method \Scid\Model\Entity\CustomerProfile newEntity($data = null, array $options = [])
@@ -27,14 +34,15 @@ use Cake\Validation\Validator;
 class CustomerProfilesTable extends Table
 {
 
+    use ScidPaymentsTrait;
+
     /**
      * Initialize method
      *
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
-    {
+    public function initialize(array $config) {
         parent::initialize($config);
 
         $this->setTable('scid_customer_profiles');
@@ -45,14 +53,61 @@ class CustomerProfilesTable extends Table
 
         $this->belongsTo('Members', [
             'foreignKey' => 'member_id',
-            'joinType' => 'INNER',
-            'className' => 'Members'
+            'joinType'   => 'INNER',
+            'className'  => 'Members',
         ]);
         $this->hasMany('Scid.PaymentProfiles')
-            ->setForeignKey('customer_profile_id')
-            ->setDependent(true);;
+             ->setForeignKey('customer_profile_id')
+             ->setDependent(TRUE);;
     }
 
+    public function beforeSave(Event $event, EntityInterface $entity, ArrayObject $options) {
+        if ($entity->isNew()) {
+            if (!$this->createCustomerProfile($entity)) {
+                $event->stopPropagation();
+            }
+        }
+    }
+
+    /**
+     * @param \Scid\Model\Entity\CustomerProfile|EntityInterface $customer_profile
+     *
+     * @return \Scid\Model\Entity\CustomerProfile|bool
+     */
+    protected function createCustomerProfile($customer_profile) {
+        if (empty($customer_profile->member)) {
+            $customer_profile->member = $this->Members->get($customer_profile->member_id);
+        }
+        $merchantAuthentication = $this->__getMerchantAuthentication();
+
+        // Set the transaction's refId
+        $refId = 'ref' . time();
+        $customerProfile = new AnetAPI\CustomerProfileType();
+        $customerProfile->setDescription(__('{0}', [$customer_profile->member->name]));
+        $customerProfile->setMerchantCustomerId($customer_profile->member->id);
+        $customerProfile->setEmail($customer_profile->member->email);
+
+        // Assemble the complete transaction request
+        $request = new AnetAPI\CreateCustomerProfileRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setProfile($customerProfile);
+
+        // Create the controller and get the response
+        $controller = new AnetController\CreateCustomerProfileController($request);
+        /** @var \net\authorize\api\contract\v1\CreateCustomerProfileResponse $response */
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            $customer_profile->profile_id = $response->getCustomerProfileId();
+
+        } else {
+            $errorMessages = $response->getMessages()->getMessage();
+            $customer_profile->setError('create_customer_profile', [ $errorMessages[0]->getCode() . "  " .$errorMessages[0]->getText()]);
+            return false;
+        }
+        return $customer_profile;
+    }
 
 
     /**
@@ -61,8 +116,7 @@ class CustomerProfilesTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
-    {
+    public function validationDefault(Validator $validator) {
         $validator
             ->uuid('id')
             ->allowEmpty('id', 'create');
@@ -88,8 +142,7 @@ class CustomerProfilesTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
-    {
+    public function buildRules(RulesChecker $rules) {
         $rules->add($rules->isUnique(['email']));
         $rules->add($rules->existsIn(['member_id'], 'Members'));
         return $rules;
