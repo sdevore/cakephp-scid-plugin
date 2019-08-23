@@ -285,6 +285,7 @@ class PaymentProfilesTable extends Table
         });
         return $query->formatResults(function (\Cake\Collection\CollectionInterface $results) {
             return $results->map(function ($paymentProfile) {
+                /** @var \Scid\Model\Entity\PaymentProfile $paymentProfile */
                 $paymentProfile->updateFromRemote();
                 return $paymentProfile;
             });

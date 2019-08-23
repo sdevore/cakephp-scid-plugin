@@ -22,24 +22,6 @@ trait ScidPaymentsTrait
 
     protected $_sandbox = TRUE;
 
-    /**
-     * @return AnetAPI\MerchantAuthenticationType
-     */
-    protected function __getMerchantAuthentication($credentials = NULL): AnetAPI\MerchantAuthenticationType {
-        if (empty($this->_options)) {
-            $this->_initialize([]);
-        }
-        $options = $this->_options;
-        if (!empty($configuration)) {
-            $options = $this->__options($credentials);
-        }
-
-        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
-        $merchantAuthentication->setName($options['login_id']);
-        $merchantAuthentication->setTransactionKey($options['transaction_key']);
-        return $merchantAuthentication;
-    }
-
     public function _initialize(array $config) {
         $scid = Configure::read('Scid.payment');
 
@@ -66,25 +48,7 @@ trait ScidPaymentsTrait
         }
     }
 
-    protected function __options($credentials, $type = NULL) {
-        if (empty($credentials)) {
-            $credentials = $this->_defaultPaymentConfig['credentials'];
-        }
-        $scid = Configure::read('Scid.payment');
-        if (empty($type)) {
-            $type = $this->_defaultPaymentConfig['type'];
-            if (!empty($scid['default_type'])) {
-                $type = $scid['default_type'];
-            }
-        }
-        if (!empty($scid[$credentials][$type])) {
-            $options = $scid[$credentials][$type];
-        } else {
-            $options = $scid[$this->_defaultPaymentConfig['credentials']][$type];
-        }
-        return $options;
-    }
-
+// private methods
     /**
      * @param $entity
      *
@@ -134,6 +98,43 @@ trait ScidPaymentsTrait
             $paymentOne->setCreditCard($card);
         }
         return $paymentOne;
+    }
+
+    /**
+     * @return AnetAPI\MerchantAuthenticationType
+     */
+    protected function __getMerchantAuthentication($credentials = NULL): AnetAPI\MerchantAuthenticationType {
+        if (empty($this->_options)) {
+            $this->_initialize([]);
+        }
+        $options = $this->_options;
+        if (!empty($configuration)) {
+            $options = $this->__options($credentials);
+        }
+
+        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+        $merchantAuthentication->setName($options['login_id']);
+        $merchantAuthentication->setTransactionKey($options['transaction_key']);
+        return $merchantAuthentication;
+    }
+
+    protected function __options($credentials, $type = NULL) {
+        if (empty($credentials)) {
+            $credentials = $this->_defaultPaymentConfig['credentials'];
+        }
+        $scid = Configure::read('Scid.payment');
+        if (empty($type)) {
+            $type = $this->_defaultPaymentConfig['type'];
+            if (!empty($scid['default_type'])) {
+                $type = $scid['default_type'];
+            }
+        }
+        if (!empty($scid[$credentials][$type])) {
+            $options = $scid[$credentials][$type];
+        } else {
+            $options = $scid[$this->_defaultPaymentConfig['credentials']][$type];
+        }
+        return $options;
     }
 
     protected function getEndpoint() {

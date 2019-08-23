@@ -70,7 +70,7 @@ class CustomerProfilesTable extends Table
     }
 
     /**
-     * @param \Scid\Model\Entity\CustomerProfile|EntityInterface $customer_profile
+     * @param \Scid\Model\Entity\CustomerProfile|EntityInterface|\Scid\Model\Entity\CustomerProfile $customer_profile
      *
      * @return \Scid\Model\Entity\CustomerProfile|bool
      */
@@ -87,24 +87,39 @@ class CustomerProfilesTable extends Table
         $customerProfile->setMerchantCustomerId($customer_profile->member->id);
         $customerProfile->setEmail($customer_profile->member->email);
 
-        // Assemble the complete transaction request
-        $request = new AnetAPI\CreateCustomerProfileRequest();
+        // check for existing profile
+
+        $request = new AnetAPI\GetCustomerProfileRequest();
         $request->setMerchantAuthentication($merchantAuthentication);
-        $request->setRefId($refId);
-        $request->setProfile($customerProfile);
+        $request->setEmail($customer_profile->member->email);
+        $controller = new AnetController\GetCustomerProfileController($request);
+        /** @var \net\authorize\api\contract\v1\GetCustomerPaymentProfileResponse $response */
+        $response = $controller->executeWithApiResponse($this->getEndpoint());
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok") ) {
+            /** @var \net\authorize\api\contract\v1\CustomerPaymentProfileType $profileSelected */
+            $profileSelected = $response->getProfile();
+            $customer_profile->profile_id = $profileSelected->getCustomerProfileId();
+        }
+        else {
+            // Assemble the complete transaction request
+            $request = new AnetAPI\CreateCustomerProfileRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setProfile($customerProfile);
 
-        // Create the controller and get the response
-        $controller = new AnetController\CreateCustomerProfileController($request);
-        /** @var \net\authorize\api\contract\v1\CreateCustomerProfileResponse $response */
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+            // Create the controller and get the response
+            $controller = new AnetController\CreateCustomerProfileController($request);
+            /** @var \net\authorize\api\contract\v1\CreateCustomerProfileResponse $response */
+            $response = $controller->executeWithApiResponse($this->getEndpoint());
 
-        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
-            $customer_profile->profile_id = $response->getCustomerProfileId();
+            if (($response != NULL) && ($response->getMessages()->getResultCode() == "Ok")) {
+                $customer_profile->profile_id = $response->getCustomerProfileId();
 
-        } else {
-            $errorMessages = $response->getMessages()->getMessage();
-            $customer_profile->setError('create_customer_profile', [ $errorMessages[0]->getCode() . "  " .$errorMessages[0]->getText()]);
-            return false;
+            } else {
+                $errorMessages = $response->getMessages()->getMessage();
+                $customer_profile->setError('create_customer_profile', [$errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText()]);
+                return FALSE;
+            }
         }
         return $customer_profile;
     }

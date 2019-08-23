@@ -5,6 +5,7 @@ namespace Scid\Model\Entity;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenDate;
 use Cake\ORM\Entity;
+use Cake\ORM\TableRegistry;
 use Scid\Utility\ScidPaymentsTrait;
 
 /**
@@ -91,7 +92,8 @@ class PaymentProfile extends Entity
 
     public function updateFromRemote() {
         if (empty($this->customer_profile)) {
-            return false;
+            $customerProfileTable =  TableRegistry::getTableLocator()->get('Scid.CustomerProfiles');
+            $this->customer_profile = $customerProfileTable->get($this->customer_profile_id);
         }
         $auth = $this->__getMerchantAuthentication();
 
@@ -147,6 +149,9 @@ class PaymentProfile extends Entity
         }
     }
 
+    /**
+     * @return \Cake\I18n\FrozenDate
+     */
     protected function _getExpiration() {
         if ($this->has('expiration_date') && !empty($this->_properties['expiration_date'])) {
             list($year, $month) = explode('-', $this->_properties['expiration_date']);

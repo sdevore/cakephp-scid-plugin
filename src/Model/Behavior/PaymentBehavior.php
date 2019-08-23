@@ -123,75 +123,105 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         $merchantAuthentication = $this->__getMerchantAuthentication();
         // Set the transaction's refId
         $refId = 'ref' . time();
+        // check if there is an existing profile
+        // check for existing profile
 
-        $customerProfile = new AnetAPI\CustomerProfileBaseType();
-        $customerProfile->setMerchantCustomerId($payment->member_id);
-        $customerProfile->setEmail($payment->member->email);
-        $customerProfile->setDescription($payment->member->name);
 
-        $request = new AnetAPI\CreateCustomerProfileFromTransactionRequest();
-        $request->setMerchantAuthentication($merchantAuthentication);
-        $request->setTransId($payment->transactionNumber);
+            $customerProfile = new AnetAPI\CustomerProfileBaseType();
+            $customerProfile->setMerchantCustomerId($payment->member_id);
+            $customerProfile->setEmail($payment->member->email);
+            $customerProfile->setDescription($payment->member->name);
 
-        // You can either specify the customer information in form of customerProfileBaseType object
-        if (empty($payment->member->customer_profiles)) {
-            $request->setCustomer($customerProfile);
-        } else {
-            // find one that matches type
-            $found = FALSE;
-            foreach ($payment->member->customer_profiles as $customer_profile) {
-                if ($customer_profile->config == $this->_credentials) {
-                    $request->setCustomerProfileId($customer_profile->profile_id);
-                    $found = TRUE;
+            $request = new AnetAPI\CreateCustomerProfileFromTransactionRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setTransId($payment->transactionNumber);
+
+            // You can either specify the customer information in form of customerProfileBaseType object
+            if (empty($payment->member->customer_profiles)) {
+                $getCustomerRequest = new AnetAPI\GetCustomerProfileRequest();
+                $getCustomerRequest->setMerchantAuthentication($merchantAuthentication);
+                $getCustomerRequest->setEmail($payment->member->email);
+                $controller = new AnetController\GetCustomerProfileController($getCustomerRequest);
+                /** @var \net\authorize\api\contract\v1\GetCustomerPaymentProfileResponse $response */
+                $response = $controller->executeWithApiResponse($this->getEndpoint());
+                if (($response != null) && ($response->getMessages()->getResultCode() == "Ok") ) {
+                    /** @var \net\authorize\api\contract\v1\CustomerPaymentProfileType $profileSelected */
+                    $profileSelected = $response->getProfile();
+                    $customer_profile_id = $profileSelected->getCustomerProfileId();
+                    $customerProfiles = TableRegistry::getTableLocator()->get('Scid.CustomerProfiles');
+                    $profile = $customerProfiles->newEntity(
+                        ['member_id'  => $payment->member->id,
+                         'profile_id' => $customer_profile_id,
+                         'config'     => $this->_credentials,
+                         'email'      => $payment->member->email,
+                        ]);
+                    if ($customerProfiles->save($profile)) {
+                        $payment->set('customer_profiles', [$profile]);
+                    } else {
+                        $payment->setError('save_payment_information', $payment->getErrors());
+                    }
+                    $request->setCustomerProfileId($profile->profile_id);
+                }
+                else {
+                    $request->setCustomer($customerProfile);
+                }
+
+            } else {
+                // find one that matches type
+                $found = FALSE;
+                foreach ($payment->member->customer_profiles as $customer_profile) {
+                    if ($customer_profile->config == $this->_credentials) {
+                        $request->setCustomerProfileId($customer_profile->profile_id);
+                        $found = TRUE;
+                    }
+                }
+                if (!$found) {
+                    $request->setCustomer($customerProfile);
                 }
             }
-            if (!$found) {
-                $request->setCustomer($customerProfile);
-            }
-        }
-        //  OR
-        // You can just provide the customer Profile ID
-        //$request->setCustomerProfileId("123343");
+            //  OR
+            // You can just provide the customer Profile ID
+            //$request->setCustomerProfileId("123343");
 
-        $controller = new AnetController\CreateCustomerProfileFromTransactionController($request);
+            $controller = new AnetController\CreateCustomerProfileFromTransactionController($request);
 
-        /** @var \net\authorize\api\contract\v1\CreateCustomerProfileResponse $response */
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+            /** @var \net\authorize\api\contract\v1\CreateCustomerProfileResponse $response */
+            $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
 
-        if (($response != NULL) && ($response->getMessages()->getResultCode() == "Ok")) {
-            /** @var \Scid\Model\Table\CustomerProfilesTable $customerProfiles */
-            $profile_id = $response->getCustomerProfileId();
-            $customerProfiles = TableRegistry::getTableLocator()->get('Scid.CustomerProfiles');
-            $profile = $customerProfiles->newEntity(
-                ['member_id'  => $payment->member->id,
-                 'profile_id' => $profile_id,
-                 'config'     => $this->_credentials,
-                 'email'      => $payment->member->email,
-                ]);
-            if (!empty($response->getCustomerPaymentProfileIdList())) {
-                $payment_profile_id_list = $response->getCustomerPaymentProfileIdList();
-                $id = array_shift($payment_profile_id_list);
-                $payment = $customerProfiles->PaymentProfiles->newEntity([
-                                                                             'member_id'           => $payment->member->id,
-                                                                             'customer_profile_id' => $profile_id,
-                                                                             'payment_profile_id'  => $id,
-                                                                             'card_number'         => $payment->credit_card_number,
-                                                                             'expiration_date'     => $payment->expDate,
-                                                                             'is_default'          => TRUE,
-                                                                         ]);
-                $profile->payment_profiles = [$payment];
-            }
-            if ($customerProfiles->save($profile)) {
-                $payment->set('customer_profiles', [$profile]);
+            if (($response != NULL) && ($response->getMessages()->getResultCode() == "Ok")) {
+                /** @var \Scid\Model\Table\CustomerProfilesTable $customerProfiles */
+                $profile_id = $response->getCustomerProfileId();
+                $customerProfiles = TableRegistry::getTableLocator()->get('Scid.CustomerProfiles');
+                $profile = $customerProfiles->newEntity(
+                    ['member_id'  => $payment->member->id,
+                     'profile_id' => $profile_id,
+                     'config'     => $this->_credentials,
+                     'email'      => $payment->member->email,
+                    ]);
+                if (!empty($response->getCustomerPaymentProfileIdList())) {
+                    $payment_profile_id_list = $response->getCustomerPaymentProfileIdList();
+                    $id = array_shift($payment_profile_id_list);
+                    $payment = $customerProfiles->PaymentProfiles->newEntity([
+                                                                                 'member_id'           => $payment->member->id,
+                                                                                 'customer_profile_id' => $profile_id,
+                                                                                 'payment_profile_id'  => $id,
+                                                                                 'card_number'         => $payment->credit_card_number,
+                                                                                 'expiration_date'     => $payment->expDate,
+                                                                                 'is_default'          => TRUE,
+                                                                             ]);
+                    $profile->payment_profiles = [$payment];
+                }
+                if ($customerProfiles->save($profile)) {
+                    $payment->set('customer_profiles', [$profile]);
+                } else {
+                    $payment->setError('save_payment_information', $payment->getErrors());
+                }
             } else {
-                $payment->setError('save_payment_information', $payment->getErrors());
+
+                $errorMessages = $response->getMessages()->getMessage();
+
+                $payment->setError('save_payment_information', $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText());
             }
-        } else {
-
-            $errorMessages = $response->getMessages()->getMessage();
-
-            $payment->setError('save_payment_information', $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText());
-        }
         return $payment;
     }
 
@@ -206,114 +236,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         if (!empty($payment->transactionNumber)) {
             return $this->createCustomerProfileFromTransaction($payment);
         } else {
-
-        }
-        $merchantAuthentication = $this->__getMerchantAuthentication();
-        $authPayment = $this->__getAuthPayment($payment);
-        $order = $this->__getOrder($payment);
-
-        $customerData = $this->__getCustomerData($payment);
-        $customerAddress = $this->__getCustomerAddress($payment);
-
-
-        // Create a TransactionRequestType object and add the previous objects to it
-        $transactionRequestType = new AnetAPI\TransactionRequestType();
-
-        $transactionRequestType->setTransactionType($transactionType);
-        $amount = $this->cleanMoney($payment->amountPaid);
-        $transactionRequestType->setAmount($amount);
-        $transactionRequestType->setOrder($order);
-        $transactionRequestType->setPayment($authPayment);
-        $transactionRequestType->setCustomer($customerData);
-        $transactionRequestType->setBillTo($customerAddress);
-        $transactionRequestType->addToTransactionSettings($this->__duplicateWindowSetting());
-        $transactionRequestType->addToTransactionSettings($this->__emailCustomerSetting(FALSE));
-        // Assemble the complete transaction request
-        $request = new AnetAPI\CreateTransactionRequest();
-        $request->setMerchantAuthentication($merchantAuthentication);
-        $payment->scid_ref_id = $this->__getReferenceId();
-        $request->setRefId($payment->scid_ref_id);
-
-        $request->setTransactionRequest($transactionRequestType);
-        // Create the controller and get the response
-        $controller = new AnetController\CreateTransactionController($request);
-        if (!$payment->getErrors()) {
-            if ($this->_sandbox) {
-                $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
-            } else {
-                $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
-            }
-            $result = [];
-            if ($response != NULL) {
-                $result['response'] = $response;
-                // Check to see if the API request was successfully received and acted upon
-                if ($response->getMessages()->getResultCode() == "Ok") {
-                    // Since the API request was successful, look for a transaction response
-                    // and parse it to display the results of authorizing the card
-                    /** @var AnetAPI\TransactionResponseType $tresponse */
-                    $tresponse = $response->getTransactionResponse();
-
-                    if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
-                        $payment->transactionNumber = $tresponse->getTransId();
-                        $payment->authorizationNumber = $tresponse->getAuthCode();
-                        $payment->scid_state = self::STATE_APPROVED;
-                        $result['failed'] = FALSE;
-                        $result['transaction_id'] = $tresponse->getTransId();
-                        $result['response_code'] = $tresponse->getResponseCode();
-                        $result['code'] = $tresponse->getMessages()[0]->getCode();
-                        $result['auth_code'] = $tresponse->getAuthCode();
-                        $result['description'] = $tresponse->getMessages()[0]->getDescription();
-
-                    } else {
-                        $payment->scid_state = self::STATE_FAILED;
-
-                        $result['failed'] = TRUE;
-                        if ($tresponse->getErrors() != NULL) {
-                            $errorCode = $tresponse->getErrors()[0]->getErrorCode();
-                            $errorText = $tresponse->getErrors()[0]->getErrorText();
-                            $result['error_code'] = $errorCode;
-                            $result['error_message'] = $errorText;
-                            $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                                         [$errorCode,
-                                                                          $errorText])]);
-                        } else {
-                            $payment->setError('credit_card_number', ['Transaction failed']);
-                        }
-                    }
-                    // Or, print errors if the API request wasn't successful
-                } else {
-                    $result['failed'] = TRUE;
-                    $tresponse = $response->getTransactionResponse();
-                    $payment->scid_state = self::STATE_FAILED;
-                    if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
-                        $errorCode = $tresponse->getErrors()[0]->getErrorCode();
-
-                        $errorText = $tresponse->getErrors()[0]->getErrorText();
-                        $result['error_message'] = $errorText;
-                        $result['error_code'] = $errorCode;
-                        $this->__setError($payment, $errorCode, $errorText);
-                    } else {
-                        $errorCode = $response->getMessages()->getMessage()[0]->getCode();
-                        $result['error_code'] = $errorCode;
-                        $errorText = $response->getMessages()->getMessage()[0]->getText();
-                        $result['error_message'] = $errorText;
-                        $this->__setError($payment, $errorCode, $errorText);
-                    }
-                }
-            } else {
-                $payment->scid_state = self::STATE_FAILED;
-                $result['error_message'] = __('No response received');
-                $payment->setError('credit_card_number', [__('No reponse received')]);
-            }
-            $payment->set('response', $result);
-        } else {
-            $payment->scid_state = self::STATE_FAILED;
-        }
-        if ($payment->scid_state == self::STATE_FAILED) {
             return FALSE;
         }
-        return $payment;
-
     }
 
     public
@@ -343,9 +267,11 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         $amount = $this->cleanMoney($payment->amountPaid);
         $transactionRequestType->setAmount($amount);
         $transactionRequestType->setOrder($order);
-        $transactionRequestType->setPayment($authPayment);
-        $transactionRequestType->setCustomer($customerData);
-        $transactionRequestType->setBillTo($customerAddress);
+        $this->__setPaymentOrProfile($payment, $transactionRequestType);
+        if(empty($payment->payment_profile_id)) {
+            $transactionRequestType->setCustomer($customerData);
+            $transactionRequestType->setBillTo($customerAddress);
+        }
         $transactionRequestType->addToTransactionSettings($this->__duplicateWindowSetting());
         $transactionRequestType->addToTransactionSettings($this->__emailCustomerSetting(FALSE));
         // Assemble the complete transaction request
@@ -496,6 +422,7 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                         $payment->transactionNumber = $tresponse->getTransId();
                         $payment->authorizationNumber = $tresponse->getAuthCode();
                         $payment->scid_state = self::STATE_CAPTURED;
+                        $payment->status = self::STATE_CAPTURED;
                         $result['failed'] = FALSE;
                         $result['transaction_id'] = $tresponse->getTransId();
                         $result['response_code'] = $tresponse->getResponseCode();
@@ -562,7 +489,6 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
     function charge($payment) {
         $transactionType = self::TRANSACTION_TYPE_AUTH_CAPTURE;
         $merchantAuthentication = $this->__getMerchantAuthentication();
-        $authPayment = $this->__getAuthPayment($payment);
         $order = $this->__getOrder($payment);
 
         $customerData = $this->__getCustomerData($payment);
@@ -578,9 +504,12 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         $amount = $this->cleanMoney($payment->amountPaid);
         $transactionRequestType->setAmount($amount);
         $transactionRequestType->setOrder($order);
-        $transactionRequestType->setPayment($authPayment);
-        $transactionRequestType->setCustomer($customerData);
-        $transactionRequestType->setBillTo($customerAddress);
+        $this->__setPaymentOrProfile($payment, $transactionRequestType);
+        if(empty($payment->payment_profile_id)) {
+            $transactionRequestType->setCustomer($customerData);
+            $transactionRequestType->setBillTo($customerAddress);
+        }
+
         $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
 
         // Assemble the complete transaction request
@@ -611,6 +540,7 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                         $payment->transactionNumber = $tresponse->getTransId();
                         $payment->authorizationNumber = $tresponse->getAuthCode();
                         $payment->scid_state = self::STATE_CAPTURED;
+                        $payment->status = self::STATE_APPROVED;
                         $result['failed'] = FALSE;
                         $result['transaction_id'] = $tresponse->getTransId();
                         $result['response_code'] = $tresponse->getResponseCode();
@@ -1148,4 +1078,53 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         ];
     }
 
+    /**
+     * @param \App\Model\Entity\Payment                             $payment
+     * @param \net\authorize\api\contract\v1\TransactionRequestType $transactionRequestType
+     * @return void
+     */
+    protected function __setPaymentOrProfile(&$payment, AnetAPI\TransactionRequestType &$transactionRequestType): void {
+
+        if (empty($payment->payment_profile_id)) {
+            $authPayment = $this->__getAuthPayment($payment);
+            $transactionRequestType->setPayment($authPayment);
+        } else {
+            $paymentProfileTable = TableRegistry::getTableLocator()->get('Scid.PaymentProfiles');
+            if (empty($payment->payment_profile)) {
+                $payment->payment_profile = $paymentProfileTable->get($payment->payment_profile_id, ['contain' => ['CustomerProfiles']]);
+            }
+            if (empty($payment->payment_profile->customer_profile)) {
+                $payment->payment_profile->customer_profile = $paymentProfileTable->CustomerProfiles->get($payment->payment_profile->customer_profile_id);
+            }
+            if (empty($payment->payment_profile->card_number)) {
+                $payment->payment_profile->updateFromRemote();
+            }
+            if (!empty($payment->payment_profile->address)) {
+                $payment->address = $payment->payment_profile->address;
+            }
+            if (!empty($payment->payment_profile->city)) {
+                $payment->city = $payment->payment_profile->city;
+            }
+            if (!empty($payment->payment_profile->state)) {
+                $payment->state = $payment->payment_profile->state;
+            }
+            if (!empty($payment->payment_profile->zip)) {
+                $payment->zip = $payment->payment_profile->zip;
+            }
+            if (!empty($payment->payment_profile->customer_profile->email)) {
+                $payment->email = $payment->payment_profile->customer_profile->email;
+            }
+            $payment->last = $payment->payment_profile->last;
+            $payment->first = $payment->payment_profile->first;
+            $payment->number = $payment->payment_profile->card_number;
+            $payment->expDate = $payment->payment_profile->expiration->format('m/Y');
+            $payment->paymentType = $payment->payment_profile->card_type;
+            $profileToCharge = new AnetAPI\CustomerProfilePaymentType();
+            $profileToCharge->setCustomerProfileId($payment->payment_profile->customer_profile->profile_id);
+            $paymentProfile = new AnetAPI\PaymentProfileType();
+            $paymentProfile->setPaymentProfileId($payment->payment_profile->payment_profile_id);
+            $profileToCharge->setPaymentProfile($paymentProfile);
+            $transactionRequestType->setProfile($profileToCharge);
+        }
+    }
 }
