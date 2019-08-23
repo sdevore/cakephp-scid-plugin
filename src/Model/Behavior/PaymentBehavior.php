@@ -8,6 +8,7 @@ use Cake\Log\Log;
 use Cake\ORM\Locator\TableLocator;
 use Cake\ORM\TableRegistry;
 use Money\Number;
+use Scid\Model\Entity\CustomerProfile;
 use Scid\Model\Entity\MoneyEntityTrait;
 use ArrayObject;
 use Cake\Core\Configure;
@@ -23,6 +24,7 @@ use Money\Parser\IntlMoneyParser;
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
 use PhpParser\Node\Expr\Empty_;
+use Scid\Model\Entity\PaymentProfile;
 use Scid\Utility\ScidPaymentsInterface;
 use Scid\Utility\ScidPaymentsTrait;
 use Tools\Model\Entity\Entity;
@@ -217,9 +219,12 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                     $payment->setError('save_payment_information', $payment->getErrors());
                 }
             } else {
-
                 $errorMessages = $response->getMessages()->getMessage();
-
+                $errorCode = $errorMessages->getErrorCode();
+                $errorText = $errorMessages->getErrorText();
+                $result['error_code'] = $errorCode;
+                $result['error_message'] = $errorText;
+                $this->__setError($payment, $errorCode, $errorText);
                 $payment->setError('save_payment_information', $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText());
             }
         return $payment;
@@ -1003,45 +1008,6 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
         return $paymentOne;
     }
 
-    /**
-     * @param Payment $payment
-     * @param integer $errorCode
-     * @param string  $errorText
-     * @return void
-     */
-    protected
-    function __setError($payment, $errorCode, $errorText): void {
-        $errorText = [$errorText];
-        switch ($errorCode) {
-            case 5:
-                $payment->setError('amountPaid', $errorText);
-                break;
-            case 6:
-                $payment->setError('credit_card_number', $errorText);
-                break;
-            case 7:
-            case 8:
-                $payment->setError('expMonth', $errorText);
-                $payment->setError('expYear', $errorText);
-                break;
-            case 9:
-                $payment->setError('routing_number', $errorText);
-                break;
-            case 10:
-                $payment->setError('account_number', $errorText);
-                break;
-            case 11:
-                $payment->setError('credit_card_number', $errorText);
-                break;
-            case 12:
-                $payment->setError('card_code', $errorText);
-                break;
-            default:
-                $payment->setError('credit_card_number', [__('{0}: {1}',
-                                                             [$errorCode,
-                                                              $errorText[0]])]);
-        }
-    }
 
     /**
      * @param $payment

@@ -162,6 +162,7 @@ class PaymentProfilesTable extends Table
 
             $errorMessages = $response->getMessages()->getMessage();
             $entity->setError('payment_profile', $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText());
+            $this->__setError($entity, $errorMessages[0]->getCode(), $errorMessages[0]->getText());
             return FALSE;
 
         }
@@ -248,6 +249,7 @@ class PaymentProfilesTable extends Table
         } else {
             $errorMessages = $response->getMessages()->getMessage();
             $entity->setError('paymentProfile', [$errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText()]);
+            $this->__setError($entity, $errorMessages[0]->getCode(), $errorMessages[0]->getText());
             return false;
         }
     }
@@ -274,6 +276,8 @@ class PaymentProfilesTable extends Table
         if (($response != NULL) && ($response->getMessages()->getResultCode() == "Ok")) {
             return TRUE;
         } else {
+            $errorMessages = $response->getMessages()->getMessage();
+            $this->__setError($entity, $errorMessages[0]->getCode(), $errorMessages[0]->getText());
             return FALSE;
         }
     }

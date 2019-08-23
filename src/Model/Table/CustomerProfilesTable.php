@@ -118,6 +118,7 @@ class CustomerProfilesTable extends Table
             } else {
                 $errorMessages = $response->getMessages()->getMessage();
                 $customer_profile->setError('create_customer_profile', [$errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText()]);
+                $this->__setError($customer_profile, $errorMessages[0]->getCode(), $errorMessages[0]->getText());
                 return FALSE;
             }
         }

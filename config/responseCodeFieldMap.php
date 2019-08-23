@@ -1,3 +1,5 @@
+<?php
+$codes = <<<CODES
 [
     {
         "code": "I00001",
@@ -3583,3 +3585,12 @@
         "other_suggestions": "This error applies to WePay merchants only if the Prior Authorization Capture request amount is different than the Authorization Only request amount."
     }
 ]
+CODES;
+
+$codes = json_decode($codes);
+$errors = [];
+foreach ($codes as $code) {
+    $errors[$code->code] = $code;
+}
+$codes = ['Scid'=>['payment_errors' => $errors]];
+return $codes;
