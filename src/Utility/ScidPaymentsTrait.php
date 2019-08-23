@@ -61,6 +61,16 @@
             $errorMapFile = Configure::load('Scid.responseCodeFieldMap');
         }
 
+        /**
+         * @return mixed
+         */
+        protected function getErrorMap() {
+            if (!Configure::check('Scid.payment_errors')) {
+                $this->__loadErrorMap();
+            }
+            return Configure::read('Scid.payment_errors');
+        }
+
 // private methods
 
         /**
@@ -190,7 +200,7 @@
                     $entity->setError('card_code', $errorText);
                     break;
                 default:
-                    $errorCodes = Configure::read('Scid.payment_errors');
+                    $errorCodes = $this->getErrorMap();
                     if (empty($errorCodes[$errorCode])) {
                         $entity->setError('credit_card_number', [
                             __('{0}: {1}',
@@ -213,7 +223,7 @@
                     }
             }
             if (empty($errorCodes)) {
-                $errorCodes = Configure::read('Scid.payment_errors');
+                $errorCodes = $this->getErrorMap();
             }
             if (!empty($errorCodes[$errorCode])) {
                 $codeMap = $errorCodes[$errorCode];
