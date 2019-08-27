@@ -54,7 +54,6 @@
             if (!empty($config['sandbox'])) {
                 $this->_sandbox = $config['sandbox'];
             }
-            $this->__loadErrorMap();
         }
 
         protected function __loadErrorMap() {
