@@ -24,6 +24,19 @@
          * @var \Money\Money
          */
         protected $_money;
+        public function __debugInfo() {
+            // TODO: Implement __debugInfo() method.
+            if (empty($this->_money)) {
+                return [];
+            }
+            else {
+                $money = $this->_money;
+                return [
+                    'amount'=>$money->getAmount(),
+                    'defaultCurrency'=>$money->getCurrency()->jsonSerialize()
+                ];
+            }
+        }
 
         /**
          * Money constructor.
