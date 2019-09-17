@@ -1131,42 +1131,60 @@ $codes = <<<CODES
         "text": "The specified month should not be in the future.",
         "description": "Reports cannot be generated for future dates, thus the specified date is invalid.",
         "integration_suggestions": "",
-        "other_suggestions": ""
+        "other_suggestions": "",
+        "fields": [
+            "month"
+        ]
     },
     {
         "code": "E00113",
         "text": "Invalid OTS Token Data.",
         "description": "The specified OTS Token Data is invalid.",
         "integration_suggestions": "",
-        "other_suggestions": ""
+        "other_suggestions": "",
+        "fields": [
+            "default"
+        ]
     },
     {
         "code": "E00114",
         "text": "Invalid OTS Token.",
         "description": "The specified OTS Token is invalid.",
         "integration_suggestions": "",
-        "other_suggestions": ""
+        "other_suggestions": "",
+        "fields": [
+            "default"
+        ]
     },
     {
         "code": "E00115",
         "text": "Expired OTS Token.",
         "description": "The specified OTS Token has expired.",
         "integration_suggestions": "",
-        "other_suggestions": ""
+        "other_suggestions": "",
+        "fields": [
+            "default"
+        ]
     },
     {
         "code": "E00116",
         "text": "OTS Token access violation",
         "description": "The authenticated merchant does not have access to the specified OTS Token.",
         "integration_suggestions": "",
-        "other_suggestions": ""
+        "other_suggestions": "",
+        "fields": [
+            "default"
+        ]
     },
     {
         "code": "E00117",
         "text": "OTS Service Error &#x27;{0}&#x27;",
         "description": "The OTS Service cannot complete the request due to a validation or configuration error.",
         "integration_suggestions": "",
-        "other_suggestions": ""
+        "other_suggestions": "",
+        "fields": [
+            "default"
+        ]
     },
     {
         "code": "E00118",

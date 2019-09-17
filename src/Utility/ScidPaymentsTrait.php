@@ -214,8 +214,8 @@
                         if (empty($errorText)) {
                             $errorText = $codeMap->text;
                         }
-                        if (empty($codeMap->fields)) {
-                            foreach ($codeMap->fields as $field) {
+                        if (empty($codeMap['fields'])) {
+                            foreach ($codeMap['fields'] as $field) {
                                 $entity->setError($field, $errorText);
                             }
                         }
@@ -229,8 +229,8 @@
                 if (empty($errorText)) {
                     $errorText = $codeMap->text;
                 }
-                if (empty($codeMap->fields)) {
-                    foreach ($codeMap->fields as $field) {
+                if (empty($codeMap['fields'])) {
+                    foreach ($codeMap['fields'] as $field) {
                         if (empty($entity->getError($field))) {
                             $entity->setError($field, $errorText);
                         }
