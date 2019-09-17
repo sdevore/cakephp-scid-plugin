@@ -17,6 +17,7 @@ use Cake\Core\Exception\Exception;
 use Cake\Filesystem\File;
 use Cake\I18n\FrozenDate;
 use Cake\Utility\Inflector;
+use IntlDateFormatter;
 use Money\Currency;
 use Money\Money;
 use Money\Currencies\ISOCurrencies;
@@ -28,6 +29,15 @@ use Money\Formatter\IntlMoneyFormatter;
 class ScidUtils
 {
 
+    /**
+     * returns an array with keys of Date::toDateString => ['date'=> Date]
+     *
+     * @param Date|Chronos $start
+     * @param Date|Chronos $end
+     *
+     * @return Date|Chronos[]
+     */
+    const DATE_ARRAY_FORMAT = 'Y-m-d';
     public static $states = [
         'AL' => "Alabama",
         'AK' => "Alaska",
@@ -81,55 +91,18 @@ class ScidUtils
         'WI' => "Wisconsin",
         'WY' => "Wyoming",
     ];
-
     /**
      * @var ISOCurrencies
      */
     public static $currencies;
-
     /**
      * @var \NumberFormatter
      */
     public static $numberFormatter;
-
     /**
      * @var IntlMoneyFormatter
      */
     public static $moneyFormatter;
-
-    /**
-     * returns an array with keys of Date::toDateString => ['date'=> Date]
-     *
-     * @param Date|Chronos $start
-     * @param Date|Chronos $end
-     *
-     * @return Date|Chronos[]
-     */
-    const DATE_ARRAY_FORMAT = 'Y-m-d';
-
-    /**
-     * @param      \Cake\I18n\Date|FrozenDate|Chronos $start
-     * @param      \Cake\I18n\Date|FrozenDate|Chronos $end
-     * @param bool                                    $hierarchical
-     *
-     * @return array
-     */
-    public static function dateArray($start, $end, $hierarchical = FALSE): array {
-        $current = $start->copy();
-        $result = [];
-
-        while ($current->lte($end)) {
-            if ($hierarchical) {
-                $result[$current->year][$current->month][$current->day] = ['date' => $current];
-            } else {
-                $result[$current->format(self::DATE_ARRAY_FORMAT)] = ['date' => $current];
-            }
-
-            $current = $current->copy()->addDay(1);
-        }
-
-        return $result;
-    }
 
     /**
      * @param array $dateArray
@@ -175,6 +148,30 @@ class ScidUtils
     }
 
     /**
+     * @param      \Cake\I18n\Date|FrozenDate|Chronos $start
+     * @param      \Cake\I18n\Date|FrozenDate|Chronos $end
+     * @param bool                                    $hierarchical
+     *
+     * @return array
+     */
+    public static function dateArray($start, $end, $hierarchical = FALSE): array {
+        $current = $start->copy();
+        $result = [];
+
+        while ($current->lte($end)) {
+            if ($hierarchical) {
+                $result[$current->year][$current->month][$current->day] = ['date' => $current];
+            } else {
+                $result[$current->format(self::DATE_ARRAY_FORMAT)] = ['date' => $current];
+            }
+
+            $current = $current->copy()->addDay(1);
+        }
+
+        return $result;
+    }
+
+    /**
      * @param \Money\Money|\Scid\Database\I18n\Money|NULL $money
      *
      * @return string
@@ -183,7 +180,7 @@ class ScidUtils
         if (NULL === $money) {
             $money = new \Scid\Database\I18n\Money(0, new Currency('USD'));
         }
-        if ($money instanceof \Money\Money) {
+        if ($money instanceof Money) {
             $money = new \Scid\Database\I18n\Money($money->getAmount(), $money->getCurrency());
         }
 
@@ -212,26 +209,6 @@ class ScidUtils
     }
 
     /**
-     * given an array of numbers group them by ranges
-     *
-     * @param array $aNumbers
-     *
-     * @return array
-     */
-    static function getRanges($aNumbers) {
-        $aNumbers = array_unique($aNumbers);
-        sort($aNumbers);
-        $aGroups = [];
-        for ($i = 0; $i < count($aNumbers); $i++) {
-            if ($i > 0 && ($aNumbers[$i - 1] == $aNumbers[$i] - 1))
-                array_push($aGroups[count($aGroups) - 1], $aNumbers[$i]);
-            else
-                array_push($aGroups, [$aNumbers[$i]]);
-        }
-        return $aGroups;
-    }
-
-    /**
      * given an associted array of numerically keyed values retunr an array of range values
      *
      * @param array  $source
@@ -255,6 +232,26 @@ class ScidUtils
             }
         }
         return $result;
+    }
+
+    /**
+     * given an array of numbers group them by ranges
+     *
+     * @param array $aNumbers
+     *
+     * @return array
+     */
+    static function getRanges($aNumbers) {
+        $aNumbers = array_unique($aNumbers);
+        sort($aNumbers);
+        $aGroups = [];
+        for ($i = 0; $i < count($aNumbers); $i++) {
+            if ($i > 0 && ($aNumbers[$i - 1] == $aNumbers[$i] - 1))
+                array_push($aGroups[count($aGroups) - 1], $aNumbers[$i]);
+            else
+                array_push($aGroups, [$aNumbers[$i]]);
+        }
+        return $aGroups;
     }
 
     /**
@@ -297,14 +294,27 @@ class ScidUtils
     }
 
     /**
+     * @param   \Cake\I18n\Date $date
+     * @param array             $format
+     *
+     * @return string
+     */
+    public static function date($date, $format = [
+        IntlDateFormatter::SHORT,
+        IntlDateFormatter::NONE,
+    ]) {
+        return self::dateTime($date, $format);
+    }
+
+    /**
      * @param  \Cake\I18n\Date|\Cake\I18n\Time $datetime
      * @param array                            $format
      *
      * @return string
      */
     public static function dateTime($datetime, $format = [
-        \IntlDateFormatter::SHORT,
-        \IntlDateFormatter::SHORT,
+        IntlDateFormatter::SHORT,
+        IntlDateFormatter::SHORT,
     ]) {
         if (empty($datetime)) {
             $datetime = '';
@@ -317,29 +327,28 @@ class ScidUtils
     }
 
     /**
-     * @param   \Cake\I18n\Date $date
-     * @param array             $format
-     *
-     * @return string
-     */
-    public static function date($date, $format = [
-        \IntlDateFormatter::SHORT,
-        \IntlDateFormatter::NONE,
-    ]) {
-        return self::dateTime($date, $format);
-    }
-
-    /**
      * @param   \Cake\I18n\Time $time
      * @param array             $format
      *
      * @return string
      */
     public static function time($time, $format = [
-        \IntlDateFormatter::NONE,
-        \IntlDateFormatter::SHORT,
+        IntlDateFormatter::NONE,
+        IntlDateFormatter::SHORT,
     ]) {
         return self::dateTime($time, $format);
+    }
+
+    /**
+     * @param    array    $data
+     * @param string $monthField
+     * @param string $yearField
+     *
+     * @return \Cake\I18n\FrozenDate
+     */
+    static function ccExpirationDate($data, $monthField = 'expMonth', $yearField = 'expYear') {
+        $date = new FrozenDate();
+        return $date->setDate($data[$yearField], $data[$monthField], 1);
     }
 
     /**
@@ -356,6 +365,7 @@ class ScidUtils
             case 'check':
                 $true = '&#10004;';
                 $false = '';
+                break;
             case 'checkbox':
                 $true = '&#9745;';
                 $false = '&#9744;';

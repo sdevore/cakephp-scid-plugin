@@ -20,6 +20,7 @@ use Cake\I18n\Date;
 use Cake\I18n\FrozenDate;
 use Cake\I18n\FrozenTime;
 use Cake\I18n\Time;
+use Exception;
 use net\authorize\api\contract\v1 as AnetAPI;
 use Scid\Database\I18n\Money;
 use Tools\Utility\Text;
@@ -30,9 +31,9 @@ trait ScidPaymentTrait
     protected $_invoice_items = [];
 
     /**
-     * @param   string           $itemId if invoice item is an enrolled course convention has course_id-student_id
-     * @param   string           $name
-     * @param  string            $description
+     * @param string             $itemId if invoice item is an enrolled course convention has course_id-student_id
+     * @param string             $name
+     * @param string             $description
      * @param float|string|Money $unitPrice
      * @param int                $quantity
      * @param bool               $taxable
@@ -64,12 +65,6 @@ trait ScidPaymentTrait
         return $this->_invoice_items;
     }
 
-
-
-    public function setExpMonthYear($month, $year) {
-        $this->expDate = __('{0}/{1}', $month, $year);
-    }
-
     protected function _getExpirationDate() {
         if (!empty($this->_properties['expMonth']) && !empty($this->_properties['expYear'])) {
             $this->setExpMonthYear($this->_properties['expMonth'], $this->_properties['expYear']);
@@ -83,5 +78,9 @@ trait ScidPaymentTrait
         } catch (Exception $e) {
             return NULL;
         }
+    }
+
+    public function setExpMonthYear($month, $year) {
+        $this->expDate = __('{0}/{1}', $month, $year);
     }
 }
