@@ -105,7 +105,7 @@ class PaymentHelper extends Helper
 
         if (empty($payment['use_hosted'])) {
             if (empty($options['onclick'])) {
-                $onclick = 'sendPaymentDataToAnet()';
+                $onclick = 'sendPaymentDataToAnet(event)';
                 $options['onclick'] = $onclick;
             } else {
                 $onclick = $options['onclick'];
@@ -122,6 +122,9 @@ class PaymentHelper extends Helper
             $script = /** @lang JavaScript 1.8 */
                 <<<ON_CLICK_SCRIPT
 function {$onclick} {
+    if (typeof event !== 'undefined') {
+        event.target.disabled = true;
+    }
     var authData = {};
         authData.clientKey = "{$client_key}";
         authData.apiLoginID = "{$api_login}";
@@ -162,6 +165,10 @@ function {$onclick} {
             alert( response.messages.message[i].code + ": " +
                 response.messages.message[i].text);
             i = i + 1;
+            if (typeof event !== 'undefined') {
+                event.target.disabled = false;
+            }
+            
         }
     } else {
         paymentFormUpdate(response.opaqueData);

@@ -71,10 +71,12 @@ class PaymentProfilesTable extends Table
         if ($entity->isNew()) {
             if (!$this->createProfile($entity)) {
                 $event->stopPropagation();
+                return false;
             }
         } else {
             if (!$this->updateProfile($entity)) {
                 $event->stopPropagation();
+                return false;
             }
         }
     }
@@ -137,7 +139,7 @@ class PaymentProfilesTable extends Table
             $paymentprofile->setBillTo($billto);
         }
         $paymentprofile->setPayment($creditCard);
-        $paymentprofile->setDefaultPaymentProfile(TRUE);
+        $paymentprofile->setDefaultPaymentProfile($entity->is_default);
 
         $paymentprofiles[] = $paymentprofile;
 

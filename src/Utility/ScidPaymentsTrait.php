@@ -214,28 +214,15 @@
                         if (empty($errorText)) {
                             $errorText = $codeMap->text;
                         }
-                        if (empty($codeMap['fields'])) {
-                            foreach ($codeMap['fields'] as $field) {
+                        if (!empty($codeMap->fields)) {
+                            foreach ($codeMap->fields as $field) {
                                 $entity->setError($field, $errorText);
                             }
                         }
-                    }
-            }
-            if (empty($errorCodes)) {
-                $errorCodes = $this->getErrorMap();
-            }
-            if (!empty($errorCodes[$errorCode])) {
-                $codeMap = $errorCodes[$errorCode];
-                if (empty($errorText)) {
-                    $errorText = $codeMap->text;
-                }
-                if (empty($codeMap['fields'])) {
-                    foreach ($codeMap['fields'] as $field) {
-                        if (empty($entity->getError($field))) {
-                            $entity->setError($field, $errorText);
+                        else {
+                            $entity->setError('default', $codeMap->description);
                         }
                     }
-                }
             }
         }
 
