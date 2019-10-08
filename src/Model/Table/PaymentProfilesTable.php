@@ -55,6 +55,7 @@ class PaymentProfilesTable extends Table
             'scopeFields' => ['customer_profile_id'],
             'scope'       => [],
         ]);
+        $this->addBehavior('Muffin/Trash.Trash');
         $this->belongsTo('Members', [
             'foreignKey' => 'member_id',
             'joinType'   => 'INNER',

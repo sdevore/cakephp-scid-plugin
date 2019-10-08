@@ -14,6 +14,7 @@
         "gourmet/email": "~3.0",
         "mikehaertl/php-pdftk": "^0.5.0",
         "moneyphp/money": "^3.1.0",
+        "muffin/trash": "^2.1",
         "npm-asset/bootstrap-duration-picker": "^2.1.3",
         "npm-asset/bootstrap-markdown-editor": "^2.2",
         "npm-asset/bootstrap-toggle": "^2.2",
