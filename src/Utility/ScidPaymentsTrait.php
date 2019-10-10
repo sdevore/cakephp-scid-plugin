@@ -3,6 +3,7 @@
     namespace Scid\Utility;
 
     use App\Model\Entity\Payment;
+    use Cake\Chronos\Date;
     use Cake\Core\Configure;
     use Cake\Datasource\EntityInterface;
     use Cake\Filesystem\File;
@@ -73,7 +74,7 @@
 // private methods
 
         /**
-         * @param $entity
+         * @param EntityInterface|PaymentProfile $entity
          *
          * @return \net\authorize\api\contract\v1\PaymentType
          */
@@ -107,11 +108,20 @@
                     $entity->setError('card_code', [__('credit card verification number is required')]);
                 }
                 if (!empty($entity->expiration_date)) {
-                    $month = $entity->expiration_date->month;
-                    $year = $entity->expiration_date->year;
-                    //Log::debug( $year, 'payment_debug');
-                    //Log::debug( $month, 'payment_debug');
-                    $card->setExpirationDate($entity->expiration_date->format('Y-m'));
+                    if (is_string($entity->expiration_date)) {
+                        $card->setExpirationDate($entity->expiration_date);
+                    }
+                    elseif ($entity->expiration_date instanceof Date) {
+                        $month = $entity->expiration_date->month;
+                        $year = $entity->expiration_date->year;
+                        //Log::debug( $year, 'payment_debug');
+                        //Log::debug( $month, 'payment_debug');
+                        $card->setExpirationDate($entity->expiration_date->format('Y-m'));
+                    }
+                    else {
+                        $card->setExpirationDate($entity->expiration_date);
+                    }
+
                 }
                 else if (!empty($entity->expMonth) && !empty($entity->expYear)) {
                     $month = $entity->expMonth;

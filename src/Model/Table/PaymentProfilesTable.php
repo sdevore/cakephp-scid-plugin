@@ -59,7 +59,7 @@ class PaymentProfilesTable extends Table
         $this->belongsTo('Members', [
             'foreignKey' => 'member_id',
             'joinType'   => 'INNER',
-            'className'  => 'Scid.Members',
+            'className'  => 'Members',
         ]);
         $this->belongsTo('CustomerProfiles', [
             'foreignKey' => 'customer_profile_id',
@@ -75,7 +75,7 @@ class PaymentProfilesTable extends Table
                 return false;
             }
         } else {
-            if (!$this->updateProfile($entity)) {
+            if (!$entity->deleted && !$this->updateProfile($entity)) {
                 $event->stopPropagation();
                 return false;
             }
@@ -173,7 +173,7 @@ class PaymentProfilesTable extends Table
     }
 
     /**
-     * @param \Scid\Model\Entity\PaymentProfile $entity
+     * @param \Scid\Model\Entity\PaymentProfile|EntityInterface $entity
      *
      * @return boolean
      */
@@ -229,8 +229,6 @@ class PaymentProfilesTable extends Table
             }
             $paymentprofile->setPayment($creditCard);
 
-
-            $paymentprofile->setBillTo($billto);
             $paymentprofile->setCustomerPaymentProfileId($entity->payment_profile_id);
             $paymentprofile->setPayment($creditCard);
 
@@ -258,7 +256,7 @@ class PaymentProfilesTable extends Table
     }
 
     /**
-     * @param \Scid\Model\Entity\PaymentProfile $entity
+     * @param \Scid\Model\Entity\PaymentProfile|EntityInterface $entity
      *
      * @return boolean
      */
