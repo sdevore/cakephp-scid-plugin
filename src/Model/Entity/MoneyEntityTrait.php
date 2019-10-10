@@ -32,6 +32,9 @@ namespace Scid\Model\Entity;
             }
             $currencies = new ISOCurrencies();
             if (is_string($amount)) {
+                if (trim($amount) == '$') {
+                    $amount = 0;
+                }
                 $numberFormatter = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
                 $moneyParser = new IntlMoneyParser($numberFormatter, $currencies);
                 try {
