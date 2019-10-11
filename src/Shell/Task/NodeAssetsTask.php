@@ -99,11 +99,16 @@ class NodeAssetsTask extends Shell
                     $dir = $this->_jsDir;
                 }
             }
-
-            if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
-                $this->success($file->name . ' successfully copied.', 1, ConsoleIo::VERBOSE);
-            } else {
-                $this->info($file->name . ' will not be copied.', 1, ConsoleIo::VERBOSE);
+            try {
+                if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
+                    $this->success($file->name . ' successfully copied.', 1, ConsoleIo::VERBOSE);
+                }
+                else {
+                    $this->info($file->name . ' will not be copied.', 1, ConsoleIo::VERBOSE);
+                }
+            }
+            catch (\Exception $exception) {
+                $this->info($file->name . ' will not be copied. Exception: ' . $exception->getMessage() , 1, ConsoleIo::VERBOSE);
             }
         }
     }
