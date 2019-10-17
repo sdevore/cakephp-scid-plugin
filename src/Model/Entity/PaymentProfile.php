@@ -39,6 +39,7 @@
      *
      *  virtual properties
      * @property int                                $number
+     * @property string                             $expDate
      */
 
     use net\authorize\api\contract\v1 as AnetAPI;
@@ -159,13 +160,29 @@
         }
 
         /**
-         * @return \Cake\I18n\FrozenDate
+         * @return \Cake\I18n\FrozenDate|null
          */
         protected function _getExpiration() {
             if ($this->has('expiration_date') && !empty($this->_properties['expiration_date'])) {
                 list($year, $month) = explode('-', $this->_properties['expiration_date']);
                 $date = new FrozenDate();
                 return $date->setDate($year, $month, 1);
+            }
+            else {
+                return NULL;
+            }
+        }
+
+        /**
+         * @return string
+         */
+        protected function _getExpDate() {
+            if ($this->has('expiration_date') && !empty($this->_properties['expiration_date'])) {
+                $date = $this->_getExpiration();
+                return $date->expiration->format('m/Y');
+            }
+            else {
+                return '';
             }
         }
     }
