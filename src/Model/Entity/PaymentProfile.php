@@ -36,6 +36,9 @@
      * @property \Cake\ORM\Entity                   $member
      * @property \Scid\Model\Entity\CustomerProfile $customer_profile
      * @property \Scid\Model\Entity\PaymentProfile  $payment_profile
+     *
+     *  virtual properties
+     * @property int                                $number
      */
 
     use net\authorize\api\contract\v1 as AnetAPI;
@@ -148,6 +151,11 @@
             if (!empty($this->first) && !empty($this->last)) {
                 return __('{0} {1}', [$this->first, $this->last]);
             }
+        }
+
+        protected function _getNumber() {
+            $number = (integer)preg_replace("/[^0-9]/", "", $this->card_number);
+            return $number;
         }
 
         /**
