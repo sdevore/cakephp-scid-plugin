@@ -1082,7 +1082,7 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
             }
             $payment->last = $payment->payment_profile->last;
             $payment->first = $payment->payment_profile->first;
-            $payment->number = $payment->payment_profile->card_number;
+            $payment->number = $payment->payment_profile->number;
             $payment->expDate = $payment->payment_profile->expiration->format('m/Y');
             $payment->paymentType = $payment->payment_profile->card_type;
             $profileToCharge = new AnetAPI\CustomerProfilePaymentType();
