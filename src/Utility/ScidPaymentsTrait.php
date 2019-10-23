@@ -180,9 +180,10 @@
          * @param EntityInterface|Payment|PaymentProfile|CustomerProfile $entity
          * @param integer                                                $errorCode
          * @param string                                                 $errorText
+         * @param AnetAPI\TransactionResponseType $response
          * @return void
          */
-        protected function __setError($entity, $errorCode, $errorText): void {
+        protected function __setError($entity, $errorCode, $errorText, $response = null): void {
             $errorText = [$errorText];
             switch ($errorCode) {
                 case 5:
@@ -208,6 +209,23 @@
                 case 12:
                     $entity->setError('card_code', $errorText);
                     break;
+                case 65:
+                    if (!empty($response)) {
+                        $cvvResultCode = $response->getCvvResultCode();
+                        if ($cvvResultCode == 'N') {
+                            $entity->setError('card_code', __('CCV does not match'));
+                        }
+                        elseif ($cvvResultCode == 'S') {
+                            $entity->setError('card_code', __('CCV should be on card but was not included'));
+                        }
+                        elseif ($cvvResultCode == 'U') {
+                            $entity->setError('card_code', __('Issuer is not certified for CCV processing'));
+                        }
+                    }
+                    else {
+                        $entity->setError('credit_card_number', $errorText);
+                    }
+                    break;
                 default:
                     $errorCodes = $this->getErrorMap();
                     if (empty($errorCodes[$errorCode])) {
@@ -224,7 +242,19 @@
                         if (empty($errorText)) {
                             $errorText = $codeMap->text;
                         }
-                        if (!empty($codeMap->fields)) {
+                        if (!empty($response)) {
+                            $cvvResultCode = $response->getCvvResultCode();
+                            if ($cvvResultCode == 'N') {
+                                $entity->setError('card_code', __('CCV does not match'));
+                            }
+                            elseif ($cvvResultCode == 'S') {
+                                $entity->setError('card_code', __('CCV should be on card but was not included'));
+                            }
+                            elseif ($cvvResultCode == 'U') {
+                                $entity->setError('card_code', __('Issuer is not certified for CCV processing'));
+                            }
+                        }
+                        elseif (!empty($codeMap->fields)) {
                             foreach ($codeMap->fields as $field) {
                                 $entity->setError($field, $errorText);
                             }

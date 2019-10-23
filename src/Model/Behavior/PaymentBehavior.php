@@ -562,7 +562,7 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                             $errorText = $tresponse->getErrors()[0]->getErrorText();
                             $result['error_code'] = $errorCode;
                             $result['error_message'] = $errorText;
-                            $this->__setError($payment, $errorCode, $errorText);
+                            $this->__setError($payment, $errorCode, $errorText, $tresponse);
                         } else {
                             $payment->setError('credit_card_number', ['Transaction failed']);
                         }
@@ -578,13 +578,13 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                         $errorText = $tresponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
-                        $this->__setError($payment, $errorCode, $errorText);
+                        $this->__setError($payment, $errorCode, $errorText, $tresponse);
                     } else {
                         $errorCode = $response->getMessages()->getMessage()[0]->getCode();
                         $result['error_code'] = $errorCode;
                         $errorText = $response->getMessages()->getMessage()[0]->getText();
                         $result['error_message'] = $errorText;
-                        $this->__setError($payment, $errorCode, $errorText);
+                        $this->__setError($payment, $errorCode, $errorText, $tresponse);
                     }
                 }
             } else {

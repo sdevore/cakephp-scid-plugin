@@ -168,7 +168,7 @@ function {$onclick} {
             if (typeof event !== 'undefined') {
                 event.target.disabled = false;
             }
-            
+
         }
     } else {
         paymentFormUpdate(response.opaqueData);
@@ -184,7 +184,7 @@ function paymentFormUpdate(opaqueData) {
      var cc_num = document.getElementById("{$cardNumber}").value
     cc_num = cc_num.substring(cc_num.length - 4, cc_num.length);
      document.getElementById("{$cardNumber}").value = cc_num;
-    document.getElementById("{$cardCode}").value = "";
+    document.getElementById("{$cardCode}").value = " ";
     document.getElementById("{$form_id}").submit();
 }
 ON_CLICK_SCRIPT;
