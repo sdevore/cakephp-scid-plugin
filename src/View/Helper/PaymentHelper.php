@@ -126,16 +126,16 @@ function {$onclick} {
         event.target.disabled = true;
     }
     var authData = {};
-        authData.clientKey = "{$client_key}";
-        authData.apiLoginID = "{$api_login}";
+    authData.clientKey = "{$client_key}";
+    authData.apiLoginID = "{$api_login}";
     var cardData = {};
-        cardData.cardNumber = document.getElementById("{$cardNumber}").value;
-        cardData.fullName = document.getElementById("{$firstName}").value + ' ' +  document.getElementById("{$lastName}").value;
-        cardData.month = document.getElementById("{$month}").value;
-        cardData.year = document.getElementById("{$year}").value;
-        cardData.cardCode = document.getElementById("{$cardCode}").value;
-        cardData.zip = document.getElementById("{$zip}").value;
-        cardData.cardNumber=cardData.cardNumber.replace(/\D/g,'');
+    cardData.cardNumber = document.getElementById("{$cardNumber}").value;
+    cardData.fullName = document.getElementById("{$firstName}").value + ' ' + document.getElementById("{$lastName}").value;
+    cardData.month = document.getElementById("{$month}").value;
+    cardData.year = document.getElementById("{$year}").value;
+    cardData.cardCode = document.getElementById("{$cardCode}").value;
+    cardData.zip = document.getElementById("{$zip}").value;
+    cardData.cardNumber = cardData.cardNumber.replace(/\D/g, '');
     // If using banking information instead of card information,
     // build a bankData object instead of a cardData object.
     //
@@ -146,45 +146,46 @@ function {$onclick} {
     //     bankData.accountType = document.getElementById('accountType').value;
 
     var secureData = {};
-        secureData.authData = authData;
-        secureData.cardData = cardData;
-        // If using banking information instead of card information,
-        // send the bankData object instead of the cardData object.
-        //
-        // secureData.bankData = bankData;
+    secureData.authData = authData;
+    secureData.cardData = cardData;
+    // If using banking information instead of card information,
+    // send the bankData object instead of the cardData object.
+    //
+    // secureData.bankData = bankData;
 
-		Accept.dispatchData(secureData, responseHandler);
-		function responseHandler(response) {
-    if (response.messages.resultCode === "Error") {
-        var i = 0;
-        while (i < response.messages.message.length) {
-            console.log(
-                response.messages.message[i].code + ": " +
-                response.messages.message[i].text
-            );
-            alert( response.messages.message[i].code + ": " +
-                response.messages.message[i].text);
-            i = i + 1;
-            if (typeof event !== 'undefined') {
-                event.target.disabled = false;
+    Accept.dispatchData(secureData, responseHandler);
+
+    function responseHandler(response) {
+        if (response.messages.resultCode === "Error") {
+            var i = 0;
+            while (i < response.messages.message.length) {
+                console.log(
+                    response.messages.message[i].code + ": " +
+                    response.messages.message[i].text
+                );
+                alert(response.messages.message[i].code + ": " +
+                    response.messages.message[i].text);
+                i = i + 1;
+                if (typeof event !== 'undefined') {
+                    event.target.disabled = false;
+                }
+
             }
-
+        } else {
+            paymentFormUpdate(response.opaqueData);
         }
-    } else {
-        paymentFormUpdate(response.opaqueData);
     }
 }
-}
-
 
 function paymentFormUpdate(opaqueData) {
     document.getElementById("dataDescriptor").value = opaqueData.dataDescriptor;
     document.getElementById("dataValue").value = opaqueData.dataValue;
 
-     var cc_num = document.getElementById("{$cardNumber}").value
+    var cc_num = document.getElementById("{$cardNumber}").value;
     cc_num = cc_num.substring(cc_num.length - 4, cc_num.length);
-     document.getElementById("{$cardNumber}").value = cc_num;
-    document.getElementById("{$cardCode}").value = " ";
+    document.getElementById("{$cardNumber}").value = cc_num;
+    document.getElementById("{$cardCode}").removeAttribute("required");
+    document.getElementById("{$cardCode}").value = "";
     document.getElementById("{$form_id}").submit();
 }
 ON_CLICK_SCRIPT;
