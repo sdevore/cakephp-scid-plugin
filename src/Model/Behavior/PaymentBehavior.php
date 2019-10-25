@@ -220,8 +220,8 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                 }
             } else {
                 $errorMessages = $response->getMessages()->getMessage();
-                $errorCode = $errorMessages->getErrorCode();
-                $errorText = $errorMessages->getErrorText();
+                $errorCode = $errorMessages[0]->getErrorCode();
+                $errorText = $errorMessages[0]->getErrorText();
                 $result['error_code'] = $errorCode;
                 $result['error_message'] = $errorText;
                 $this->__setError($payment, $errorCode, $errorText);
