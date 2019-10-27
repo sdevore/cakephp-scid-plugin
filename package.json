@@ -28,15 +28,6 @@
         "checkboxes.js": "^1.2.2",
         "datepair.js": "^0.4.16",
         "element-ui": "^2.4.11",
-        "filepond": "^1.6",
-        "filepond-plugin-file-encode": "dev-master",
-        "filepond-plugin-file-validate-size": "dev-master",
-        "filepond-plugin-file-validate-type": "dev-master",
-        "filepond-plugin-image-crop": "dev-master",
-        "filepond-plugin-image-exif-orientation": "dev-master",
-        "filepond-plugin-image-preview": "dev-master",
-        "filepond-plugin-image-resize": "dev-master",
-        "filepond-plugin-image-transform": "dev-master",
         "flatpickr": "^4.5",
         "jquery": "^3.3.1",
         "jquery-awesome-cursor": "^0.3",
@@ -52,3 +43,4 @@
         "vue": "^2.5.21"
     }
 }
+

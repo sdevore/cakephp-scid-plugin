@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "407bf531791f841de196200ff634f93e",
+    "content-hash": "2bcdfc91ade955ec67b1ba27f2b80b09",
     "packages": [
         {
             "name": "aura/intl",
@@ -113,16 +113,16 @@
         },
         {
             "name": "cakephp/cakephp",
-            "version": "3.8.4",
+            "version": "3.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/cakephp.git",
-                "reference": "a2ff473a20f467458680b6841a3fdb190eef113d"
+                "reference": "ea64434740f0d2a53438f95a3de414de63a11101"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/cakephp/zipball/a2ff473a20f467458680b6841a3fdb190eef113d",
-                "reference": "a2ff473a20f467458680b6841a3fdb190eef113d",
+                "url": "https://api.github.com/repos/cakephp/cakephp/zipball/ea64434740f0d2a53438f95a3de414de63a11101",
+                "reference": "ea64434740f0d2a53438f95a3de414de63a11101",
                 "shasum": ""
             },
             "require": {
@@ -198,7 +198,7 @@
                 "rapid-development",
                 "validation"
             ],
-            "time": "2019-09-14T01:34:26+00:00"
+            "time": "2019-10-07T00:51:50+00:00"
         },
         {
             "name": "cakephp/chronos",
@@ -852,344 +852,6 @@
             "time": "2018-04-17T21:27:44+00:00"
         },
         {
-            "name": "npm-asset/bootstrap-duration-picker",
-            "version": "2.1.3",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/bootstrap-duration-picker/-/bootstrap-duration-picker-2.1.3.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/bootstrap-markdown-editor",
-            "version": "2.2.4",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/bootstrap-markdown-editor/-/bootstrap-markdown-editor-2.2.4.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/bootstrap-toggle",
-            "version": "2.2.2",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/bootstrap-toggle/-/bootstrap-toggle-2.2.2.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/checkboxes.js",
-            "version": "1.2.2",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/checkboxes.js/-/checkboxes.js-1.2.2.tgz"
-            },
-            "require": {
-                "npm-asset/jquery": ">=3.3.1,<4.0.0"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/filepond",
-            "version": "1.8.8",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/filepond/-/filepond-1.8.8.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/filepond-plugin-file-encode",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pqina/filepond-plugin-file-encode.git",
-                "reference": "003b2a11975e2719eeaff4c0350e020bc57ae520"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pqina/filepond-plugin-file-encode/zipball/003b2a11975e2719eeaff4c0350e020bc57ae520",
-                "reference": "003b2a11975e2719eeaff4c0350e020bc57ae520"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-03-25T08:08:29+00:00"
-        },
-        {
-            "name": "npm-asset/filepond-plugin-file-validate-size",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pqina/filepond-plugin-file-validate-size.git",
-                "reference": "e20c312ff668f00660ebd786f06df6b60d7f988d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pqina/filepond-plugin-file-validate-size/zipball/e20c312ff668f00660ebd786f06df6b60d7f988d",
-                "reference": "e20c312ff668f00660ebd786f06df6b60d7f988d"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-07-11T06:19:04+00:00"
-        },
-        {
-            "name": "npm-asset/filepond-plugin-file-validate-type",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pqina/filepond-plugin-file-validate-type.git",
-                "reference": "d37ee1d4b5a82ef1543f5fa73f2db80d1b890ecc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pqina/filepond-plugin-file-validate-type/zipball/d37ee1d4b5a82ef1543f5fa73f2db80d1b890ecc",
-                "reference": "d37ee1d4b5a82ef1543f5fa73f2db80d1b890ecc"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-08-26T06:06:57+00:00"
-        },
-        {
-            "name": "npm-asset/filepond-plugin-image-crop",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pqina/filepond-plugin-image-crop.git",
-                "reference": "9239d0231df274a07714952c5d28d5f292f1b2b0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pqina/filepond-plugin-image-crop/zipball/9239d0231df274a07714952c5d28d5f292f1b2b0",
-                "reference": "9239d0231df274a07714952c5d28d5f292f1b2b0"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-03-25T08:25:28+00:00"
-        },
-        {
-            "name": "npm-asset/filepond-plugin-image-exif-orientation",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pqina/filepond-plugin-image-exif-orientation.git",
-                "reference": "7a384d4f4a73670fb897f5764959da689bae4545"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pqina/filepond-plugin-image-exif-orientation/zipball/7a384d4f4a73670fb897f5764959da689bae4545",
-                "reference": "7a384d4f4a73670fb897f5764959da689bae4545"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-03-25T08:27:23+00:00"
-        },
-        {
-            "name": "npm-asset/filepond-plugin-image-preview",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pqina/filepond-plugin-image-preview.git",
-                "reference": "6bf4d0b4c8f90176c97abc508a784887cbc16583"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pqina/filepond-plugin-image-preview/zipball/6bf4d0b4c8f90176c97abc508a784887cbc16583",
-                "reference": "6bf4d0b4c8f90176c97abc508a784887cbc16583"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-08-20T06:47:33+00:00"
-        },
-        {
-            "name": "npm-asset/filepond-plugin-image-resize",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pqina/filepond-plugin-image-resize.git",
-                "reference": "52e428767fabdd3ab0a485f0301dc1f4b0b46fc5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pqina/filepond-plugin-image-resize/zipball/52e428767fabdd3ab0a485f0301dc1f4b0b46fc5",
-                "reference": "52e428767fabdd3ab0a485f0301dc1f4b0b46fc5"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-03-25T08:29:28+00:00"
-        },
-        {
-            "name": "npm-asset/filepond-plugin-image-transform",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pqina/filepond-plugin-image-transform.git",
-                "reference": "7a56c529e49b4d8559da60ac081c51f3ed0d1db5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pqina/filepond-plugin-image-transform/zipball/7a56c529e49b4d8559da60ac081c51f3ed0d1db5",
-                "reference": "7a56c529e49b4d8559da60ac081c51f3ed0d1db5"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-08-14T13:42:20+00:00"
-        },
-        {
-            "name": "npm-asset/flatpickr",
-            "version": "4.6.2",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/flatpickr/-/flatpickr-4.6.2.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/font-awesome",
-            "version": "4.7.0",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/font-awesome/-/font-awesome-4.7.0.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "(OFL-1.1 AND MIT)"
-            ]
-        },
-        {
-            "name": "npm-asset/jquery",
-            "version": "3.4.1",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/jquery/-/jquery-3.4.1.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/jquery-awesome-cursor",
-            "version": "0.3.1",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/jquery-awesome-cursor/-/jquery-awesome-cursor-0.3.1.tgz"
-            },
-            "require": {
-                "npm-asset/font-awesome": "dev-4.x|4.x"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/jquery-mask-plugin",
-            "version": "1.14.16",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/jquery-mask-plugin/-/jquery-mask-plugin-1.14.16.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/jsignature",
-            "version": "2.1.3",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/jsignature/-/jsignature-2.1.3.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/leaflet",
-            "version": "1.5.1",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/leaflet/-/leaflet-1.5.1.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "BSD-2-Clause"
-            ]
-        },
-        {
-            "name": "npm-asset/markitup",
-            "version": "3.0.0-patch0",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/markitup/-/markitup-3.0.0-0.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/select2",
-            "version": "4.0.10",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/select2/-/select2-4.0.10.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/signature_pad",
-            "version": "2.3.2",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/signature_pad/-/signature_pad-2.3.2.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
             "name": "oomphinc/composer-installers-extender",
             "version": "v1.1.2",
             "source": {
@@ -1352,16 +1014,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+                "reference": "bf73deb2b3b896a9d9c75f3f0d88185d2faa27e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
-                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/bf73deb2b3b896a9d9c75f3f0d88185d2faa27e2",
+                "reference": "bf73deb2b3b896a9d9c75f3f0d88185d2faa27e2",
                 "shasum": ""
             },
             "require": {
@@ -1370,7 +1032,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "1.1.x-dev"
                 }
             },
             "autoload": {
@@ -1395,7 +1057,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-11-20T15:27:04+00:00"
+            "time": "2019-10-25T08:06:51+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -1447,16 +1109,16 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v4.3.4",
+            "version": "v4.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
-                "reference": "c6e5e2a00db768c92c3ae131532af4e1acc7bd03"
+                "reference": "f4b3ff6a549d9ed28b2b0ecd1781bf67cf220ee9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/c6e5e2a00db768c92c3ae131532af4e1acc7bd03",
-                "reference": "c6e5e2a00db768c92c3ae131532af4e1acc7bd03",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/f4b3ff6a549d9ed28b2b0ecd1781bf67cf220ee9",
+                "reference": "f4b3ff6a549d9ed28b2b0ecd1781bf67cf220ee9",
                 "shasum": ""
             },
             "require": {
@@ -1496,25 +1158,27 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
-            "time": "2019-08-20T14:07:54+00:00"
+            "time": "2019-10-02T08:36:26+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
-            "version": "2.2.1",
+            "version": "2.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tijsverkoyen/CssToInlineStyles.git",
-                "reference": "0ed4a2ea4e0902dac0489e6436ebcd5bbcae9757"
+                "reference": "dda2ee426acd6d801d5b7fd1001cde9b5f790e15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tijsverkoyen/CssToInlineStyles/zipball/0ed4a2ea4e0902dac0489e6436ebcd5bbcae9757",
-                "reference": "0ed4a2ea4e0902dac0489e6436ebcd5bbcae9757",
+                "url": "https://api.github.com/repos/tijsverkoyen/CssToInlineStyles/zipball/dda2ee426acd6d801d5b7fd1001cde9b5f790e15",
+                "reference": "dda2ee426acd6d801d5b7fd1001cde9b5f790e15",
                 "shasum": ""
             },
             "require": {
+                "ext-dom": "*",
+                "ext-libxml": "*",
                 "php": "^5.5 || ^7.0",
-                "symfony/css-selector": "^2.7 || ^3.0 || ^4.0"
+                "symfony/css-selector": "^2.7 || ^3.0 || ^4.0 || ^5.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
@@ -1543,7 +1207,7 @@
             ],
             "description": "CssToInlineStyles is a class that enables you to convert HTML-pages/files into HTML-pages/files with inline styles. This is very useful when you're sending emails.",
             "homepage": "https://github.com/tijsverkoyen/CssToInlineStyles",
-            "time": "2017-11-27T11:13:29+00:00"
+            "time": "2019-10-24T08:53:34+00:00"
         },
         {
             "name": "twbs/bootstrap",
@@ -2018,22 +1682,22 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.8.1",
+            "version": "1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "1927e75f4ed19131ec9bcc3b002e07fb1173ee76"
+                "reference": "f6811d96d97bdf400077a0cc100ae56aa32b9203"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/1927e75f4ed19131ec9bcc3b002e07fb1173ee76",
-                "reference": "1927e75f4ed19131ec9bcc3b002e07fb1173ee76",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/f6811d96d97bdf400077a0cc100ae56aa32b9203",
+                "reference": "f6811d96d97bdf400077a0cc100ae56aa32b9203",
                 "shasum": ""
             },
             "require": {
                 "doctrine/instantiator": "^1.0.2",
                 "php": "^5.3|^7.0",
-                "phpdocumentor/reflection-docblock": "^2.0|^3.0.2|^4.0",
+                "phpdocumentor/reflection-docblock": "^2.0|^3.0.2|^4.0|^5.0",
                 "sebastian/comparator": "^1.1|^2.0|^3.0",
                 "sebastian/recursion-context": "^1.0|^2.0|^3.0"
             },
@@ -2077,7 +1741,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2019-06-13T12:50:23+00:00"
+            "time": "2019-10-03T11:07:50+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3133,15 +2797,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "bower-asset/json2": 20,
-        "npm-asset/filepond-plugin-file-encode": 20,
-        "npm-asset/filepond-plugin-file-validate-size": 20,
-        "npm-asset/filepond-plugin-file-validate-type": 20,
-        "npm-asset/filepond-plugin-image-crop": 20,
-        "npm-asset/filepond-plugin-image-exif-orientation": 20,
-        "npm-asset/filepond-plugin-image-preview": 20,
-        "npm-asset/filepond-plugin-image-resize": 20,
-        "npm-asset/filepond-plugin-image-transform": 20
+        "bower-asset/json2": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
