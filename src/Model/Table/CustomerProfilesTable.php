@@ -163,4 +163,45 @@
             $rules->add($rules->existsIn(['member_id'], 'Members'));
             return $rules;
         }
+
+        /**
+         * @param string $email
+         * @param string $member_id
+         * @param bool   $save if one should save to the local database for reuse later
+         *
+         * @return bool|AnetAPI\CustomerPaymentProfileType
+         */
+        public function getRemoteFromEmail($email, $member_id, $save = TRUE) {
+            $merchantAuthentication = $this->__getMerchantAuthentication();
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+            $getCustomerRequest = new AnetAPI\GetCustomerProfileRequest();
+            $getCustomerRequest->setMerchantAuthentication($merchantAuthentication);
+            $getCustomerRequest->setEmail($email);
+            $controller = new AnetController\GetCustomerProfileController($getCustomerRequest);
+            /** @var \net\authorize\api\contract\v1\GetCustomerPaymentProfileResponse $response */
+            $response = $controller->executeWithApiResponse($this->getEndpoint());
+            if (($response != NULL) && ($response->getMessages()->getResultCode() == "Ok")) {
+                /** @var \net\authorize\api\contract\v1\CustomerPaymentProfileType $profileSelected */
+                $profileSelected = $response->getProfile();
+                $customer_profile_id = $profileSelected->getCustomerProfileId();
+                $profile = $this->newEntity(
+                    [
+                        'member_id'  => $member_id,
+                        'profile_id' => $customer_profile_id,
+                        'config'     => $this->_credentials,
+                        'email'      => $email,
+                    ]);
+                if ($save) {
+                    $this->save($profile);
+                }
+                return $profileSelected;
+            }
+            else {
+                // handle errors/
+                return FALSE;
+            }
+            return FALSE;
+        }
+
     }

@@ -359,7 +359,7 @@ CHECKBOX_LIMIT;
      * @return mixed
      */
     private function __datamask($options) {
-        $this->Html->useScript('/assets/npm-asset/jquery-mask-plugin/dist/jquery.mask.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useScript('Scid.jquery.mask.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         // could add options and build out the script rather then using attribute later
         if (is_array($options['data-mask'])) {
             $mask = $options['data-mask']['mask'];
@@ -820,8 +820,8 @@ EXPAND;
          * <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
          */
         $useFullBase = $this->__useFullBase();
-        $this->Html->useCssFile(['/node_modules/select2/dist/css/select2.min', 'Scid.select2-bootstrap.min'], ['fullBase' => $useFullBase]);
-        $this->Html->useScript('/node_modules/select2/dist/js/select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM, 'fullBase' => $useFullBase]);
+        $this->Html->useCssFile(['Scid.select2.min', 'Scid.select2-bootstrap.min'], ['fullBase' => $useFullBase]);
+        $this->Html->useScript('Scid.select2.min', ['block' => HtmlHelper::SCRIPT_BOTTOM, 'fullBase' => $useFullBase]);
         $options['type'] = 'select';
         $id = $options['id'];
 
@@ -853,8 +853,8 @@ EXPAND;
     }
 
     private function __select2Sortable($options) {
-        $this->Html->useCssFile(['/node_modules/select2/dist/css/select2.min', 'Scid.select2-bootstrap.min']);
-        $this->Html->useScript(['/node_modules/select2/dist/js/select2.min', 'Scid.jquery-ui.min'], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useCssFile(['Scid.select2.min', 'Scid.select2-bootstrap.min']);
+        $this->Html->useScript(['Scid.select2.min', 'Scid.jquery-ui.min'], ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $options['type'] = 'select';
         $id = $options['id'];
 
@@ -872,8 +872,8 @@ EXPAND;
             $script = <<<SELECT_2_SORTABLE_USE
 $(document).ready(function() {
     $('#{$id}').select2({$selectOptions});
-    
- 
+
+
   function select2_sortable(\$select2){
         var ul = \$select2.next('.select2-container').first('ul.select2-selection__rendered');
         ul.sortable({
@@ -887,16 +887,16 @@ $(document).ready(function() {
                     function hasTitle(title, value) {
   return $(this).html() == title;
 }
-                    var option = $('#test option').filter(function () { 
+                    var option = $('#test option').filter(function () {
                     return $(this).html() == title;
                      }).val();
                     \$select2.prepend(option);
                 });
-                
+
             }
         });
     }
-    
+
     select2_sortable($("#{$id}"));
 });
 SELECT_2_SORTABLE_USE;
@@ -986,7 +986,7 @@ var group = $('${tag}.${group}').sortable({
 var token = $('[name="_csrfToken"]').val();
     var jsonString = JSON.stringify(data, null, ' ');
     $('#${id}').val(jsonString);
-    
+
     $.ajax({
         beforeSend: function (xhr) { // Add this line
             xhr.setRequestHeader('X-CSRF-Token', $('[name="_csrfToken"]').val());
@@ -996,7 +996,7 @@ var token = $('[name="_csrfToken"]').val();
         url: '${url}',
         dataType: "html",
         success: function(data, textStatus) {
-        $("#{$target_id}").html(data);    
+        $("#{$target_id}").html(data);
     },
     });
     _super(\$item, container
@@ -1210,7 +1210,7 @@ TAG;
      console.log(jqXHR);
      $("#{$idForInput}").bootstrapToggle({
      onstyle:'danger',offstyle:'danger'});
-     
+
      alert(textStatus + ': problem updating database');
   }
 });
@@ -1304,12 +1304,12 @@ SWITCH;
 
         $this->addWidget('signature',
                          ['Scid.Signature', 'text', 'label']);
-        $this->Html->useScript('/assets/npm-asset/signature_pad/dist/signature_pad.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useScript('/Scid.signature_pad.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $signatureBlock = /** @lang JavaScript 1.8 */
             <<<SIGNATURE_SCRIPT
 var wrapper = document.getElementById("{$wrapper_id}");
 var canvas = wrapper.querySelector("canvas");
-var signaturePad = new SignaturePad(canvas, 
+var signaturePad = new SignaturePad(canvas,
     // It's Necessary to use an opaque color when saving image as JPEG;
     // this option can be omitted if only saving as PNG or SVG
     {$signatureOptions}
@@ -1553,7 +1553,7 @@ CHECK_ALL_SCRIPT;
                                    'Scid.moment.min',
                                    'Scid.bootstrap-datetimepicker.min',
                                ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-        $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
+        $this->Html->css('Scid.bootstrap-datetimepicker.min',  ['block' => TRUE,]);
         if (!empty($this->_inputDefaults['after'])) {
             $options['after'] = $this->_inputDefaults['after'];
         }
@@ -1580,7 +1580,7 @@ CHECK_ALL_SCRIPT;
                                    'Scid.moment.min',
                                    'Scid.bootstrap-datetimepicker.min',
                                ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-        $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
+        $this->Html->css('Scid.bootstrap-datetimepicker.min' , ['block' => TRUE,]);
         if (!empty($this->_inputDefaults['after'])) {
             $options['after'] = $this->_inputDefaults['after'];
         }
@@ -1608,7 +1608,7 @@ CHECK_ALL_SCRIPT;
                                    'Scid.moment.min',
                                    'Scid.bootstrap-datetimepicker.min',
                                ], ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
-        $this->Html->css('Scid.bootstrap-datetimepicker.min', 'stylesheet', ['block' => TRUE,]);
+        $this->Html->css('Scid.bootstrap-datetimepicker.min',  ['block' => TRUE,]);
         if (!empty($this->_inputDefaults['after'])) {
             $options['after'] = $this->_inputDefaults['after'];
         }
@@ -1677,7 +1677,7 @@ $('#${buttonID}').on('click', function () {
     {$var_id}.val(result).trigger('change');
 return false;
 });
-                            
+
 SELECT_BUTTONS;
             }
             $script = implode("\r", $script);

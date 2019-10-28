@@ -2,6 +2,9 @@
 namespace Scid\Model\Entity;
 
 use Cake\ORM\Entity;
+use Scid\Utility\ScidPaymentsTrait;
+use net\authorize\api\contract\v1 as AnetAPI;
+use net\authorize\api\controller as AnetController;
 
 /**
  * ScidCustomerProfile Entity
@@ -21,6 +24,7 @@ use Cake\ORM\Entity;
 class CustomerProfile extends Entity
 {
 
+    use ScidPaymentsTrait;
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
@@ -40,4 +44,28 @@ class CustomerProfile extends Entity
         'member' => true,
         'profile' => true
     ];
+
+    public function getRemote() {
+        $merchantAuthentication = $this->__getMerchantAuthentication();
+        // Set the transaction's refId
+        $refId = 'ref' . time();
+        $getCustomerRequest = new AnetAPI\GetCustomerProfileRequest();
+        $getCustomerRequest->setMerchantAuthentication($merchantAuthentication);
+        $getCustomerRequest->setCustomerProfileId($this->profile_id);
+        $controller = new AnetController\GetCustomerProfileController($getCustomerRequest);
+        /** @var \net\authorize\api\contract\v1\GetCustomerPaymentProfileResponse $response */
+        $response = $controller->executeWithApiResponse($this->getEndpoint());
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok") ) {
+            /** @var \net\authorize\api\contract\v1\CustomerPaymentProfileType $profileSelected */
+            $profileSelected = $response->getProfile();
+            return $profileSelected;
+
+        }
+        else {
+            // handle errors/
+            return false;
+
+        }
+        return false;
+    }
 }
