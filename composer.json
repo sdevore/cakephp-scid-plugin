@@ -6,7 +6,6 @@
     "require": {
         "php": ">=7.0.0",
         "authorizenet/authorizenet": "^2.0",
-        "bower-asset/json2": "dev-master",
         "cakephp/cakephp": ">=3.3.2 <4.0.0",
         "cebe/markdown": "*",
         "friendsofcake/bootstrap-ui": "^1.4",
@@ -39,18 +38,6 @@
         "psr-4": {
             "Scid\\Test\\": "tests",
             "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
-        }
-    },
-    "extra": {
-        "installer-types": [
-            "bower-asset",
-            "npm-asset"
-        ],
-        "installer-paths": {
-            "webroot/assets/{$vendor}/{$name}/": [
-                "type:bower-asset",
-                "type:npm-asset"
-            ]
         }
     }
 }
