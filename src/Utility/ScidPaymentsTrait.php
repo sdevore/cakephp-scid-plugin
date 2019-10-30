@@ -229,13 +229,24 @@
                 default:
                     $errorCodes = $this->getErrorMap();
                     if (empty($errorCodes[$errorCode])) {
-                        $entity->setError('credit_card_number', [
-                            __('{0}: {1}',
-                               [
-                                   $errorCode,
-                                   $errorText[0],
-                               ]),
-                        ]);
+                        if (is_array($errorText) and !empty($errorText)) {
+                            $errorText = 'Problem with Credit Card numer';
+                        }
+                        try {
+                            $entity->setError('credit_card_number', [
+                                __('{0}: {1}',
+                                   [
+                                       $errorCode,
+                                       $errorText[0],
+                                   ]),
+                            ]);
+                        }
+                        catch (\Exception $e) {
+                            $entity->setError('credit_card_number', [
+                                __('Problem with Credit Card number'),
+                            ]);
+                        }
+
                     }
                     else {
                         $codeMap = $errorCodes[$errorCode];
