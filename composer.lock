@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2bcdfc91ade955ec67b1ba27f2b80b09",
+    "content-hash": "c256cbe11eddb20545110584bd2a4336",
     "packages": [
         {
             "name": "aura/intl",
@@ -94,22 +94,6 @@
                 "payment"
             ],
             "time": "2019-01-14T13:32:41+00:00"
-        },
-        {
-            "name": "bower-asset/json2",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/douglascrockford/JSON-js.git",
-                "reference": "594c8fa5f8e3fb38b0977f1ff8a87e9d709e7db1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/douglascrockford/JSON-js/zipball/594c8fa5f8e3fb38b0977f1ff8a87e9d709e7db1",
-                "reference": "594c8fa5f8e3fb38b0977f1ff8a87e9d709e7db1"
-            },
-            "type": "bower-asset",
-            "time": "2019-08-26T22:15:55+00:00"
         },
         {
             "name": "cakephp/cakephp",
@@ -2796,9 +2780,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "bower-asset/json2": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
