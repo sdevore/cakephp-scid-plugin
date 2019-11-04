@@ -1304,7 +1304,7 @@ SWITCH;
 
         $this->addWidget('signature',
                          ['Scid.Signature', 'text', 'label']);
-        $this->Html->useScript('/Scid.signature_pad.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+        $this->Html->useScript('Scid.signature_pad.min', ['block' => HtmlHelper::SCRIPT_BOTTOM]);
         $signatureBlock = /** @lang JavaScript 1.8 */
             <<<SIGNATURE_SCRIPT
 var wrapper = document.getElementById("{$wrapper_id}");
