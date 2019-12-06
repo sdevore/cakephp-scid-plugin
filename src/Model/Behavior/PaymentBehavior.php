@@ -153,32 +153,33 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                 if ($response->getMessages()->getResultCode() == "Ok") {
                     // Since the API request was successful, look for a transaction response
                     // and parse it to display the results of authorizing the card
-                    /** @var AnetAPI\TransactionResponseType $tresponse */
-                    $tresponse = $response->getTransactionResponse();
+                    /** @var AnetAPI\TransactionResponseType $transactionResponse */
+                    $transactionResponse = $response->getTransactionResponse();
 
-                    if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
-                        $payment->transactionNumber = $tresponse->getTransId();
-                        $payment->authorizationNumber = $tresponse->getAuthCode();
+                    if ($transactionResponse != NULL && $transactionResponse->getMessages() != NULL) {
+                        $payment->transactionNumber = $transactionResponse->getTransId();
+                        $payment->authorizationNumber = $transactionResponse->getAuthCode();
                         $payment->scid_state = self::STATE_APPROVED;
                         $result['failed'] = FALSE;
-                        $result['transaction_id'] = $tresponse->getTransId();
-                        $result['response_code'] = $tresponse->getResponseCode();
-                        $result['code'] = $tresponse->getMessages()[0]->getCode();
-                        $result['auth_code'] = $tresponse->getAuthCode();
-                        $result['description'] = $tresponse->getMessages()[0]->getDescription();
+                        $result['transaction_id'] = $transactionResponse->getTransId();
+                        $result['response_code'] = $transactionResponse->getResponseCode();
+                        $result['code'] = $transactionResponse->getMessages()[0]->getCode();
+                        $result['auth_code'] = $transactionResponse->getAuthCode();
+                        $result['description'] = $transactionResponse->getMessages()[0]->getDescription();
 
                     } else {
                         $payment->scid_state = self::STATE_FAILED;
 
                         $result['failed'] = TRUE;
-                        if ($tresponse->getErrors() != NULL) {
-                            $errorCode = $tresponse->getErrors()[0]->getErrorCode();
-                            $errorText = $tresponse->getErrors()[0]->getErrorText();
+                        if ($transactionResponse->getErrors() != NULL) {
+                            $errorCode = $transactionResponse->getErrors()[0]->getErrorCode();
+                            $errorText = $transactionResponse->getErrors()[0]->getErrorText();
                             $result['error_code'] = $errorCode;
                             $result['error_message'] = $errorText;
                             $payment->setError('credit_card_number', [__('{0}: {1}',
                                                                          [$errorCode,
                                                                           $errorText])]);
+                            $this->__setErrorFromTransactionResponse($payment, $transactionResponse );
                         } else {
                             $payment->setError('credit_card_number', ['Transaction failed']);
                         }
@@ -186,15 +187,16 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                     // Or, print errors if the API request wasn't successful
                 } else {
                     $result['failed'] = TRUE;
-                    $tresponse = $response->getTransactionResponse();
+                    $transactionResponse = $response->getTransactionResponse();
                     $payment->scid_state = self::STATE_FAILED;
-                    if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
-                        $errorCode = $tresponse->getErrors()[0]->getErrorCode();
+                    if ($transactionResponse != NULL && $transactionResponse->getErrors() != NULL) {
+                        $errorCode = $transactionResponse->getErrors()[0]->getErrorCode();
 
-                        $errorText = $tresponse->getErrors()[0]->getErrorText();
+                        $errorText = $transactionResponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
                         $this->__setError($payment, $errorCode, $errorText);
+                        $this->__setErrorFromTransactionResponse($payment, $transactionResponse );
                     } else {
                         $errorCode = $response->getMessages()->getMessage()[0]->getCode();
                         $result['error_code'] = $errorCode;
@@ -272,31 +274,32 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                 if ($response->getMessages()->getResultCode() == "Ok") {
                     // Since the API request was successful, look for a transaction response
                     // and parse it to display the results of authorizing the card
-                    /** @var AnetAPI\TransactionResponseType $tresponse */
-                    $tresponse = $response->getTransactionResponse();
+                    /** @var AnetAPI\TransactionResponseType $transactionResponse */
+                    $transactionResponse = $response->getTransactionResponse();
 
-                    if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
-                        $payment->transactionNumber = $tresponse->getTransId();
-                        $payment->authorizationNumber = $tresponse->getAuthCode();
+                    if ($transactionResponse != NULL && $transactionResponse->getMessages() != NULL) {
+                        $payment->transactionNumber = $transactionResponse->getTransId();
+                        $payment->authorizationNumber = $transactionResponse->getAuthCode();
                         $payment->scid_state = self::STATE_CAPTURED;
                         $payment->status = self::STATE_CAPTURED;
                         $result['failed'] = FALSE;
-                        $result['transaction_id'] = $tresponse->getTransId();
-                        $result['response_code'] = $tresponse->getResponseCode();
-                        $result['code'] = $tresponse->getMessages()[0]->getCode();
-                        $result['auth_code'] = $tresponse->getAuthCode();
-                        $result['description'] = $tresponse->getMessages()[0]->getDescription();
+                        $result['transaction_id'] = $transactionResponse->getTransId();
+                        $result['response_code'] = $transactionResponse->getResponseCode();
+                        $result['code'] = $transactionResponse->getMessages()[0]->getCode();
+                        $result['auth_code'] = $transactionResponse->getAuthCode();
+                        $result['description'] = $transactionResponse->getMessages()[0]->getDescription();
 
                     } else {
                         $payment->scid_state = self::STATE_FAILED;
 
                         $result['failed'] = TRUE;
-                        if ($tresponse->getErrors() != NULL) {
-                            $errorCode = $tresponse->getErrors()[0]->getErrorCode();
-                            $errorText = $tresponse->getErrors()[0]->getErrorText();
+                        if ($transactionResponse->getErrors() != NULL) {
+                            $errorCode = $transactionResponse->getErrors()[0]->getErrorCode();
+                            $errorText = $transactionResponse->getErrors()[0]->getErrorText();
                             $result['error_code'] = $errorCode;
                             $result['error_message'] = $errorText;
                             $this->__setError($payment, $errorCode, $errorText);
+                            $this->__setErrorFromTransactionResponse($payment, $transactionResponse );
                         } else {
                             $payment->setError('credit_card_number', ['Transaction failed']);
                         }
@@ -304,12 +307,12 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                     // Or, print errors if the API request wasn't successful
                 } else {
                     $result['failed'] = TRUE;
-                    $tresponse = $response->getTransactionResponse();
+                    $transactionResponse = $response->getTransactionResponse();
                     $payment->scid_state = self::STATE_FAILED;
-                    if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
-                        $errorCode = $tresponse->getErrors()[0]->getErrorCode();
+                    if ($transactionResponse != NULL && $transactionResponse->getErrors() != NULL) {
+                        $errorCode = $transactionResponse->getErrors()[0]->getErrorCode();
 
-                        $errorText = $tresponse->getErrors()[0]->getErrorText();
+                        $errorText = $transactionResponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
                         $this->__setError($payment, $errorCode, $errorText);
@@ -390,31 +393,32 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                 if ($response->getMessages()->getResultCode() == "Ok") {
                     // Since the API request was successful, look for a transaction response
                     // and parse it to display the results of authorizing the card
-                    /** @var AnetAPI\TransactionResponseType $tresponse */
-                    $tresponse = $response->getTransactionResponse();
+                    /** @var AnetAPI\TransactionResponseType $transactionResponse */
+                    $transactionResponse = $response->getTransactionResponse();
 
-                    if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
-                        $payment->transactionNumber = $tresponse->getTransId();
-                        $payment->authorizationNumber = $tresponse->getAuthCode();
+                    if ($transactionResponse != NULL && $transactionResponse->getMessages() != NULL) {
+                        $payment->transactionNumber = $transactionResponse->getTransId();
+                        $payment->authorizationNumber = $transactionResponse->getAuthCode();
                         $payment->scid_state = self::STATE_CAPTURED;
                         $payment->status = self::STATE_APPROVED;
                         $result['failed'] = FALSE;
-                        $result['transaction_id'] = $tresponse->getTransId();
-                        $result['response_code'] = $tresponse->getResponseCode();
-                        $result['code'] = $tresponse->getMessages()[0]->getCode();
-                        $result['auth_code'] = $tresponse->getAuthCode();
-                        $result['description'] = $tresponse->getMessages()[0]->getDescription();
+                        $result['transaction_id'] = $transactionResponse->getTransId();
+                        $result['response_code'] = $transactionResponse->getResponseCode();
+                        $result['code'] = $transactionResponse->getMessages()[0]->getCode();
+                        $result['auth_code'] = $transactionResponse->getAuthCode();
+                        $result['description'] = $transactionResponse->getMessages()[0]->getDescription();
 
                     } else {
                         $payment->scid_state = self::STATE_FAILED;
 
                         $result['failed'] = TRUE;
-                        if ($tresponse->getErrors() != NULL) {
-                            $errorCode = $tresponse->getErrors()[0]->getErrorCode();
-                            $errorText = $tresponse->getErrors()[0]->getErrorText();
+                        if ($transactionResponse->getErrors() != NULL) {
+                            $errorCode = $transactionResponse->getErrors()[0]->getErrorCode();
+                            $errorText = $transactionResponse->getErrors()[0]->getErrorText();
                             $result['error_code'] = $errorCode;
                             $result['error_message'] = $errorText;
-                            $this->__setError($payment, $errorCode, $errorText, $tresponse);
+                            $this->__setError($payment, $errorCode, $errorText, $transactionResponse);
+                            $this->__setErrorFromTransactionResponse($payment, $transactionResponse );
                         } else {
                             $payment->setError('credit_card_number', ['Transaction failed']);
                         }
@@ -422,21 +426,21 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                     // Or, print errors if the API request wasn't successful
                 } else {
                     $result['failed'] = TRUE;
-                    $tresponse = $response->getTransactionResponse();
+                    $transactionResponse = $response->getTransactionResponse();
                     $payment->scid_state = self::STATE_FAILED;
-                    if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
-                        $errorCode = $tresponse->getErrors()[0]->getErrorCode();
+                    if ($transactionResponse != NULL && $transactionResponse->getErrors() != NULL) {
+                        $errorCode = $transactionResponse->getErrors()[0]->getErrorCode();
 
-                        $errorText = $tresponse->getErrors()[0]->getErrorText();
+                        $errorText = $transactionResponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
-                        $this->__setError($payment, $errorCode, $errorText, $tresponse);
+                        $this->__setError($payment, $errorCode, $errorText, $transactionResponse);
                     } else {
                         $errorCode = $response->getMessages()->getMessage()[0]->getCode();
                         $result['error_code'] = $errorCode;
                         $errorText = $response->getMessages()->getMessage()[0]->getText();
                         $result['error_message'] = $errorText;
-                        $this->__setError($payment, $errorCode, $errorText, $tresponse);
+                        $this->__setError($payment, $errorCode, $errorText, $transactionResponse);
                     }
                 }
             } else {
@@ -504,27 +508,27 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                 if ($response->getMessages()->getResultCode() == "Ok") {
                     // Since the API request was successful, look for a transaction response
                     // and parse it to display the results of authorizing the card
-                    /** @var AnetAPI\TransactionResponseType $tresponse */
-                    $tresponse = $response->getTransactionResponse();
+                    /** @var AnetAPI\TransactionResponseType $transactionResponse */
+                    $transactionResponse = $response->getTransactionResponse();
 
-                    if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
-                        $payment->transactionNumber = $tresponse->getTransId();
-                        $payment->authorizationNumber = $tresponse->getAuthCode();
+                    if ($transactionResponse != NULL && $transactionResponse->getMessages() != NULL) {
+                        $payment->transactionNumber = $transactionResponse->getTransId();
+                        $payment->authorizationNumber = $transactionResponse->getAuthCode();
                         $payment->scid_state = self::STATE_VOIDED;
                         $result['failed'] = FALSE;
-                        $result['transaction_id'] = $tresponse->getTransId();
-                        $result['response_code'] = $tresponse->getResponseCode();
-                        $result['code'] = $tresponse->getMessages()[0]->getCode();
-                        $result['auth_code'] = $tresponse->getAuthCode();
-                        $result['description'] = $tresponse->getMessages()[0]->getDescription();
+                        $result['transaction_id'] = $transactionResponse->getTransId();
+                        $result['response_code'] = $transactionResponse->getResponseCode();
+                        $result['code'] = $transactionResponse->getMessages()[0]->getCode();
+                        $result['auth_code'] = $transactionResponse->getAuthCode();
+                        $result['description'] = $transactionResponse->getMessages()[0]->getDescription();
 
                     } else {
                         $payment->scid_state = self::STATE_FAILED;
 
                         $result['failed'] = TRUE;
-                        if ($tresponse->getErrors() != NULL) {
-                            $errorCode = $tresponse->getErrors()[0]->getErrorCode();
-                            $errorText = $tresponse->getErrors()[0]->getErrorText();
+                        if ($transactionResponse->getErrors() != NULL) {
+                            $errorCode = $transactionResponse->getErrors()[0]->getErrorCode();
+                            $errorText = $transactionResponse->getErrors()[0]->getErrorText();
                             $result['error_code'] = $errorCode;
                             $result['error_message'] = $errorText;
                             $this->__setError($payment, $errorCode, $errorText);
@@ -535,12 +539,12 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
                     // Or, print errors if the API request wasn't successful
                 } else {
                     $result['failed'] = TRUE;
-                    $tresponse = $response->getTransactionResponse();
+                    $transactionResponse = $response->getTransactionResponse();
                     $payment->scid_state = self::STATE_FAILED;
-                    if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
-                        $errorCode = $tresponse->getErrors()[0]->getErrorCode();
+                    if ($transactionResponse != NULL && $transactionResponse->getErrors() != NULL) {
+                        $errorCode = $transactionResponse->getErrors()[0]->getErrorCode();
 
-                        $errorText = $tresponse->getErrors()[0]->getErrorText();
+                        $errorText = $transactionResponse->getErrors()[0]->getErrorText();
                         $result['error_message'] = $errorText;
                         $result['error_code'] = $errorCode;
                         $this->__setError($payment, $errorCode, $errorText);
@@ -665,30 +669,30 @@ class PaymentBehavior extends Behavior implements ScidPaymentsInterface
             if ($response->getMessages()->getResultCode() == "Ok") {
                 // Since the API request was successful, look for a transaction response
                 // and parse it to display the results of authorizing the card
-                $tresponse = $response->getTransactionResponse();
+                $transactionResponse = $response->getTransactionResponse();
 
-                if ($tresponse != NULL && $tresponse->getMessages() != NULL) {
+                if ($transactionResponse != NULL && $transactionResponse->getMessages() != NULL) {
                     $result['failed'] = FALSE;
-                    $result['transaction_id'] = $tresponse->getTransId();
-                    $result['response_code'] = $tresponse->getResponseCode();
-                    $result['code'] = $tresponse->getMessages()[0]->getCode();
-                    $result['auth_code'] = $tresponse->getAuthCode();
-                    $result['description'] = $tresponse->getMessages()[0]->getDescription();
+                    $result['transaction_id'] = $transactionResponse->getTransId();
+                    $result['response_code'] = $transactionResponse->getResponseCode();
+                    $result['code'] = $transactionResponse->getMessages()[0]->getCode();
+                    $result['auth_code'] = $transactionResponse->getAuthCode();
+                    $result['description'] = $transactionResponse->getMessages()[0]->getDescription();
                 } else {
                     $result['failed'] = TRUE;
-                    if ($tresponse->getErrors() != NULL) {
-                        $result['error_code'] = $tresponse->getErrors()[0]->getErrorCode();
-                        $result['error_message'] = $tresponse->getErrors()[0]->getErrorText();
+                    if ($transactionResponse->getErrors() != NULL) {
+                        $result['error_code'] = $transactionResponse->getErrors()[0]->getErrorCode();
+                        $result['error_message'] = $transactionResponse->getErrors()[0]->getErrorText();
                     }
                 }
                 // Or, print errors if the API request wasn't successful
             } else {
                 $result['failed'] = TRUE;
-                $tresponse = $response->getTransactionResponse();
+                $transactionResponse = $response->getTransactionResponse();
 
-                if ($tresponse != NULL && $tresponse->getErrors() != NULL) {
-                    $result['error_code'] = $tresponse->getErrors()[0]->getErrorCode();
-                    $result['error_message'] = $tresponse->getErrors()[0]->getErrorText();
+                if ($transactionResponse != NULL && $transactionResponse->getErrors() != NULL) {
+                    $result['error_code'] = $transactionResponse->getErrors()[0]->getErrorCode();
+                    $result['error_message'] = $transactionResponse->getErrors()[0]->getErrorText();
                 } else {
                     $result['error_code'] = $response->getMessages()->getMessage()[0]->getCode();
                     $result['error_message'] = $response->getMessages()->getMessage()[0]->getText();

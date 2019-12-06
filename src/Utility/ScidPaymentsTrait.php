@@ -62,6 +62,52 @@
         }
 
         /**
+         * address verification error
+         * @param $code
+         *
+         * @return mixed|string
+         */
+        protected function getAvsResultError($code) {
+            $map = [
+                'A' => 'The street address matched, but the postal code did not.',
+                'B' => 'No address information was provided.', 'E' => 'The AVS check returned an error.',
+                'G' => 'The card was issued by a bank outside the U.S. and does not support AVS.',
+                'N' => 'Neither the street address nor postal code matched.',
+                'P' => 'AVS is not applicable for this transaction.',
+                'R' => 'Retry — AVS was unavailable or timed out.', 'S' => 'AVS is not supported by card issuer.',
+                'U' => 'Address information is unavailable.',
+                'W' => 'The US ZIP+4 code matches, but the street address does not.',
+                'X' => 'Both the street address and the US ZIP+4 code matched.',
+                'Y' => 'The street address and postal code matched.',
+                'Z' => 'The postal code matched, but the street address did not.',
+            ];
+            if (!empty($map[$code])) {
+                return $map[$code];
+            }
+            return 'unknown Address Verification Service (AVS) error';
+        }
+
+        protected function getCVVResultError($code) {
+            $map = [
+                'M' => 'CVV matched.', 'N' => 'CVV did not match.', 'P' => 'CVV was not processed.',
+                'S' => 'CVV should have been present but was not indicated.',
+                'U' => 'The issuer was unable to process the CVV check.',
+            ];
+            if (!empty($map[$code])) {
+                return $map[$code];
+            }
+            return 'unknown Card code verification (CCV) error';
+        }
+
+        protected function getCavvResultError($code) {
+            $map = ['0' => 'CAVV was not validated because erroneous data was submitted.','1' => 'CAVV failed validation.','2' => 'CAVV passed validation.','3' => 'CAVV validation could not be performed; issuer attempt incomplete.','4' => 'CAVV validation could not be performed; issuer system error.','5' => 'Reserved for future use.','6' => 'Reserved for future use.','7' => 'CAVV failed validation, but the issuer is available. Valid for U.S.-issued card submitted to non-U.S acquirer.','8' => 'CAVV passed validation and the issuer is available. Valid for U.S.-issued card submitted to non-U.S. acquirer.','9' => 'CAVV failed validation and the issuer is unavailable. Valid for U.S.-issued card submitted to non-U.S acquirer.','A' => 'CAVV passed validation but the issuer unavailable. Valid for U.S.-issued card submitted to non-U.S acquirer.','B' => 'CAVV passed validation, information only, no liability shift.',];
+            if (!empty($map[$code])) {
+                return $map[$code];
+            }
+            return 'unknown Cardholder authentication verification error';
+        }
+
+        /**
          * @return mixed
          */
         protected function getErrorMap() {
@@ -121,7 +167,6 @@
                     else {
                         $card->setExpirationDate($entity->expiration_date);
                     }
-
                 }
                 else if (!empty($entity->expMonth) && !empty($entity->expYear)) {
                     $month = $entity->expMonth;
@@ -180,10 +225,10 @@
          * @param EntityInterface|Payment|PaymentProfile|CustomerProfile $entity
          * @param integer                                                $errorCode
          * @param string                                                 $errorText
-         * @param AnetAPI\TransactionResponseType $response
+         * @param AnetAPI\TransactionResponseType                        $response
          * @return void
          */
-        protected function __setError($entity, $errorCode, $errorText, $response = null): void {
+        protected function __setError($entity, $errorCode, $errorText, $response = NULL): void {
             $errorText = [$errorText];
             switch ($errorCode) {
                 case 5:
@@ -240,13 +285,11 @@
                                        $errorText[0],
                                    ]),
                             ]);
-                        }
-                        catch (\Exception $e) {
+                        } catch (\Exception $e) {
                             $entity->setError('credit_card_number', [
                                 __('Problem with Credit Card number'),
                             ]);
                         }
-
                     }
                     else {
                         $codeMap = $errorCodes[$errorCode];
@@ -274,6 +317,26 @@
                             $entity->setError('default', $codeMap->description);
                         }
                     }
+            }
+        }
+
+        /**
+         * @param Payment                         $payment
+         * @param AnetAPI\TransactionResponseType $tresponse
+         * @return Payment
+         */
+        protected function __setErrorFromTransactionResponse($payment, $tresponse) {
+            if ($tresponse->getResponseCode() !== 1) {
+                if ($tresponse->getAvsResultCode() !== 'Y') {
+                    $payment->setError('address', $this->getAvsResultError($tresponse->getAvsResultCode()));
+                }
+                if ($tresponse->getCvvResultCode() !== 'M') {
+                    $payment->setError('cvv', $this->getCVVResultError($tresponse->getCvvResultCode()));
+                    $payment->setError('card_code', $this->getCVVResultError($tresponse->getCvvResultCode()));
+                }
+                if ($tresponse->getCavvResultCode() !== '2') {
+                    $payment->setError('cavv', $this->getAvsResultError($tresponse->getAvsResultCode()));
+                }
             }
         }
 
