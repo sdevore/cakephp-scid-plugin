@@ -22,6 +22,7 @@ use Money\Currency;
 use Money\Money;
 use Money\Currencies\ISOCurrencies;
 use Money\Formatter\IntlMoneyFormatter;
+use mikehaertl\pdftk\Pdf;
 
 /**
  * Utility class
@@ -261,36 +262,49 @@ class ScidUtils
      * @return boolean|string
      */
     public static function concatinatePDF($sources, $destination) {
-        $pdftkPath = Configure::read('Scid.PDF.path');
-        if (!is_executable($pdftkPath)) {
-            throw new Exception(sprintf('pdftk binary is not found or not executable: %s', $pdftkPath));
-        }
+        $handle = 'A';
+
+//        $pdftkPath = Configure::read('Scid.PDF.path');
+//        if (!is_executable($pdftkPath)) {
+//            throw new Exception(sprintf('pdftk binary is not found or not executable: %s', $pdftkPath));
+//        }
         if (!is_array($sources)) {
             $sources = [$sources];
         }
         $paths = [];
+        $pages = [];
         foreach ($sources as $source) {
             if ($source instanceof File) {
                 $paths[] = $source->path;
+                $pages[$handle++] = $source->path;
             } else {
-                $paths = $source;
+                $paths[] = $source;
+                $pages[$handle++] = $source;
             }
         }
         if ($destination instanceof File) {
             $destination = $destination->path;
         }
-        $arguments = implode(' ', $paths);
-
-        $command = sprintf('%s %s cat output %s', $pdftkPath, $arguments, $destination);
-
-        $outputString = NULL;
-        $output = 0;
-        $out = exec($command, $outputString, $output);
-        if ($output == 0) {
-            return TRUE;
-        } else {
-            return FALSE;
+//        $arguments = implode(' ', $paths);
+//
+//        $command = sprintf('%s %s cat output %s', $pdftkPath, $arguments, $destination);
+//
+//        $outputString = NULL;
+//        $output = 0;
+//        $out = exec($command, $outputString, $output);
+        $bulkPDF = new PDF($pages);
+        if (!$bulkPDF->saveAs($destination)) {
+            $error = $bulkPDF->getError();
+            return false;
         }
+        else {
+            return true;
+        }
+//        if ($output == 0) {
+//            return TRUE;
+//        } else {
+//            return FALSE;
+//        }
     }
 
     /**
