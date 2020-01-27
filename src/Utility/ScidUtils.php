@@ -263,7 +263,7 @@ class ScidUtils
      */
     public static function concatinatePDF($sources, $destination) {
         $handle = 'A';
-
+// don't use the path directly anymore try using the plugin works a bit better
 //        $pdftkPath = Configure::read('Scid.PDF.path');
 //        if (!is_executable($pdftkPath)) {
 //            throw new Exception(sprintf('pdftk binary is not found or not executable: %s', $pdftkPath));
@@ -285,6 +285,7 @@ class ScidUtils
         if ($destination instanceof File) {
             $destination = $destination->path;
         }
+        // don't directly use the hard path and directly interact with the pdftk exec
 //        $arguments = implode(' ', $paths);
 //
 //        $command = sprintf('%s %s cat output %s', $pdftkPath, $arguments, $destination);
