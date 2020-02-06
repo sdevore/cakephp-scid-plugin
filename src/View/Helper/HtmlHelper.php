@@ -1175,7 +1175,7 @@ TOGGLE_HEADING_ICON;
         }
 
         public function scriptBlock($script, array $options = []) {
-            if (empty($options['block'])) {
+            if (empty($options['block']) && !isset($options['defer'])) {
                 $options['block'] = self::SCRIPT_BOTTOM;
             }
             return parent::scriptBlock($script, $options);
