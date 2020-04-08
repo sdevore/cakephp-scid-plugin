@@ -168,7 +168,7 @@
                         $card->setExpirationDate($entity->expiration_date);
                     }
                 }
-                else if (!empty($entity->expMonth) && !empty($entity->expYear)) {
+                elseif (!empty($entity->expMonth) && !empty($entity->expYear)) {
                     $month = $entity->expMonth;
                     $year = $entity->expYear;
                     $date = new FrozenDate();
