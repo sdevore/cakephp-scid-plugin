@@ -30,7 +30,7 @@
         "element-ui": "^2.13.2",
         "flatpickr": "^4.5",
         "jquery": "^3.5.1",
-        "jquery-awesome-cursor": "^0.3",
+        "jquery-awesome-cursor": "^0.3.1",
         "jquery-mask-plugin": "^1.14.16",
         "jquery-ui": "^1.12.1",
         "jsignature": "^2.1",
@@ -39,7 +39,7 @@
         "select2": "^4.0.13",
         "signature_pad": "^2.3.2",
         "sticky-sidebar": "^3.3.1",
-        "timepicker": "^1.13.11",
+        "timepicker": "^1.11.14",
         "vue": "^2.6.11"
     }
 }
