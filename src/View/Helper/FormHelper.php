@@ -380,6 +380,16 @@ CHECKBOX_LIMIT;
 
                 }
                 return $options;
+            case 'money2':
+                $options = $this->injectClasses('money2', $options);
+                if (!in_array('money2', $this->_dataMaskType)) {
+                    $script = "$('.money2').mask('#,##0.00', {reverse: true});";
+                    $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
+                    $this->_dataMaskType[] = 'money2';
+
+
+                }
+                return $options;
         }
 
         $id = $options['id'];
