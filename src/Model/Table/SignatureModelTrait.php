@@ -39,6 +39,7 @@
                     $array['tmp_name'] = $file->path;
                     $array['error'] = UPLOAD_ERR_OK;
                     $array['type'] = $mime_type;
+                    $array['mime_type'] = $mime_type;
                     $array['name'] = $fileName;
                     $array['size'] = $file->size();
                 }
