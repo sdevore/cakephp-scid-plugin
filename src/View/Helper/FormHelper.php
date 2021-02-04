@@ -25,6 +25,8 @@ use PHP_CodeSniffer\Generators\HTML;
 class FormHelper extends Helper
 {
 
+    const DOCUMENT_READY_FUNCTION = "$(document).ready(function()";
+    //const DOCUMENT_READY_FUNCTION = "$(document.body).on('vue-mounted', function()";
     public $helpers = ['Url', 'Scid.Html'];
     /**
      * A list of allowed styles for buttons.
@@ -423,7 +425,7 @@ CHECKBOX_LIMIT;
         }
         $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
-        $this->Html->scriptBlock("$(document).ready(function() {
+        $this->Html->scriptBlock(self::DOCUMENT_READY_FUNCTION . " {
         $('#{$id}').daterangepicker({$rangeOptionString}{$callback});
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
 
@@ -518,7 +520,7 @@ CHECKBOX_LIMIT;
 
         $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
-        $this->Html->scriptBlock("$(document).ready(function() {
+        $this->Html->scriptBlock(self::DOCUMENT_READY_FUNCTION . " {
         $('#{$id}').daterangepicker({$rangeOptionString});
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM]);
 
@@ -643,7 +645,7 @@ TIMEPICKER;
             unset($options['timepicker']);
         }
         $json = json_encode($json);
-        $this->Html->scriptBlock("$(document).ready(function() {
+        $this->Html->scriptBlock(self::DOCUMENT_READY_FUNCTION . " {
         $('#{$id}').timepicker({$json});
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
 
@@ -688,7 +690,7 @@ TIMEPICKER;
         $defaultRangeOptions = ['autoApply' => TRUE];
         $rangeOptionString = $this->__rangeOptions($options, $defaultRangeOptions);
 
-        $this->Html->scriptBlock("$(document).ready(function() {
+        $this->Html->scriptBlock(self::DOCUMENT_READY_FUNCTION . " {
         $('#{$id}').daterangepicker({$rangeOptionString});
     });", ['block' => HtmlHelper::SCRIPT_BOTTOM,]);
 
@@ -793,7 +795,7 @@ EXPAND;
             if (!empty($options['id'])) {
                 $id = $options['id'];
             }
-            $script = "$(document).ready(function(){
+            $script = self::DOCUMENT_READY_FUNCTION . "{
                         $('select#${id}').change(function(){
                             $(this).find('option:selected').each(function(){
                                 var optionValue = $(this).attr('value');
@@ -846,14 +848,14 @@ EXPAND;
         }
         $selectOptions = json_encode($selectOptions);
         if ($useClass && !$this->_hasSelect2Added) {
-            $script = "$(document).ready(function() {
+            $script =  self::DOCUMENT_READY_FUNCTION . " {
     $('.select2').select2({$selectOptions});
 });";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $this->_hasSelect2Added = TRUE;
         } else {
 
-            $script = "$(document).ready(function() {
+            $script = self::DOCUMENT_READY_FUNCTION . " {
     $('#{$id}').select2({$selectOptions});
 });";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
@@ -879,8 +881,8 @@ EXPAND;
         }
         $selectOptions = json_encode($selectOptions);
         if ($useClass && !$this->_hasSelect2Added) {
-            $script = <<<SELECT_2_SORTABLE_USE
-$(document).ready(function() {
+            $script = self::DOCUMENT_READY_FUNCTION . <<<SELECT_2_SORTABLE_USE
+{
     $('#{$id}').select2({$selectOptions});
 
 
@@ -913,7 +915,7 @@ SELECT_2_SORTABLE_USE;
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
             $this->_hasSelect2Added = TRUE;
         } else {
-            $script = "$(document).ready(function() {
+            $script = self::DOCUMENT_READY_FUNCTION . " {
     $('#{$id}').select2({$selectOptions});
 });";
             $this->Html->scriptBlock($script, ['block' => HtmlHelper::SCRIPT_BOTTOM]);
@@ -1570,7 +1572,7 @@ CHECK_ALL_SCRIPT;
         $options['after'] =
             '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>' . $options['after'];
         $options['type'] = 'text';
-        $this->Html->scriptBlock("$(document).ready(function() {
+        $this->Html->scriptBlock(self::DOCUMENT_READY_FUNCTION . " {
         $('#{$idForInput}').datetimepicker({
         pickTime: true
         });
@@ -1597,7 +1599,7 @@ CHECK_ALL_SCRIPT;
         $options['after'] =
             '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>' . $options['after'];
         $options['type'] = 'text';
-        $this->Html->scriptBlock("$(document).ready(function() {
+        $this->Html->scriptBlock(self::DOCUMENT_READY_FUNCTION . " {
         $('#{$idForInput}').datetimepicker({
         pickTime: false,
         format: 'MM/YYYY'
@@ -1625,7 +1627,7 @@ CHECK_ALL_SCRIPT;
         $options['after'] =
             '<span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>' . $options['after'];
         $options['type'] = 'text';
-        $this->Html->scriptBlock("$(document).ready(function() {
+        $this->Html->scriptBlock(self::DOCUMENT_READY_FUNCTION . " {
         $('#{$idForInput}').datetimepicker({
                     pickDate: false,
                     minuteStepping:15,
