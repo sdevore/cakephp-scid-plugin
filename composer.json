@@ -6,7 +6,7 @@
     "require": {
         "php": ">=7.0.0",
         "authorizenet/authorizenet": "^2.0",
-        "cakephp/cakephp": ">=3.3.2 <4.0.0",
+        "cakephp/cakephp": ">=3.8.0 <4.0.0",
         "cebe/markdown": "*",
         "friendsofcake/bootstrap-ui": "^1.4",
         "fzaninotto/faker": "^1.7",
