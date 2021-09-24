@@ -1,37 +1,43 @@
 {
-  "name": "sdevore/cakephp-scid-plugin",
-  "type": "cakephp-plugin",
-  "description": "Scid plugin for CakePHP",
-  "license": "MIT",
-  "require": {
-    "php": ">=7.0.0",
-    "cakephp/cakephp": ">=3.3.2 <4.0.0",
-    "cebe/markdown": "*",
-    "friendsofcake/bootstrap-ui": "dev-master",
-    "fzaninotto/faker": "^1.7",
-    "gourmet/email": "~3.0",
-    "picqer/php-barcode-generator": "^0.2.2",
-    "tijsverkoyen/css-to-inline-styles": "^2.2"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "*"
-  },
-  "suggest": {
-    "dereuromark/cakephp-ide-helper": "annotate classes and views to work better with autocomplete in IDE",
-    "lavary/crunz": "useful for scheduling"
-  },
-  "config": {
-    "sort-packages": true
-  },
-  "autoload": {
-    "psr-4": {
-      "Scid\\": "src"
+    "name": "sdevore/cakephp-scid-plugin",
+    "type": "cakephp-plugin",
+    "description": "Scid plugin for CakePHP",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.0.0",
+        "authorizenet/authorizenet": "^2.0",
+        "cakephp/cakephp": ">=3.8.0 <4.0.0",
+        "cebe/markdown": "*",
+        "friendsofcake/bootstrap-ui": "^1.4",
+        "fzaninotto/faker": "^1.7",
+        "gourmet/email": "~3.0",
+        "mikehaertl/php-pdftk": "^0.5.0",
+        "moneyphp/money": "^3.1.0",
+        "muffin/trash": "^2.1",
+        "oomphinc/composer-installers-extender": "^1.1",
+        "picqer/php-barcode-generator": "^0.2.2",
+        "tijsverkoyen/css-to-inline-styles": "^2.2",
+        "twbs/bootstrap": "^4.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "suggest": {
+        "dereuromark/cakephp-ide-helper": "annotate classes and views to work better with autocomplete in IDE",
+        "lavary/crunz": "useful for scheduling"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Scid\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Scid\\Test\\": "tests",
+            "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
+        }
     }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Scid\\Test\\": "tests",
-      "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
-    }
-  }
 }
