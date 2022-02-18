@@ -351,24 +351,3 @@
         }
     }
 
-    interface ScidPaymentsInterface
-    {
-
-        const TRANSACTION_ID_PREFIX_KEY = 'id-prefix';
-        const TRANSACTION_TRANSACTION_KEY_KEY = 'transaction-key';
-        const TRANSACTION_TYPE_KEY = 'transactionType';
-        const TRANSACTION_TYPE_AUTHORIZE = 'authOnlyTransaction';
-        const TRANSACTION_TYPE_AUTH_CAPTURE = 'authCaptureTransaction';
-        const TRANSACTION_TYPE_CAPTURE = 'priorAuthCaptureTransaction';
-        const TRANSACTION_TYPE_VOID = 'voidTransaction';
-        const TRANSACTION_TYPE_REFUND = 'refundTransaction';
-
-        const STATE_PENDING = 'Pending';
-        const STATE_APPROVED = 'Approved';
-        const STATE_FAILED = 'Failed';
-        const STATE_CAPTURED = 'Captured';
-        const STATE_SETTLED = 'Settled';
-        const STATE_VOIDED = 'Voided';
-        const STATE_REFUNDED = 'Refunded';
-
-    }

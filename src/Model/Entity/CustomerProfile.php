@@ -20,6 +20,7 @@ use net\authorize\api\controller as AnetController;
  * @property \App\Model\Entity\Member $member
  * @property \Scid\Model\Entity\Profile $profile
  * @property \Scid\Model\Entity\PaymentProfile[] $payment_profiles
+ * @property \Cake\I18n\FrozenTime|null $deleted
  */
 class CustomerProfile extends Entity
 {

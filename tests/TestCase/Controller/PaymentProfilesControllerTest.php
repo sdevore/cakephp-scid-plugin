@@ -6,6 +6,8 @@ use Scid\Controller\PaymentProfilesController;
 
 /**
  * Scid\Controller\PaymentProfilesController Test Case
+ *
+ * @uses \Scid\Controller\PaymentProfilesController
  */
 class PaymentProfilesControllerTest extends IntegrationTestCase
 {

@@ -56,8 +56,13 @@
      * @property string                             $card_number
      * @property string                             $expiration_date
      * @property string                             $card_type
-     * @property \Cake\ORM\Entity                   $member
+     * @property \App\Model\Entity\Member $member
      * @property \Scid\Model\Entity\CustomerProfile $customer_profile
+ * @property \Cake\I18n\FrozenTime|null $deleted
+ * @property mixed $name
+ * @property mixed $number
+ * @property \Cake\I18n\FrozenDate|null $expiration
+ * @property string $exp_date
      */
     class PaymentProfile extends Entity
     {

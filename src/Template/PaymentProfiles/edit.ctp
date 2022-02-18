@@ -2,6 +2,8 @@
 /**
  * @var \App\View\AppView $this
  * @var \Scid\Model\Entity\PaymentProfile $paymentProfile
+ * @var mixed $customerProfiles
+ * @var mixed $members
  */
 ?>
 <nav class="large-3 medium-4 columns" id="actions-sidebar">

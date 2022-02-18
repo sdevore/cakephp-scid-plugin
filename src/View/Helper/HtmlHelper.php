@@ -333,6 +333,7 @@ DRIVER_TOUR_BLOCK;
             Configure::write($SCID_CSS_PATHS, $existingPaths);
         }
 
+
         private function __useFullBase() {
             $view = $this->_View;
             $request = $view->request;
@@ -1122,7 +1123,7 @@ ENABLETOOLTIP;
                 if (is_array($options)) {
                     $keys = array_keys($options);
                     foreach ($keys as $key) {
-                        if (in_array($key[0], ['@', ':'])) {
+                        if (is_array($key) && in_array($key[0], ['@', ':'])) {
                             $addVue = TRUE;
                         }
                         else if (substr($key, 0, 5) == 'v-on:' || substr($key, 0, 7) == 'v-bind:') {
@@ -1166,7 +1167,7 @@ ENABLETOOLTIP;
                 <<<TOGGLE_HEADING_ICON
 var atag = document.querySelector('#{$id}');
 atag.addEventListener('click', function () {
-    var elem = document.querySelector('{$id} .svg-inline--fa');
+    var elem = document.querySelector('#{$id} .svg-inline--fa');
     elem.classList.toggle("{$up}");
     elem.classList.toggle("{$down}");
 });

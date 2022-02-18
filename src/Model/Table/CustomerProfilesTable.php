@@ -16,20 +16,21 @@
     /**
      * CustomerProfiles Model
      *
-     * @property \App\Model\Table\MembersTable|\Cake\ORM\Association\BelongsTo        $Members
+     * @property \App\Model\Table\MembersTable&\Cake\ORM\Association\BelongsTo $Members
      * @property \Scid\Model\Table\ProfilesTable|\Cake\ORM\Association\BelongsTo      $Profiles
      *
      * @method \Scid\Model\Entity\CustomerProfile get($primaryKey, $options = [])
-     * @method \Scid\Model\Entity\CustomerProfile newEntity($data = NULL, array $options = [])
+     * @method \Scid\Model\Entity\CustomerProfile newEntity($data = null, array $options = [])
      * @method \Scid\Model\Entity\CustomerProfile[] newEntities(array $data, array $options = [])
-     * @method \Scid\Model\Entity\CustomerProfile|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
-     * @method \Scid\Model\Entity\CustomerProfile|bool saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+     * @method \Scid\Model\Entity\CustomerProfile|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
+     * @method \Scid\Model\Entity\CustomerProfile saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
      * @method \Scid\Model\Entity\CustomerProfile patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
      * @method \Scid\Model\Entity\CustomerProfile[] patchEntities($entities, array $data, array $options = [])
-     * @method \Scid\Model\Entity\CustomerProfile findOrCreate($search, callable $callback = NULL, $options = [])
+     * @method \Scid\Model\Entity\CustomerProfile findOrCreate($search, callable $callback = null, $options = [])
      *
      * @mixin \Cake\ORM\Behavior\TimestampBehavior
-     * @property \Scid\Model\Table\PaymentProfilesTable|\Cake\ORM\Association\HasMany $PaymentProfiles
+     * @property \Scid\Model\Table\PaymentProfilesTable&\Cake\ORM\Association\HasMany $PaymentProfiles
+ * @mixin \Muffin\Trash\Model\Behavior\TrashBehavior
      */
     class CustomerProfilesTable extends Table
     {

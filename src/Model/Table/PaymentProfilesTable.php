@@ -17,21 +17,22 @@
     /**
      * PaymentProfiles Model
      *
-     * @property \Cake\ORM\Table|\Cake\ORM\Association\BelongsTo                         $Members
-     * @property \Scid\Model\Table\CustomerProfilesTable|\Cake\ORM\Association\BelongsTo $CustomerProfiles
+     * @property \App\Model\Table\MembersTable&\Cake\ORM\Association\BelongsTo $Members
+     * @property \Scid\Model\Table\CustomerProfilesTable&\Cake\ORM\Association\BelongsTo $CustomerProfiles
      * @property \Scid\Model\Table\PaymentProfilesTable|\Cake\ORM\Association\BelongsTo  $PaymentProfiles
      *
      * @method \Scid\Model\Entity\PaymentProfile get($primaryKey, $options = [])
-     * @method \Scid\Model\Entity\PaymentProfile newEntity($data = NULL, array $options = [])
+     * @method \Scid\Model\Entity\PaymentProfile newEntity($data = null, array $options = [])
      * @method \Scid\Model\Entity\PaymentProfile[] newEntities(array $data, array $options = [])
-     * @method \Scid\Model\Entity\PaymentProfile|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
-     * @method \Scid\Model\Entity\PaymentProfile|bool saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+     * @method \Scid\Model\Entity\PaymentProfile|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
+     * @method \Scid\Model\Entity\PaymentProfile saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
      * @method \Scid\Model\Entity\PaymentProfile patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
      * @method \Scid\Model\Entity\PaymentProfile[] patchEntities($entities, array $data, array $options = [])
-     * @method \Scid\Model\Entity\PaymentProfile findOrCreate($search, callable $callback = NULL, $options = [])
+     * @method \Scid\Model\Entity\PaymentProfile findOrCreate($search, callable $callback = null, $options = [])
      *
      * @mixin \Cake\ORM\Behavior\TimestampBehavior
      * @mixin \Tools\Model\Behavior\ToggleBehavior
+ * @mixin \Muffin\Trash\Model\Behavior\TrashBehavior
      */
     class PaymentProfilesTable extends Table
     {
