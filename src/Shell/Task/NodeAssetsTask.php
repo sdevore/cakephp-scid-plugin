@@ -87,30 +87,34 @@
                 $dir = NULL;
                 /** @var \Cake\Filesystem\Folder $parent */
                 $parent = $file->folder();
-                if (!$parent->inPath($scss)) {
-                    if ($parent->inPath($sprites)) {
-                        $dir = $this->_spritesDir;
-                    }
-                    else if ($parent->inPath($webfonts)) {
-                        $dir = $this->_webfontsDir;
-                    }
-                    else if ($parent->inPath($svgs)) {
-                        $pInfo = pathinfo($parent->path);
-                        $dir = new Folder(Folder::addPathElement($this->_svgsDir->path, $pInfo['basename']));
-                    }
-                    else if (preg_match('/.css/', $file->name)) {
-                        $dir = $this->_cssDir;
-                    }
-                    else if (preg_match('/.js|.min.map/', $file->name)) {
-                        $dir = $this->_jsDir;
-                    }
-                }
                 try {
-                    if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
-                        $this->success($file->name . ' successfully copied.', 1, ConsoleIo::VERBOSE);
+                    if (!$parent->inPath($scss)) {
+                        if ($parent->inPath($sprites)) {
+                            $dir = $this->_spritesDir;
+                        }
+                        elseif ($parent->inPath($webfonts)) {
+                            $dir = $this->_webfontsDir;
+                        }
+                        elseif ($parent->inPath($svgs)) {
+                            $pInfo = pathinfo($parent->path);
+                            $dir = new Folder(Folder::addPathElement($this->_svgsDir->path, $pInfo['basename']));
+                        }
+                        elseif (preg_match('/.css/', $file->name)) {
+                            $dir = $this->_cssDir;
+                        }
+                        elseif (preg_match('/.js|.min.map/', $file->name)) {
+                            $dir = $this->_jsDir;
+                        }
                     }
-                    else {
-                        $this->info($file->name . ' will not be copied.', 1, ConsoleIo::VERBOSE);
+                    try {
+                        if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
+                            $this->success($file->name . ' successfully copied.', 1, ConsoleIo::VERBOSE);
+                        }
+                        else {
+                            $this->info($file->name . ' will not be copied.', 1, ConsoleIo::VERBOSE);
+                        }
+                    } catch (\Exception $exception) {
+                        $this->info($file->name . ' will not be copied. Exception: ' . $exception->getMessage(), 1, ConsoleIo::VERBOSE);
                     }
                 } catch (\Exception $exception) {
                     $this->info($file->name . ' will not be copied. Exception: ' . $exception->getMessage(), 1, ConsoleIo::VERBOSE);
@@ -156,7 +160,12 @@
                     $files[] = new File($file);
                 }
             }
-            $this->_copy($files);
+            try {
+                $this->_copy($files);
+            } catch (\Exception $exception) {
+                $this->info('Some did not copy. Exception: ' . $exception->getMessage(), 1, ConsoleIo::VERBOSE);
+            }
+
         }
 
         /**

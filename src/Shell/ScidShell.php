@@ -31,7 +31,7 @@ class ScidShell extends Shell
         $this->NodeAssets->perserveNodeModules(['bootstrap']);
         $this->NodeAssets->cleanAssets();
         $this->Assets->remove('Scid');
-        $this->Assets->symlink('Scid');
+        @$this->Assets->symlink('Scid');
     }
 
 
