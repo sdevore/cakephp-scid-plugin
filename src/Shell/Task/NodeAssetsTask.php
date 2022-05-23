@@ -106,7 +106,7 @@
                     }
                 }
                 try {
-                    if (!empty($dir) && $file->copy($dir->path . DS . $file->name)) {
+                    if (!empty($dir) && !file_exists($dir->path . DS . $file->name) && @$file->copy($dir->path . DS . $file->name)) {
                         $this->success($file->name . ' successfully copied.', 1, ConsoleIo::VERBOSE);
                     }
                     else {
