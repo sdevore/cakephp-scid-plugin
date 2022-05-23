@@ -87,21 +87,22 @@
                 $dir = NULL;
                 /** @var \Cake\Filesystem\Folder $parent */
                 $parent = $file->folder();
+                try {
                 if (!$parent->inPath($scss)) {
                     if ($parent->inPath($sprites)) {
                         $dir = $this->_spritesDir;
                     }
-                    else if ($parent->inPath($webfonts)) {
+                        elseif ($parent->inPath($webfonts)) {
                         $dir = $this->_webfontsDir;
                     }
-                    else if ($parent->inPath($svgs)) {
+                        elseif ($parent->inPath($svgs)) {
                         $pInfo = pathinfo($parent->path);
                         $dir = new Folder(Folder::addPathElement($this->_svgsDir->path, $pInfo['basename']));
                     }
-                    else if (preg_match('/.css/', $file->name)) {
+                        elseif (preg_match('/.css/', $file->name)) {
                         $dir = $this->_cssDir;
                     }
-                    else if (preg_match('/.js|.min.map/', $file->name)) {
+                        elseif (preg_match('/.js|.min.map/', $file->name)) {
                         $dir = $this->_jsDir;
                     }
                 }
@@ -156,7 +157,12 @@
                     $files[] = new File($file);
                 }
             }
+            try {
             $this->_copy($files);
+            } catch (\Exception $exception) {
+                $this->info('Some did not copy. Exception: ' . $exception->getMessage(), 1, ConsoleIo::VERBOSE);
+            }
+
         }
 
         /**
