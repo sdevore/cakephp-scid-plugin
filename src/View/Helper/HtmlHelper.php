@@ -336,7 +336,7 @@ DRIVER_TOUR_BLOCK;
 
         private function __useFullBase() {
             $view = $this->_View;
-            $request = $view->request;
+            $request = $view->getRequest();
             if ($request->is(['pdf'])) {
                 return TRUE;
             }
