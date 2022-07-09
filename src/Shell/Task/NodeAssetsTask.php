@@ -97,7 +97,7 @@
                     }
                         elseif ($parent->inPath($svgs)) {
                         $pInfo = pathinfo($parent->path);
-                        $dir = new Folder(Folder::addPathElement($this->_svgsDir->path, $pInfo['basename']));
+                        $dir = new Folder(Folder::addPathElement($this->_svgsDir->path, $pInfo['basename']), true);
                     }
                         elseif (preg_match('/.css/', $file->name)) {
                         $dir = $this->_cssDir;
