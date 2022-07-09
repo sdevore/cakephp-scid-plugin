@@ -87,7 +87,7 @@
                 $dir = NULL;
                 /** @var \Cake\Filesystem\Folder $parent */
                 $parent = $file->folder();
-                try {
+                
                 if (!$parent->inPath($scss)) {
                     if ($parent->inPath($sprites)) {
                         $dir = $this->_spritesDir;
