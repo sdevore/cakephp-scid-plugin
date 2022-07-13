@@ -32,7 +32,7 @@
         "jquery": "^3.5.1",
         "jquery-awesome-cursor": "^0.3.1",
         "jquery-mask-plugin": "^1.14.16",
-        "jquery-ui": "^1.12.1",
+        "jquery-ui": "^1.13.0",
         "jsignature": "^2.1",
         "markitup": "^3.0.0-0",
         "popper.js": "^1.16.1",
