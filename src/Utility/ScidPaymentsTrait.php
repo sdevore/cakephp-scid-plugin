@@ -314,7 +314,7 @@
                             }
                         }
                         else {
-                            $entity->setError('default', $codeMap->description);
+                            $entity->setError('default', !empty($codeMap->description)?$codeMap->description:'unknown error');
                         }
                     }
             }
