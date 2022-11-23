@@ -80,6 +80,7 @@ trait DatePickerTrait
         if ($modelKey == $key) {
             if (is_string($value)) {
                 try {
+                    $s = Date::parse($value);
                     $data[$key] = Date::parse($value);
                 }
                 catch (\Exception $e) {

@@ -14,7 +14,7 @@
         "mikehaertl/php-pdftk": "^0.5.0",
         "moneyphp/money": "^3.1.0",
         "muffin/trash": "^2.1",
-        "oomphinc/composer-installers-extender": "^1.1",
+
         "picqer/php-barcode-generator": "^0.2.2",
         "tijsverkoyen/css-to-inline-styles": "^2.2",
         "twbs/bootstrap": "^4.3"
