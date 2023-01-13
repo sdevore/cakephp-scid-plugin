@@ -26,7 +26,7 @@
 
         /**
          * @param       $boolean
-         * @param array $options
+         * @param array $options 'type' option can include 'icon, checkbox, yes-no' default is icon
          */
         public function boolean($boolean, $options = ['type' => 'icon']) {
             if (empty($options['type'])) {
