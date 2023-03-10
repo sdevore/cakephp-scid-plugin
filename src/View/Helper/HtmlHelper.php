@@ -199,9 +199,14 @@
                 <<<ANIMATED_SCROLL_TO
 $(document).ready(function () {
     // Handler for .ready() called.
+    try {
     $('html, body').animate({
         scrollTop: $('#{$id}').offset().top + {$offset}
     }, 'slow');
+    } catch (e) {
+      // ignore error
+      console.log('element to scroll to #' + $id + 'not found in dom.')
+    }
 });
 ANIMATED_SCROLL_TO;
 
