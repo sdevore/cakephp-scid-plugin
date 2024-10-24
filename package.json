@@ -39,6 +39,6 @@
         "signature_pad": "^2.3.2",
         "sticky-sidebar": "^3.3.1",
         "timepicker": "^1.11.14",
-        "vue": "^2.6.11"
+        "vue": "^3.0.0"
     }
 }
